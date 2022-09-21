@@ -15,23 +15,88 @@
           <div class="aside-user-desc-name">伤心太平洋</div>
           <div class="aside-user-desc-signature">
             我只爱你 You are my only 我只爱你 You are my only 我只爱你 You are
-            my only 我只爱你 You are my only 我只爱你 You are my only 我只爱你 You are
-              my only 我只爱你 You are my only 我只爱你 You are my only 我只爱你 You are
-              my only
+            my only 我只爱你 You are my only 我只爱你 You are my only 我只爱你
+            You are my only 我只爱你 You are my only 我只爱你 You are my only
+            我只爱你 You are my only
           </div>
         </div>
       </div>
-
-
 
       <div class="aside-search">
         <input type="text" class="aside-search-input" />
         <div class="aside-search-button">搜索</div>
       </div>
 
+      <div class="aside-talkblock">
 
 
-      <div class="aside-talkblock"></div>
+        <div class="aside-talkblock-talkitem">
+          <div class="aside-user-profilepicture" style="left: 40px"></div>
+          <div class="aside-user-desc" style="margin-left: 50px; width: 400px">
+            <div class="aside-user-desc-name">夕阳的刻痕</div>
+            <div class="aside-user-desc-signature">你要好好上课啊</div>
+          </div>
+          <div class="aside-talkblock-talkitem-right">
+            <div class="aside-talkblock-talkitem-right-isread"></div>
+            <div class="aside-talkblock-talkitem-right-time">12:27</div>
+          </div>
+        </div>
+        
+        <div class="aside-talkblock-talkitem">
+          <div class="aside-user-profilepicture" style="left: 40px"></div>
+          <div class="aside-user-desc" style="margin-left: 50px; width: 400px">
+            <div class="aside-user-desc-name">夕阳的刻痕</div>
+            <div class="aside-user-desc-signature">你要好好上课啊</div>
+          </div>
+          <div class="aside-talkblock-talkitem-right">
+            <div class="aside-talkblock-talkitem-right-isread"></div>
+            <div class="aside-talkblock-talkitem-right-time">12:27</div>
+          </div>
+        </div>
+
+        <div class="aside-talkblock-talkitem">
+          <div class="aside-user-profilepicture" style="left: 40px"></div>
+          <div class="aside-user-desc" style="margin-left: 50px; width: 400px">
+            <div class="aside-user-desc-name">夕阳的刻痕</div>
+            <div class="aside-user-desc-signature">你要好好上课啊</div>
+          </div>
+          <div class="aside-talkblock-talkitem-right">
+            <div class="aside-talkblock-talkitem-right-isread"></div>
+            <div class="aside-talkblock-talkitem-right-time">12:27</div>
+          </div>
+        </div>
+
+        <div class="aside-talkblock-talkitem">
+          <div class="aside-user-profilepicture" style="left: 40px"></div>
+          <div class="aside-user-desc" style="margin-left: 50px; width: 400px">
+            <div class="aside-user-desc-name">夕阳的刻痕</div>
+            <div class="aside-user-desc-signature">你要好好上课啊</div>
+          </div>
+          <div class="aside-talkblock-talkitem-right">
+            <div class="aside-talkblock-talkitem-right-isread"></div>
+            <div class="aside-talkblock-talkitem-right-time">12:27</div>
+          </div>
+        </div>
+
+        <div class="aside-talkblock-talkitem">
+          <div class="aside-user-profilepicture" style="left: 40px"></div>
+          <div class="aside-user-desc" style="margin-left: 50px; width: 400px">
+            <div class="aside-user-desc-name">夕阳的刻痕</div>
+            <div class="aside-user-desc-signature">你要好好上课啊</div>
+          </div>
+          <div class="aside-talkblock-talkitem-right">
+            <div class="aside-talkblock-talkitem-right-isread"></div>
+            <div class="aside-talkblock-talkitem-right-time">12:27</div>
+          </div>
+        </div>
+
+
+
+
+
+
+      </div>
+
       <div class="aside-talkblockbottom">
         <div class="aside-talkblockbottom-operation">
           <div class="aside-talkblockbottom-operation-cloud">词云</div>
@@ -41,41 +106,93 @@
     </div>
 
     <div class="maintalk">
-
-
       <div class="maintalk-header">
         <div class="maintalk-header-desc">
-          <div class="aside-user-profilepicture" style="left:60px"></div>
-          <div class="aside-user-desc" style="left:180px">
+          <div class="aside-user-profilepicture" style="left: 60px"></div>
+          <div class="aside-user-desc" style="left: 180px">
             <div class="aside-user-desc-name">伤心太平洋</div>
             <div class="aside-user-desc-signature">
               我只爱你 You are my only 我只爱你 You are my only 我只爱你 You are
-              my only 我只爱你 You are my only 我只爱你 You are my only 我只爱你 You are
-              my only 我只爱你 You are my only 我只爱你 You are my only 我只爱你 You are
-              my only
+              my only 我只爱你 You are my only 我只爱你 You are my only 我只爱你
+              You are my only 我只爱你 You are my only 我只爱你 You are my only
+              我只爱你 You are my only
             </div>
           </div>
         </div>
       </div>
 
+      <div class="maintalk-main">
+        <div class="maintalk-main-talkitem">
+          <div class="isFri">
+            <div class="maintalk-main-talkitem-time">12:30</div>
+            <div class="maintalk-main-talkitem-content">你干嘛</div>
+          </div>
+        </div>
 
-      <div class="maintalk-main"></div>
+        <div class="maintalk-main-talkitem">
+          <div class="isMe">
+            <div class="maintalk-main-talkitem-time">12:30</div>
+            <div class="maintalk-main-talkitem-content">你干嘛</div>
+          </div>
+        </div>
 
-      <div class="maintalk-footer">
+        <div class="maintalk-main-talkitem">
+          <div class="isFri">
+            <div class="maintalk-main-talkitem-time">12:30</div>
+            <div class="maintalk-main-talkitem-content">你好烦</div>
+          </div>
+        </div>
 
-
-        <div class="maintalk-footer-header">
-            <div class="maintalk-footer-header-expression"></div>
-            <div class="maintalk-footer-header-expression"></div>
-            <div class="maintalk-footer-header-expression"></div>
-
-            <div class="maintalk-footer-header-send">发送</div>
+        <div class="maintalk-main-talkitem">
+          <div class="isMe">
+            <div class="maintalk-main-talkitem-time">12:30</div>
+            <div class="maintalk-main-talkitem-content">你好烦</div>
+          </div>
         </div>
 
 
-        <textarea class="maintalk-footer-input"></textarea>
+        <div class="maintalk-main-talkitem">
+          <div class="isFri">
+            <div class="maintalk-main-talkitem-time">12:30</div>
+            <div class="maintalk-main-talkitem-content">你干嘛</div>
+          </div>
+        </div>
+
+        <div class="maintalk-main-talkitem">
+          <div class="isMe">
+            <div class="maintalk-main-talkitem-time">12:30</div>
+            <div class="maintalk-main-talkitem-content">你干嘛</div>
+          </div>
+        </div>
+
+        <div class="maintalk-main-talkitem">
+          <div class="isFri">
+            <div class="maintalk-main-talkitem-time">12:30</div>
+            <div class="maintalk-main-talkitem-content">你好烦</div>
+          </div>
+        </div>
+
+        <div class="maintalk-main-talkitem">
+          <div class="isMe">
+            <div class="maintalk-main-talkitem-time">12:30</div>
+            <div class="maintalk-main-talkitem-content">你好烦</div>
+          </div>
+        </div>
+
+        
       </div>
 
+      <div class="maintalk-footer">
+        <div class="maintalk-footer-header">
+          <div class="maintalk-footer-header-expression"></div>
+          <div class="maintalk-footer-header-expression"></div>
+          <div class="maintalk-footer-header-expression"></div>
+
+          <div class="maintalk-footer-header-send">发送</div>
+        </div>
+
+        <textarea class="maintalk-footer-input"></textarea>
+      </div>
     </div>
   </div>
 </template>
@@ -210,6 +327,30 @@ export default {};
   margin-top: 30px;
   box-sizing: border-box;
   border: 1px solid black;
+
+  overflow-y: scroll;
+}
+.aside-talkblock-talkitem {
+  position: relative;
+  height: 200px;
+  width: 100%;
+  border-bottom: 1px solid black;
+  cursor: pointer;
+}
+.aside-talkblock-talkitem-right {
+  width: 150px;
+  height: 100%;
+  position: relative;
+  float: right;
+  margin-right: 30px;
+}
+.aside-talkblock-talkitem-right-isread {
+  position: absolute;
+  top: 40%;
+}
+.aside-talkblock-talkitem-right-time {
+  position: absolute;
+  top: 60%;
 }
 .aside-talkblockbottom {
   height: 40px;
@@ -265,6 +406,26 @@ export default {};
   width: 100%;
   border-bottom: 1px solid black;
   box-sizing: border-box;
+  overflow: scroll;
+}
+.maintalk-main-talkitem{
+  width: 100%;
+  box-sizing: border-box;
+  padding: 50px;
+}
+.maintalk-main-talkitem-time{
+
+}
+.maintalk-main-talkitem-content{
+
+}
+
+.isMe{
+
+}
+.isFri{
+
+  text-align: right;
 }
 .maintalk-footer {
   height: 20%;
@@ -277,36 +438,36 @@ export default {};
   box-sizing: border-box;
   border-bottom: 1px solid black;
 }
-.maintalk-footer-header-expression{
-    height: 100%;
-    width: 5%;
-    box-sizing: border-box;
-    border-right: 1px solid black;
-    cursor: pointer;
+.maintalk-footer-header-expression {
+  height: 100%;
+  width: 5%;
+  box-sizing: border-box;
+  border-right: 1px solid black;
+  cursor: pointer;
 
-    display: inline-block;
+  display: inline-block;
 }
-.maintalk-footer-header-send{
-    background-color: #CCCCFF;
-    text-align: center;
-    height: 100%;
-    width: 10%;
-    box-sizing: border-box;
-    border-left: 1px solid black;
-    cursor: pointer;
+.maintalk-footer-header-send {
+  background-color: #ccccff;
+  text-align: center;
+  height: 100%;
+  width: 10%;
+  box-sizing: border-box;
+  border-left: 1px solid black;
+  cursor: pointer;
 
-    float: right;
-    line-height: 55px;
+  float: right;
+  line-height: 55px;
 }
 .maintalk-footer-input {
-    width: 100%;
-    height: 70%;
-    box-sizing: border-box;
+  width: 100%;
+  height: 70%;
+  box-sizing: border-box;
 
-    outline: none;
-    border: 0;
+  outline: none;
+  border: 0;
 
-    font-size: 20px;
-    padding: 10px;
+  font-size: 20px;
+  padding: 10px;
 }
 </style>
