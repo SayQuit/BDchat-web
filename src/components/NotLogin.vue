@@ -22,10 +22,14 @@
         </div>
       </div>
 
+
+
       <div class="aside-search">
         <input type="text" class="aside-search-input" />
         <div class="aside-search-button">搜索</div>
       </div>
+
+
 
       <div class="aside-talkblock"></div>
       <div class="aside-talkblockbottom">
@@ -37,10 +41,10 @@
     </div>
 
     <div class="maintalk">
+
+
       <div class="maintalk-header">
         <div class="maintalk-header-desc">
-
-
           <div class="aside-user-profilepicture" style="left:60px"></div>
           <div class="aside-user-desc" style="left:180px">
             <div class="aside-user-desc-name">伤心太平洋</div>
@@ -51,10 +55,27 @@
               my only
             </div>
           </div>
-
-
         </div>
       </div>
+
+
+      <div class="maintalk-main"></div>
+
+      <div class="maintalk-footer">
+
+
+        <div class="maintalk-footer-header">
+            <div class="maintalk-footer-header-expression"></div>
+            <div class="maintalk-footer-header-expression"></div>
+            <div class="maintalk-footer-header-expression"></div>
+
+            <div class="maintalk-footer-header-send">发送</div>
+        </div>
+
+
+        <textarea class="maintalk-footer-input"></textarea>
+      </div>
+
     </div>
   </div>
 </template>
@@ -228,6 +249,7 @@ export default {};
   height: 20%;
   width: 100%;
   border-bottom: 1px solid black;
+  box-sizing: border-box;
 }
 .maintalk-header-desc {
   height: 100%;
@@ -236,5 +258,55 @@ export default {};
   border-right: 1px solid black;
 
   position: relative;
+}
+
+.maintalk-main {
+  height: 60%;
+  width: 100%;
+  border-bottom: 1px solid black;
+  box-sizing: border-box;
+}
+.maintalk-footer {
+  height: 20%;
+  width: 100%;
+  box-sizing: border-box;
+}
+.maintalk-footer-header {
+  height: 30%;
+  width: 100%;
+  box-sizing: border-box;
+  border-bottom: 1px solid black;
+}
+.maintalk-footer-header-expression{
+    height: 100%;
+    width: 5%;
+    box-sizing: border-box;
+    border-right: 1px solid black;
+    cursor: pointer;
+
+    display: inline-block;
+}
+.maintalk-footer-header-send{
+    background-color: #CCCCFF;
+    text-align: center;
+    height: 100%;
+    width: 10%;
+    box-sizing: border-box;
+    border-left: 1px solid black;
+    cursor: pointer;
+
+    float: right;
+    line-height: 55px;
+}
+.maintalk-footer-input {
+    width: 100%;
+    height: 70%;
+    box-sizing: border-box;
+
+    outline: none;
+    border: 0;
+
+    font-size: 20px;
+    padding: 10px;
 }
 </style>
