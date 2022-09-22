@@ -2,9 +2,8 @@
   <div>
     <div class="header">
       <div class="header-operation">
-        <div class="header-operation-min">-</div>
-        <div class="header-operation-max">□</div>
-        <div class="header-operation-close">×</div>
+        <el-button class="header-operation-min" type="primary">最小化</el-button>
+        <el-button class="header-operation-close" type="danger">退出</el-button>
       </div>
     </div>
 
@@ -204,6 +203,7 @@ export default {};
 <style scoped>
 * {
   font-size: 20px;
+  color:#555;
 }
 .header {
   width: 100%;
@@ -211,9 +211,8 @@ export default {};
 }
 .header-operation {
   height: 100%;
-  width: 210px;
   float: right;
-  margin-right: 20px;
+  margin-right: 30px;
 }
 .header-operation div {
   height: 100%;
@@ -224,13 +223,13 @@ export default {};
   cursor: pointer;
 }
 .header-operation-min {
-  background-color: #fcffca;
+  
 }
 .header-operation-max {
-  background-color: #cafeff;
+  
 }
 .header-operation-close {
-  background-color: #fecccb;
+  
 }
 
 .aside {
@@ -250,7 +249,7 @@ export default {};
   height: 80px;
   width: 80px;
   border-radius: 40px;
-  border: 1px solid black;
+  border: 1px solid #999;
 
   position: absolute;
   top: 50%;
@@ -286,7 +285,7 @@ export default {};
 }
 .aside-search-input {
   outline: none;
-  border: 1px solid black;
+  border: 1px solid #999;;
   vertical-align: top;
 
   width: 65%;
@@ -304,7 +303,7 @@ export default {};
 
   line-height: 40px;
 
-  border: 1px solid black;
+  border: 1px solid #999;;
   border-left: none;
   box-sizing: border-box;
   cursor: pointer;
@@ -317,7 +316,7 @@ export default {};
 
   line-height: 40px;
 
-  border: 1px solid black;
+  border: 1px solid #999;;
   border-left: none;
   box-sizing: border-box;
   cursor: pointer;
@@ -326,16 +325,19 @@ export default {};
   height: 730px;
   margin-top: 30px;
   box-sizing: border-box;
-  border: 1px solid black;
-
+  border: 1px solid #999;
+  border-right: none;
   overflow-y: scroll;
+
 }
 .aside-talkblock-talkitem {
   position: relative;
   height: 200px;
   width: 100%;
-  border-bottom: 1px solid black;
+  border-bottom: 1px solid #999;;
   cursor: pointer;
+
+
 }
 .aside-talkblock-talkitem-right {
   width: 150px;
@@ -354,7 +356,7 @@ export default {};
 }
 .aside-talkblockbottom {
   height: 40px;
-  border: 1px solid black;
+  border: 1px solid #999;;
   border-top: none;
   box-sizing: border-box;
 }
@@ -366,7 +368,7 @@ export default {};
   text-align: center;
   display: inline-block;
   line-height: 40px;
-  border: 1px solid black;
+  border: 1px solid #999;;
   border-top: none;
   border-bottom: none;
   border-right: none;
@@ -379,9 +381,9 @@ export default {};
   margin-left: 20px;
   display: inline-block;
   height: 970px;
-  width: 56.5%;
+  width: 56.3%;
 
-  border: 1px solid black;
+  border: 1px solid #999;;
   box-sizing: border-box;
 
   vertical-align: top;
@@ -389,14 +391,15 @@ export default {};
 .maintalk-header {
   height: 20%;
   width: 100%;
-  border-bottom: 1px solid black;
+  border-bottom: 1px solid #999;;
+
   box-sizing: border-box;
 }
 .maintalk-header-desc {
   height: 100%;
   width: 70%;
 
-  border-right: 1px solid black;
+  border-right: 1px solid #999;;
 
   position: relative;
 }
@@ -404,9 +407,11 @@ export default {};
 .maintalk-main {
   height: 60%;
   width: 100%;
-  border-bottom: 1px solid black;
+  border-bottom: 1px solid #999;;
   box-sizing: border-box;
-  overflow: scroll;
+  
+  border-right: none;
+  overflow-y: scroll;
 }
 .maintalk-main-talkitem{
   width: 100%;
@@ -436,13 +441,13 @@ export default {};
   height: 30%;
   width: 100%;
   box-sizing: border-box;
-  border-bottom: 1px solid black;
+  border-bottom: 1px solid #999;;
 }
 .maintalk-footer-header-expression {
   height: 100%;
   width: 5%;
   box-sizing: border-box;
-  border-right: 1px solid black;
+  border-right: 1px solid #999;;
   cursor: pointer;
 
   display: inline-block;
@@ -453,7 +458,7 @@ export default {};
   height: 100%;
   width: 10%;
   box-sizing: border-box;
-  border-left: 1px solid black;
+  border-left: 1px solid #999;;
   cursor: pointer;
 
   float: right;
@@ -470,4 +475,33 @@ export default {};
   font-size: 20px;
   padding: 10px;
 }
+
+/*滚动条的宽度*/
+::-webkit-scrollbar {
+    width: 4px;
+}
+
+/*滚动条里面小方块*/
+::-webkit-scrollbar-thumb {
+    border-radius: 2px;
+    box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.2);
+    background: rgba(0, 0, 0, 0.2);
+}
+
+/*滚动条里面轨道*/
+::-webkit-scrollbar-track {
+    box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.2);
+    border-radius: 0;
+    background: rgba(0, 0, 0, 0.1);
+}
+body {
+    overflow-x: hidden;
+}
+
+
+.container {
+    width: 100vw;
+    overflow-x: hidden;
+}
+
 </style>

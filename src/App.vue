@@ -1,17 +1,18 @@
 <template>
   <div>
-    <NotLogin></NotLogin>
+    <MainPage></MainPage>
   </div>
 </template>
 
 <script>
-import NotLogin from './components/NotLogin.vue';
+import MainPage from './components/MainPage.vue';
+  
 
 
 export default {
   name: 'App',
   components: {
-    NotLogin
+    MainPage
 }
 }
 </script>
@@ -24,5 +25,11 @@ export default {
   min-height: 900px;
   max-width: 2560px; 
   margin: 0 auto;
+}
+html{
+  margin: 0;
+}
+body{
+  margin: 0;
 }
 </style>
