@@ -20,6 +20,7 @@
 
             <div class="operation">
                 <el-button type="success" size="medium">注册</el-button>
+                <el-button type="warning" size="medium">清空</el-button>
                 <el-button type="danger" size="medium">返回</el-button>
             </div>
         </div>
@@ -51,7 +52,7 @@ export default {
         background: url('../assets/2.png') no-repeat;
         background-size: cover;
         width: 100%;
-        height: 1010px;
+        height: 1080px;
     }
     .center{
         position: absolute;
@@ -79,7 +80,7 @@ export default {
         color: #444;
         vertical-align: middle;
         display: inline-block;
-        margin-left: 200px;
+        margin-left: 240px;
     }
     .header-name div{
         display: inline-block;
@@ -99,17 +100,23 @@ export default {
     }
     .info>div>div{
         margin-right: 30px;
+        line-height: 60px;
     }
     .info>div{
         margin-bottom: 30px;
         width: 450px;
+        height: 60px;
         display: inline-block;
     }
     .info input{
         /* display: inline-block; */
-        width: 300px;
+        width: 280px;
+        height: 60px;
         border: 1px solid #999;
         float: right;
+        border-radius: 10px;
+        outline: none;
+        padding: 0 10px;
     }
 
     .info>.operation{
@@ -121,6 +128,6 @@ export default {
     }
     .operation>.el-button{
         flex: 1;
-        
+        font-size: 16px
     }
 </style>

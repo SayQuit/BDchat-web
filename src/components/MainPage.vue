@@ -1,25 +1,26 @@
 <template>
   <div>
-    <div class="log">
-        <el-button type="success" class="login" size="medium" @click="handleLogin">登录</el-button>
-        <el-button type="primary" class="login" size="medium">注册</el-button>
-        <el-button type="danger" class="login" size="medium">退出</el-button>
-    </div>
+
 
     
     
-    <RegisterPage></RegisterPage>
+    <!-- <RegisterPage></RegisterPage> -->
     <!-- <NotLogin></NotLogin> -->
+    <!-- <LoginPage></LoginPage> -->
+    <!-- <NotLogin></NotLogin> -->
+    <AccountManage></AccountManage>
   </div>
 </template>
 
 <script>
 // import NotLogin from './NotLogin.vue';
 import axios from 'axios';
-import RegisterPage from './RegisterPage.vue';
+import AccountManage from './AccountManage.vue';
+// import NotLogin from './NotLogin.vue';
+// import RegisterPage from './RegisterPage.vue';
 export default {
     components: {
-    RegisterPage
+    AccountManage
 },
     methods: {
         handleLogin(){
@@ -33,7 +34,7 @@ export default {
 }
 </script>
 
-<style>
+<style scoped>
     .log{
         width: 100%;
         height: 50px;
