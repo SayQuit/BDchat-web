@@ -3,18 +3,23 @@
     <div class="bgr">
       <div class="log">
         <el-button
+          type="primary"
+          class="login"
+          size="medium"
+          @click="goPage('LoginPage')"
+          >登录</el-button
+        >
+        <el-button
           type="success"
           class="login"
           size="medium"
-          @click="handleLogin"
-          >登录</el-button
+          @click="goPage('RegisterPage')"
+          >注册</el-button
         >
-        <el-button type="primary" class="login" size="medium">注册</el-button>
-        <el-button type="danger" class="login" size="medium">退出</el-button>
       </div>
 
       <div class="main">
-        <div class="item"></div>
+        <div class="item" @click="goPage('NotLogin')"></div>
         <div class="item"></div>
         <div class="item"></div>
         <div class="item"></div>
@@ -26,14 +31,32 @@
 </template>
 
 <script>
-export default {};
+import { useRouter } from "vue-router";
+export default {
+  setup() {
+    const router = useRouter();
+    return {
+      router,
+    };
+  },
+  methods: {
+    goPage(pageName) {
+      console.log(pageName);
+      console.log(this.router);
+      this.router.push({ name: pageName });
+    },
+  },
+};
 </script>
 
 <style scoped>
-* {
-  opacity: 0.9;
+.item {
+  opacity: 0.8;
 }
 
+.item:hover {
+  opacity: 1;
+}
 .bgr {
   background: url("../assets/2.png") no-repeat;
   background-size: cover;

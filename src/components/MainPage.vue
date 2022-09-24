@@ -8,19 +8,17 @@
     <!-- <NotLogin></NotLogin> -->
     <!-- <LoginPage></LoginPage> -->
     <!-- <NotLogin></NotLogin> -->
-    <AccountManage></AccountManage>
+    <router-view></router-view>
   </div>
 </template>
 
 <script>
 // import NotLogin from './NotLogin.vue';
 import axios from 'axios';
-import AccountManage from './AccountManage.vue';
 // import NotLogin from './NotLogin.vue';
 // import RegisterPage from './RegisterPage.vue';
 export default {
     components: {
-    AccountManage
 },
     methods: {
         handleLogin(){

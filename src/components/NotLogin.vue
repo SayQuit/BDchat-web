@@ -3,18 +3,18 @@
     <div class="bgr">
       <div class="log">
         <el-button
-          type="success"
+          type="primary"
           class="login"
           size="medium"
-          @click="handleLogin"
+          @click="goPage('LoginPage')"
           >登录</el-button
         >
-        <el-button type="primary" class="login" size="medium">注册</el-button>
+        <el-button type="success" class="login" size="medium" @click="goPage('RegisterPage')">注册</el-button>
         <el-button type="danger" class="login" size="medium">退出</el-button>
       </div>
       <div class="header">
         <div class="header-operation">
-          <el-button class="header-operation-min" type="primary"
+          <el-button class="header-operation-min" type="primary" @click="goPage('AccountManage')"
             >最小化</el-button
           >
           <el-button class="header-operation-close" type="danger"
@@ -218,13 +218,28 @@
 </template>
 
 <script>
-export default {};
+import { useRouter } from "vue-router";
+export default {
+  setup() {
+    const router = useRouter();
+    return {
+      router,
+    };
+  },
+  methods: {
+    goPage(pageName) {
+      this.router.push({ name: pageName });
+    },
+    goBack(){
+        this.$router.back();
+    }
+  },
+};
 </script>
 
 <style scoped>
 * {
-  font-size: 20px;
-  color: #555;
+  color: #555555;
   opacity: 0.9;
 }
 *:hover {

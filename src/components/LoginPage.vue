@@ -16,9 +16,9 @@
 
   
               <div class="operation">
-                <el-button type="success" size="medium">注册</el-button>
+                <el-button type="success" size="medium" @click="goPage('RegisterPage')">注册</el-button>
                 <el-button type="warning" size="medium">清空</el-button>
-                <el-button type="danger" size="medium">返回</el-button>
+                <el-button type="danger" size="medium" @click="goBack()">返回</el-button>
               </div>
           </div>
       </div>
@@ -29,9 +29,23 @@
   </template>
   
   <script>
-  export default {
-  
-  }
+import { useRouter } from "vue-router";
+export default {
+  setup() {
+    const router = useRouter();
+    return {
+      router,
+    };
+  },
+  methods: {
+    goPage(pageName) {
+      this.router.push({ name: pageName });
+    },
+    goBack(){
+        this.$router.back();
+    }
+  },
+};
   </script>
   
   <style scoped>
