@@ -16,7 +16,6 @@
           @click="goPage('RegisterPage')"
           >注册</el-button
         >
-        <el-button type="danger" class="login" size="medium">退出</el-button>
       </div>
       <div class="header">
         <div class="header-operation">
@@ -36,7 +35,7 @@
         <div class="aside-user">
           <div class="aside-user-profilepicture"></div>
           <div class="aside-user-desc">
-            <div class="aside-user-desc-name">伤心太平洋</div>
+            <div class="aside-user-desc-name">{{ user.name }}</div>
             <div class="aside-user-desc-signature">
               我只爱你 You are my only 我只爱你 You are my only 我只爱你 You are
               my only 我只爱你 You are my only 我只爱你 You are my only 我只爱你
@@ -131,7 +130,10 @@
         <div class="aside-talkblockbottom">
           <div class="aside-talkblockbottom-operation">
             <div class="aside-talkblockbottom-operation-cloud">词云</div>
-            <div class="aside-talkblockbottom-operation-add">+</div>
+            <div class="aside-talkblockbottom-operation-add" @click="open">
+              +
+            </div>
+            <!-- <el-button type="text" @click="open">点击打开 Message Box</el-button> -->
           </div>
         </div>
       </div>
@@ -228,6 +230,7 @@
 
 <script>
 import { useRouter } from "vue-router";
+import axios from "axios";
 import { useStore } from "vuex";
 export default {
   setup() {
@@ -239,11 +242,18 @@ export default {
   data() {
     return {
       store: "",
+      account: "",
+      user: {
+        name: "",
+        account: "",
+      },
     };
   },
-  mounted() {
+  created() {
     this.store = useStore();
+    this.account = this.$route.query.account;
     // console.log(this.$route.query.account);
+    this.getUserInfo();
     // console.log(this.store.state);
   },
   methods: {
@@ -252,6 +262,39 @@ export default {
     },
     goBack() {
       this.$router.back();
+    },
+    getUserInfo() {
+      let url =
+        this.store.state.requestUrl + "/user/info?account=" + this.account;
+      console.log(url);
+      axios.post(url).then((res) => {
+        // console.log(res.data.user);
+        if (res.data.user) {
+          this.user = res.data.user;
+        } else {
+          console.log(res.data.message);
+        }
+      });
+    },
+    open() {
+      this.$prompt("请输入对方账号", "提示", {
+        confirmButtonText: "确定",
+        cancelButtonText: "取消",
+        inputErrorMessage: "账号格式不正确",
+      })
+        .then(({ value }) => {
+          
+          this.$message({
+            type: "success",
+            message: "对方账号是: " + value + "发送成功",
+          });
+        })
+        .catch(() => {
+          this.$message({
+            type: "info",
+            message: "取消输入",
+          });
+        });
     },
   },
 };
