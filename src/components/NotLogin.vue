@@ -9,12 +9,21 @@
           @click="goPage('LoginPage')"
           >登录</el-button
         >
-        <el-button type="success" class="login" size="medium" @click="goPage('RegisterPage')">注册</el-button>
+        <el-button
+          type="success"
+          class="login"
+          size="medium"
+          @click="goPage('RegisterPage')"
+          >注册</el-button
+        >
         <el-button type="danger" class="login" size="medium">退出</el-button>
       </div>
       <div class="header">
         <div class="header-operation">
-          <el-button class="header-operation-min" type="primary" @click="goPage('AccountManage')"
+          <el-button
+            class="header-operation-min"
+            type="primary"
+            @click="goPage('AccountManage')"
             >最小化</el-button
           >
           <el-button class="header-operation-close" type="danger"
@@ -219,6 +228,7 @@
 
 <script>
 import { useRouter } from "vue-router";
+import { useStore } from "vuex";
 export default {
   setup() {
     const router = useRouter();
@@ -226,13 +236,23 @@ export default {
       router,
     };
   },
+  data() {
+    return {
+      store: "",
+    };
+  },
+  mounted() {
+    this.store = useStore();
+    // console.log(this.$route.query.account);
+    // console.log(this.store.state);
+  },
   methods: {
     goPage(pageName) {
       this.router.push({ name: pageName });
     },
-    goBack(){
-        this.$router.back();
-    }
+    goBack() {
+      this.$router.back();
+    },
   },
 };
 </script>
@@ -267,10 +287,13 @@ export default {
   cursor: pointer;
 }
 .header-operation-min {
+  margin-left: 10px;
 }
 .header-operation-max {
+  margin-left: 10px;
 }
 .header-operation-close {
+  margin-left: 10px;
 }
 
 .aside {

@@ -19,12 +19,12 @@
       </div>
 
       <div class="main">
-        <div class="item" @click="goPage('NotLogin')"></div>
-        <div class="item"></div>
-        <div class="item"></div>
-        <div class="item"></div>
-        <div class="item"></div>
-        <div class="item"></div>
+        <template v-for="(item, index) in user" :key="index">
+          <div class="item" @click="handleClickAccount(item.account)">
+            <div class="account">账号:{{ item.account }}</div>
+            <div class="name">昵称:{{ item.name }}</div>
+          </div>
+        </template>
       </div>
     </div>
   </div>
@@ -32,6 +32,7 @@
 
 <script>
 import { useRouter } from "vue-router";
+import { useStore } from "vuex";
 export default {
   setup() {
     const router = useRouter();
@@ -39,11 +40,29 @@ export default {
       router,
     };
   },
+  data() {
+    return {
+      store: "",
+      user: "",
+    };
+  },
+  mounted() {
+    const store = useStore(); // 该方法用于返回store 实例
+
+    this.store = store;
+    this.user = this.store.state.user;
+    // console.log(this.user); // store 实例对象
+    // console.log();
+  },
+
   methods: {
     goPage(pageName) {
-      console.log(pageName);
-      console.log(this.router);
+      // console.log(pageName);
+      // console.log(this.router);
       this.router.push({ name: pageName });
+    },
+    handleClickAccount(TheAccount) {
+      this.$router.push({ path: "/NotLogin", query: { account: TheAccount } });
     },
   },
 };
@@ -104,5 +123,11 @@ export default {
 /* 使最后一个元素的边距填满剩余空间 */
 .item:last-child {
   margin-right: auto;
+}
+.account {
+  margin-top: 50px;
+}
+.name {
+  margin-top: 20px;
 }
 </style>

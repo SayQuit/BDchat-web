@@ -1,34 +1,14 @@
 <template>
   <div>
-
-
-    
-    
-    <!-- <RegisterPage></RegisterPage> -->
-    <!-- <NotLogin></NotLogin> -->
-    <!-- <LoginPage></LoginPage> -->
-    <!-- <NotLogin></NotLogin> -->
     <router-view></router-view>
   </div>
 </template>
 
 <script>
-// import NotLogin from './NotLogin.vue';
-import axios from 'axios';
-// import NotLogin from './NotLogin.vue';
-// import RegisterPage from './RegisterPage.vue';
 export default {
     components: {
 },
-    methods: {
-        handleLogin(){
-            axios
-            .post("")
-            .then((data)=>{
-                console.log(data);
-            })
-        }
-    },
+    
 }
 </script>
 
