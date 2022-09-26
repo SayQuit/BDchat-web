@@ -10,14 +10,13 @@
       <div class="info">
         <div class="info-name">
           <div class="info-name-title">账号</div>
-          <input type="text" v-model="account" @keyup="clearTips()" />
+          <input type="text" v-model="account" />
         </div>
         <div class="info-psw">
           <div class="info-psw-title">密码</div>
-          <input type="password" v-model="psw" @keyup="clearTips()" />
+          <input type="password" v-model="psw" />
         </div>
 
-        <div class="tips">{{ error }}</div>
         <div class="operation">
           <el-button type="primary" size="medium" @click="handleLogin()"
             >登录</el-button
@@ -45,7 +44,6 @@ export default {
   },
   data() {
     return {
-      error: "",
       account: "",
       psw: "",
       store: "",
@@ -66,12 +64,18 @@ export default {
       this.$router.back();
     },
     handleLogin() {
-      if (this.name === "") {
-        this.error = "账号不能为空";
+      if (this.account === "") {
+        this.$message({
+            type: "error",
+            message: "账号不能为空",
+          });
         return;
       }
       if (this.psw === "") {
-        this.error = "密码不能为空";
+        this.$message({
+            type: "error",
+            message: "密码不能为空",
+          });
         return;
       }
       let url =
@@ -91,16 +95,21 @@ export default {
           };
           this.store.commit("handlePushUser", u);
           var ac = this.account;
+          this.$message({
+            type: "success",
+            message: "登录成功",
+          });
           this.$router.push({ path: "/NotLogin", query: { account: ac } });
         } else {
-          this.error = dt.message;
+          this.$message({
+            type: "error",
+            message: dt.message,
+          });
         }
       });
       //   this.goPage("NotLogin");
     },
-    clearTips() {
-      this.error = "";
-    },
+
   },
 };
 </script>

@@ -11,17 +11,16 @@
         <div class="info">
           <div class="info-name">
             <div class="info-name-title">昵称</div>
-            <input type="text" @keyup="clearTips()" v-model="name" />
+            <input type="text" v-model="name" />
           </div>
           <div class="info-psw">
             <div class="info-psw-title">密码</div>
-            <input type="password" @keyup="clearTips()" v-model="psw" />
+            <input type="password" v-model="psw" />
           </div>
           <div class="info-pswMakeSure">
             <div class="info-pswMakeSure-title">确认密码</div>
-            <input type="password" @keyup="clearTips()" v-model="makesurePsw" />
+            <input type="password" v-model="makesurePsw" />
           </div>
-          <div class="tips">{{ tips }}</div>
           <div class="operation">
             <el-button type="success" size="medium" @click="handleRegister()"
               >注册</el-button
@@ -47,18 +46,18 @@
         </div>
         <div class="info">注册成功!</div>
         <div class="info" style="margin-top: 160px">您的账号为</div>
-        <div class="info" style="margin-top: 200px">{{account}}</div>
+        <div class="info" style="margin-top: 200px">{{ account }}</div>
         <el-button
           type="success"
           class="info"
-          style="margin-top: 270px;width: 150px;height: auto;"
+          style="margin-top: 270px; width: 150px; height: auto"
           @click="goPage('AccountManage')"
           >返回主页</el-button
         >
         <el-button
           type="primary"
           class="info"
-          style="margin-top: 340px;width: 150px;height: auto;"
+          style="margin-top: 340px; width: 150px; height: auto"
           @click="goPage('LoginPage')"
           >前往登录</el-button
         >
@@ -82,7 +81,6 @@ export default {
       name: "",
       psw: "",
       makesurePsw: "",
-      tips: "",
       account: "",
     };
   },
@@ -95,13 +93,22 @@ export default {
     },
     handleRegister() {
       if (!this.name) {
-        this.tips = "昵称不能为空";
+        this.$message({
+          type: "error",
+          message: "昵称不能为空",
+        });
         return;
       } else if (!this.psw) {
-        this.tips = "密码不能为空";
+        this.$message({
+          type: "error",
+          message: "密码不能为空",
+        });
         return;
       } else if (this.psw !== this.makesurePsw) {
-        this.tips = "两次输入的密码不一致";
+        this.$message({
+          type: "error",
+          message: "两次输入的密码不一致",
+        });
         return;
       }
       //   console.log(this.name);
@@ -111,13 +118,22 @@ export default {
         "http://127.0.0.1/user/register?name=" + this.name + "&psw=" + this.psw;
       console.log(url);
       axios.post(url).then((data) => {
-        var dt = data.data;
-        this.account = dt.account;
+        if (data.data.account) {
+          var dt = data.data;
+          this.account = dt.account;
+          this.$message({
+            type: "success",
+            message: "注册成功",
+          });
+        } else {
+          this.$message({
+            type: "error",
+            message: data.data.message,
+          });
+        }
       });
     },
-    clearTips() {
-      this.tips = "";
-    },
+
     handleClear() {
       (this.name = ""), (this.psw = ""), (this.makesurePsw = "");
     },
@@ -140,7 +156,6 @@ export default {
   font-size: 16px;
   text-align: center;
   margin: 0 auto;
-
 }
 .center {
   position: absolute;
@@ -206,7 +221,7 @@ export default {
 }
 
 .info > .operation {
-  margin-top: 60px;
+  margin-top: 120px;
   position: absolute;
   left: 50%;
   transform: translateX(-50%);

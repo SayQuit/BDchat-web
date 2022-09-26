@@ -24,6 +24,8 @@
             type="primary"
             @click="goPage('AccountManage')"
             >最小化</el-button
+          ><el-button class="header-operation-close" type="warning"
+            >消息</el-button
           >
           <el-button class="header-operation-close" type="danger"
             >退出</el-button
@@ -51,80 +53,22 @@
         </div>
 
         <div class="aside-talkblock">
-          <div class="aside-talkblock-talkitem">
-            <div class="aside-user-profilepicture" style="left: 40px"></div>
-            <div
-              class="aside-user-desc"
-              style="margin-left: 50px; width: 400px"
-            >
-              <div class="aside-user-desc-name">夕阳的刻痕</div>
-              <div class="aside-user-desc-signature">你要好好上课啊</div>
+          <template v-for="(item, index) in friendList" :key="index">
+            <div class="aside-talkblock-talkitem" :class="{'currentSelect':selectFri==item}" @click="handleChangeSelectFri(item)">
+              <div class="aside-user-profilepicture" style="left: 40px"></div>
+              <div
+                class="aside-user-desc"
+                style="margin-left: 50px; width: 400px"
+              >
+                <div class="aside-user-desc-name">{{ item.name }}</div>
+                <div class="aside-user-desc-signature">你要好好上课啊</div>
+              </div>
+              <div class="aside-talkblock-talkitem-right">
+                <div class="aside-talkblock-talkitem-right-isread"></div>
+                <div class="aside-talkblock-talkitem-right-time">12:27</div>
+              </div>
             </div>
-            <div class="aside-talkblock-talkitem-right">
-              <div class="aside-talkblock-talkitem-right-isread"></div>
-              <div class="aside-talkblock-talkitem-right-time">12:27</div>
-            </div>
-          </div>
-
-          <div class="aside-talkblock-talkitem">
-            <div class="aside-user-profilepicture" style="left: 40px"></div>
-            <div
-              class="aside-user-desc"
-              style="margin-left: 50px; width: 400px"
-            >
-              <div class="aside-user-desc-name">夕阳的刻痕</div>
-              <div class="aside-user-desc-signature">你要好好上课啊</div>
-            </div>
-            <div class="aside-talkblock-talkitem-right">
-              <div class="aside-talkblock-talkitem-right-isread"></div>
-              <div class="aside-talkblock-talkitem-right-time">12:27</div>
-            </div>
-          </div>
-
-          <div class="aside-talkblock-talkitem">
-            <div class="aside-user-profilepicture" style="left: 40px"></div>
-            <div
-              class="aside-user-desc"
-              style="margin-left: 50px; width: 400px"
-            >
-              <div class="aside-user-desc-name">夕阳的刻痕</div>
-              <div class="aside-user-desc-signature">你要好好上课啊</div>
-            </div>
-            <div class="aside-talkblock-talkitem-right">
-              <div class="aside-talkblock-talkitem-right-isread"></div>
-              <div class="aside-talkblock-talkitem-right-time">12:27</div>
-            </div>
-          </div>
-
-          <div class="aside-talkblock-talkitem">
-            <div class="aside-user-profilepicture" style="left: 40px"></div>
-            <div
-              class="aside-user-desc"
-              style="margin-left: 50px; width: 400px"
-            >
-              <div class="aside-user-desc-name">夕阳的刻痕</div>
-              <div class="aside-user-desc-signature">你要好好上课啊</div>
-            </div>
-            <div class="aside-talkblock-talkitem-right">
-              <div class="aside-talkblock-talkitem-right-isread"></div>
-              <div class="aside-talkblock-talkitem-right-time">12:27</div>
-            </div>
-          </div>
-
-          <div class="aside-talkblock-talkitem">
-            <div class="aside-user-profilepicture" style="left: 40px"></div>
-            <div
-              class="aside-user-desc"
-              style="margin-left: 50px; width: 400px"
-            >
-              <div class="aside-user-desc-name">夕阳的刻痕</div>
-              <div class="aside-user-desc-signature">你要好好上课啊</div>
-            </div>
-            <div class="aside-talkblock-talkitem-right">
-              <div class="aside-talkblock-talkitem-right-isread"></div>
-              <div class="aside-talkblock-talkitem-right-time">12:27</div>
-            </div>
-          </div>
+          </template>
         </div>
 
         <div class="aside-talkblockbottom">
@@ -143,7 +87,7 @@
           <div class="maintalk-header-desc">
             <div class="aside-user-profilepicture" style="left: 60px"></div>
             <div class="aside-user-desc" style="left: 180px">
-              <div class="aside-user-desc-name">伤心太平洋</div>
+              <div class="aside-user-desc-name">{{selectFri.name}}</div>
               <div class="aside-user-desc-signature">
                 我只爱你 You are my only 我只爱你 You are my only 我只爱你 You
                 are my only 我只爱你 You are my only 我只爱你 You are my only
@@ -218,10 +162,19 @@
             <div class="maintalk-footer-header-expression"></div>
             <div class="maintalk-footer-header-expression"></div>
 
-            <div class="maintalk-footer-header-send">发送</div>
+            <div
+              class="maintalk-footer-header-send"
+              @click="handleSendMessage()"
+            >
+              发送
+            </div>
           </div>
 
-          <textarea class="maintalk-footer-input"></textarea>
+          <textarea
+            class="maintalk-footer-input"
+            v-model="send"
+            @keyup.enter="handleSendMessage()"
+          ></textarea>
         </div>
       </div>
     </div>
@@ -243,10 +196,13 @@ export default {
     return {
       store: "",
       account: "",
+      friendList: [],
       user: {
         name: "",
         account: "",
       },
+      send: "",
+      selectFri: "",
     };
   },
   created() {
@@ -254,11 +210,50 @@ export default {
     this.account = this.$route.query.account;
     // console.log(this.$route.query.account);
     this.getUserInfo();
+    this.getFriendList();
     // console.log(this.store.state);
   },
   methods: {
     goPage(pageName) {
       this.router.push({ name: pageName });
+    },
+    handleChangeSelectFri(item){
+      this.selectFri=item
+    },
+    getFriendList() {
+      let url =
+        this.store.state.requestUrl + "/user/friend?account=" + this.account;
+      console.log(url);
+      axios.get(url).then((res) => {
+        this.friendList = res.data.friendList;
+        this.selectFri=this.friendList[0];
+      });
+    },
+    handleSendMessage() {
+      const msg = this.send;
+      if (msg.trim() == "") {
+        this.send = "";
+        return;
+      }
+      let url =
+        this.store.state.requestUrl + "/message/send?myaccount=" + this.account+'&hisaccount='+this.selectFri.account+'&message='+msg;
+        console.log(url);
+      axios.post(url).then((res) => {
+        console.log(res.data);
+        if(res.data.state=='success'){
+          this.$message({
+                type: "success",
+                message: "发送成功",
+              });
+        }
+        else{
+          this.$message({
+                type: "error",
+                message: "发送失败",
+              });
+        }
+      });
+      this.send = "";
     },
     goBack() {
       this.$router.back();
@@ -266,7 +261,7 @@ export default {
     getUserInfo() {
       let url =
         this.store.state.requestUrl + "/user/info?account=" + this.account;
-      console.log(url);
+      // console.log(url);
       axios.post(url).then((res) => {
         // console.log(res.data.user);
         if (res.data.user) {
@@ -283,10 +278,26 @@ export default {
         inputErrorMessage: "账号格式不正确",
       })
         .then(({ value }) => {
-          
-          this.$message({
-            type: "success",
-            message: "对方账号是: " + value + "发送成功",
+          const url =
+            this.store.state.requestUrl +
+            "/user/add?account1=" +
+            this.account +
+            "&account2=" +
+            value;
+          axios.post(url).then((res) => {
+            // 这里要做一次好友是否存在的检验，直接在前端做
+            // console.log(res.data);
+            if (res.data.state == "success") {
+              this.$message({
+                type: "success",
+                message: "对方账号是:" + value + ",发送成功",
+              });
+            } else {
+              this.$message({
+                type: "error",
+                message: res.data.message,
+              });
+            }
           });
         })
         .catch(() => {
@@ -301,13 +312,13 @@ export default {
 </script>
 
 <style scoped>
-* {
+/* * {
   color: #555555;
   opacity: 0.9;
 }
 *:hover {
   opacity: 1;
-}
+} */
 .el-button {
   color: white;
 }
@@ -628,5 +639,8 @@ body {
 
   height: 1200px;
   opacity: 1;
+}
+.currentSelect {
+  background-color: #DDD;
 }
 </style>
