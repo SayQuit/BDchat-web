@@ -1,7 +1,7 @@
 import { createRouter, createWebHashHistory } from 'vue-router'
 const AccountManage=()=>import('@/components/AccountManage.vue');
 const LoginPage=()=>import('@/components/LoginPage.vue');
-const NotLogin=()=>import('@/components/NotLogin.vue');
+const UserPage=()=>import('@/components/UserPage.vue');
 const RegisterPage=()=>import('@/components/RegisterPage.vue');
 const routes = [
     {
@@ -20,9 +20,9 @@ const routes = [
         component:LoginPage
     },
     {
-        path:'/NotLogin',
-        name:'NotLogin',
-        component:NotLogin
+        path:'/UserPage',
+        name:'UserPage',
+        component:UserPage
     },
     {
         path:'/RegisterPage',

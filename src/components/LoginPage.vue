@@ -99,7 +99,7 @@ export default {
             type: "success",
             message: "登录成功",
           });
-          this.$router.push({ path: "/NotLogin", query: { account: ac } });
+          this.$router.push({ path: "/UserPage", query: { account: ac } });
         } else {
           this.$message({
             type: "error",
@@ -107,7 +107,7 @@ export default {
           });
         }
       });
-      //   this.goPage("NotLogin");
+      //   this.goPage("UserPage");
     },
 
   },

@@ -62,7 +62,7 @@ export default {
       this.router.push({ name: pageName });
     },
     handleClickAccount(TheAccount) {
-      this.$router.push({ path: "/NotLogin", query: { account: TheAccount } });
+      this.$router.push({ path: "/UserPage", query: { account: TheAccount } });
     },
   },
 };
