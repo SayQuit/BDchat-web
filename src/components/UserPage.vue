@@ -54,7 +54,11 @@
 
         <div class="aside-talkblock">
           <template v-for="(item, index) in friendList" :key="index">
-            <div class="aside-talkblock-talkitem" :class="{'currentSelect':selectFri==item}" @click="handleChangeSelectFri(item)">
+            <div
+              class="aside-talkblock-talkitem"
+              :class="{ currentSelect: selectFri == item }"
+              @click="handleChangeSelectFri(item)"
+            >
               <div class="aside-user-profilepicture" style="left: 40px"></div>
               <div
                 class="aside-user-desc"
@@ -87,7 +91,7 @@
           <div class="maintalk-header-desc">
             <div class="aside-user-profilepicture" style="left: 60px"></div>
             <div class="aside-user-desc" style="left: 180px">
-              <div class="aside-user-desc-name">{{selectFri.name}}</div>
+              <div class="aside-user-desc-name">{{ selectFri.name }}</div>
               <div class="aside-user-desc-signature">
                 我只爱你 You are my only 我只爱你 You are my only 我只爱你 You
                 are my only 我只爱你 You are my only 我只爱你 You are my only
@@ -99,61 +103,16 @@
         </div>
 
         <div class="maintalk-main">
-          <div class="maintalk-main-talkitem">
-            <div class="isFri">
-              <div class="maintalk-main-talkitem-time">12:30</div>
-              <div class="maintalk-main-talkitem-content">你干嘛</div>
+          <template v-for="(item, index) in messageList" :key="index">
+            <div class="maintalk-main-talkitem">
+              <div :class="[item.sendID == account ? 'isMe' : 'isFri']">
+                <div class="maintalk-main-talkitem-time">{{ item.time }}</div>
+                <div class="maintalk-main-talkitem-content">
+                  {{ item.message }}
+                </div>
+              </div>
             </div>
-          </div>
-
-          <div class="maintalk-main-talkitem">
-            <div class="isMe">
-              <div class="maintalk-main-talkitem-time">12:30</div>
-              <div class="maintalk-main-talkitem-content">你干嘛</div>
-            </div>
-          </div>
-
-          <div class="maintalk-main-talkitem">
-            <div class="isFri">
-              <div class="maintalk-main-talkitem-time">12:30</div>
-              <div class="maintalk-main-talkitem-content">你好烦</div>
-            </div>
-          </div>
-
-          <div class="maintalk-main-talkitem">
-            <div class="isMe">
-              <div class="maintalk-main-talkitem-time">12:30</div>
-              <div class="maintalk-main-talkitem-content">你好烦</div>
-            </div>
-          </div>
-
-          <div class="maintalk-main-talkitem">
-            <div class="isFri">
-              <div class="maintalk-main-talkitem-time">12:30</div>
-              <div class="maintalk-main-talkitem-content">你干嘛</div>
-            </div>
-          </div>
-
-          <div class="maintalk-main-talkitem">
-            <div class="isMe">
-              <div class="maintalk-main-talkitem-time">12:30</div>
-              <div class="maintalk-main-talkitem-content">你干嘛</div>
-            </div>
-          </div>
-
-          <div class="maintalk-main-talkitem">
-            <div class="isFri">
-              <div class="maintalk-main-talkitem-time">12:30</div>
-              <div class="maintalk-main-talkitem-content">你好烦</div>
-            </div>
-          </div>
-
-          <div class="maintalk-main-talkitem">
-            <div class="isMe">
-              <div class="maintalk-main-talkitem-time">12:30</div>
-              <div class="maintalk-main-talkitem-content">你好烦</div>
-            </div>
-          </div>
+          </template>
         </div>
 
         <div class="maintalk-footer">
@@ -203,6 +162,7 @@ export default {
       },
       send: "",
       selectFri: "",
+      messageList: [],
     };
   },
   created() {
@@ -217,8 +177,22 @@ export default {
     goPage(pageName) {
       this.router.push({ name: pageName });
     },
-    handleChangeSelectFri(item){
-      this.selectFri=item
+    handleChangeSelectFri(item) {
+      this.selectFri = item;
+      this.getMessage();
+    },
+    getMessage() {
+      let url =
+        this.store.state.requestUrl +
+        "/message/get?myaccount=" +
+        this.account +
+        "&hisaccount=" +
+        this.selectFri.account;
+      console.log(url);
+      axios.get(url).then((res) => {
+        console.log(res.data.message);
+        this.messageList = res.data.message;
+      });
     },
     getFriendList() {
       let url =
@@ -226,7 +200,8 @@ export default {
       console.log(url);
       axios.get(url).then((res) => {
         this.friendList = res.data.friendList;
-        this.selectFri=this.friendList[0];
+        this.handleChangeSelectFri(this.friendList[0]);
+        // this.selectFri=this.friendList[0];
       });
     },
     handleSendMessage() {
@@ -236,21 +211,27 @@ export default {
         return;
       }
       let url =
-        this.store.state.requestUrl + "/message/send?myaccount=" + this.account+'&hisaccount='+this.selectFri.account+'&message='+msg;
-        console.log(url);
+        this.store.state.requestUrl +
+        "/message/send?myaccount=" +
+        this.account +
+        "&hisaccount=" +
+        this.selectFri.account +
+        "&message=" +
+        msg;
+      console.log(url);
       axios.post(url).then((res) => {
         console.log(res.data);
-        if(res.data.state=='success'){
+        if (res.data.state == "success") {
           this.$message({
-                type: "success",
-                message: "发送成功",
-              });
-        }
-        else{
+            type: "success",
+            message: "发送成功",
+          });
+          this.getMessage();
+        } else {
           this.$message({
-                type: "error",
-                message: "发送失败",
-              });
+            type: "error",
+            message: "发送失败",
+          });
         }
       });
       this.send = "";
@@ -545,9 +526,9 @@ export default {
 }
 
 .isMe {
+  text-align: right;
 }
 .isFri {
-  text-align: right;
 }
 .maintalk-footer {
   height: 20%;
@@ -641,6 +622,6 @@ body {
   opacity: 1;
 }
 .currentSelect {
-  background-color: #DDD;
+  background-color: #ddd;
 }
 </style>
