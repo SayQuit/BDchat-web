@@ -128,7 +128,7 @@
 
         <div class="maintalk-footer">
           <div class="maintalk-footer-header">
-            <div class="maintalk-footer-header-expression"></div>
+            <div class="maintalk-footer-header-expression"><img src="../assets/expression.png"></div>
             <div class="maintalk-footer-header-expression"></div>
             <div class="maintalk-footer-header-expression"></div>
 
@@ -184,13 +184,6 @@ export default {
     this.getFriendList();
 
     // console.log(this.store.state);
-  },
-  mounted() {
-    // this.$nextTick(() => {
-    //   console.log(this.$refs.scrollWin);
-    //   console.log(this.$refs.content);
-    //   this.$refs.scrollWin.scrollTop = this.$refs.content.scrollHeight;
-    // });
   },
   methods: {
     goPage(pageName) {
@@ -304,6 +297,7 @@ export default {
                 type: "success",
                 message: "对方账号是:" + value + ",发送成功",
               });
+              this.getFriendList()
             } else {
               this.$message({
                 type: "error",
@@ -561,7 +555,7 @@ export default {
   height: 50px;
   width: 50px;
   border-radius: 25px;
-  border: 1px solid black;
+  border: 1px solid #999;
   display: inline-block;
   vertical-align: middle;
 }
@@ -569,9 +563,11 @@ export default {
   margin-left: 15px;
   display: inline-block;
   vertical-align: middle;
+  color: #444;
 }
 .maintalk-main-talkitem-time {
   margin-top: 10px;
+  color: #777;
 }
 .maintalk-main-talkitem-content {
   margin-top: 15px;
@@ -620,6 +616,10 @@ export default {
   cursor: pointer;
 
   display: inline-block;
+}
+.maintalk-footer-header-expression img{
+  width: 100%;
+  height: 100%;
 }
 .maintalk-footer-header-send {
   background-color: #ccccff;
@@ -697,8 +697,10 @@ body {
 }
 .greenMessage{
   background-color: #95EB6C;
+  color: #111;
 }
 .blueMessage{
   background-color: #1099FE;
+  color:white
 }
 </style>

@@ -142,8 +142,9 @@ export default {
 </script>
 
 <style scoped>
+
 * {
-  font-size: 22px;
+  font-size: 28px;
 }
 .bgr {
   background: url("../assets/2.png") no-repeat;

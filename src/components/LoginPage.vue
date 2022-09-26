@@ -118,6 +118,7 @@ export default {
 * {
   font-size: 28px;
 }
+
 .bgr {
   background: url("../assets/2.png") no-repeat;
   background-size: cover;
