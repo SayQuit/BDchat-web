@@ -102,12 +102,23 @@
           </div>
         </div>
 
-        <div class="maintalk-main">
+        <div class="maintalk-main" ref="scrollWin" id="maintalk-main">
           <template v-for="(item, index) in messageList" :key="index">
-            <div class="maintalk-main-talkitem">
-              <div :class="[item.sendID == account ? 'isMe' : 'isFri']">
+            <div :class="[item.sendID == account ? 'isMe' : 'isFri']">
+              <div class="maintalk-main-talkitem">
+                <div class="maintalk-main-talkitem-user">
+                  <div class="maintalk-main-talkitem-user-profilepicture"></div>
+                  <div class="maintalk-main-talkitem-user-name">
+                    <template v-if="item.sendID==account">
+                      {{user.name}}
+                    </template>
+                    <template v-else>
+                      {{selectFri.name}}
+                    </template>
+                  </div>
+                </div>
                 <div class="maintalk-main-talkitem-time">{{ item.time }}</div>
-                <div class="maintalk-main-talkitem-content">
+                <div class="maintalk-main-talkitem-content" :class="[item.sendID == account ? 'floatR greenMessage' : 'floatL blueMessage']">
                   {{ item.message }}
                 </div>
               </div>
@@ -171,13 +182,26 @@ export default {
     // console.log(this.$route.query.account);
     this.getUserInfo();
     this.getFriendList();
+
     // console.log(this.store.state);
+  },
+  mounted() {
+    // this.$nextTick(() => {
+    //   console.log(this.$refs.scrollWin);
+    //   console.log(this.$refs.content);
+    //   this.$refs.scrollWin.scrollTop = this.$refs.content.scrollHeight;
+    // });
   },
   methods: {
     goPage(pageName) {
       this.router.push({ name: pageName });
     },
     handleChangeSelectFri(item) {
+      for(let i=0;i<this.friendList;i++){
+        if(this.friendList[i].account==this.selectFri.account){
+          this.selectFri.name=this.friendList[i].name;
+        }
+      }
       this.selectFri = item;
       this.getMessage();
     },
@@ -188,16 +212,18 @@ export default {
         this.account +
         "&hisaccount=" +
         this.selectFri.account;
-      console.log(url);
+      // console.log(url);
       axios.get(url).then((res) => {
-        console.log(res.data.message);
+        // console.log(res.data.message);
         this.messageList = res.data.message;
+        console.log(this.messageList);
+        this.scrollToBottom();
       });
     },
     getFriendList() {
       let url =
         this.store.state.requestUrl + "/user/friend?account=" + this.account;
-      console.log(url);
+      // console.log(url);
       axios.get(url).then((res) => {
         this.friendList = res.data.friendList;
         this.handleChangeSelectFri(this.friendList[0]);
@@ -218,9 +244,9 @@ export default {
         this.selectFri.account +
         "&message=" +
         msg;
-      console.log(url);
+      // console.log(url);
       axios.post(url).then((res) => {
-        console.log(res.data);
+        // console.log(res.data);
         if (res.data.state == "success") {
           this.$message({
             type: "success",
@@ -238,6 +264,11 @@ export default {
     },
     goBack() {
       this.$router.back();
+    },
+    scrollToBottom: function () {
+      this.$nextTick(() => {
+        this.$refs.scrollWin.scrollTop = this.$refs.scrollWin.scrollHeight;
+      });
     },
     getUserInfo() {
       let url =
@@ -513,22 +544,62 @@ export default {
   box-sizing: border-box;
 
   border-right: none;
-  overflow-y: scroll;
+  /* overflow-y: scroll; */
+  overflow: auto;
+  padding: 30px 0;
 }
 .maintalk-main-talkitem {
   width: 100%;
   box-sizing: border-box;
-  padding: 50px;
+  padding: 30px 50px;
+}
+.maintalk-main-talkitem-user {
+  display: block;
+  width: auto;
+}
+.maintalk-main-talkitem-user-profilepicture {
+  height: 50px;
+  width: 50px;
+  border-radius: 25px;
+  border: 1px solid black;
+  display: inline-block;
+  vertical-align: middle;
+}
+.maintalk-main-talkitem-user-name {
+  margin-left: 15px;
+  display: inline-block;
+  vertical-align: middle;
 }
 .maintalk-main-talkitem-time {
+  margin-top: 10px;
 }
 .maintalk-main-talkitem-content {
+  margin-top: 15px;
+  width: auto;
+  margin-right: 0;
+  padding: 10px;
+  font-size: 16px;
+  border-radius: 10px;
+  display: inline-block;
+  color: #111;
+  flex: 1;
 }
+.floatR{
+  text-align: left;
+  float: right;
+  margin-left: 200px;
+}
+.floatL{
 
+  margin-right: 200px;
+}
 .isMe {
   text-align: right;
+  display: flex;
 }
 .isFri {
+  text-align: left;
+  display: flex;
 }
 .maintalk-footer {
   height: 20%;
@@ -623,5 +694,11 @@ body {
 }
 .currentSelect {
   background-color: #ddd;
+}
+.greenMessage{
+  background-color: #95EB6C;
+}
+.blueMessage{
+  background-color: #1099FE;
 }
 </style>
