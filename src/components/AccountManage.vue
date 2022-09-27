@@ -16,6 +16,13 @@
           @click="goPage('RegisterPage')"
           >注册</el-button
         >
+        <!-- <el-button
+          type="warning"
+          class="login"
+          size="medium"
+          @click="giveImg()"
+          >传输图片</el-button> -->
+        
       </div>
 
       <div class="main">
@@ -56,6 +63,10 @@ export default {
   },
 
   methods: {
+    // giveImg(){
+    //   // console.log('img');
+
+    // },
     goPage(pageName) {
       // console.log(pageName);
       // console.log(this.router);

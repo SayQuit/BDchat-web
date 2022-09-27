@@ -109,17 +109,29 @@
                 <div class="maintalk-main-talkitem-user">
                   <div class="maintalk-main-talkitem-user-profilepicture"></div>
                   <div class="maintalk-main-talkitem-user-name">
-                    <template v-if="item.sendID==account">
-                      {{user.name}}
+                    <template v-if="item.sendID == account">
+                      {{ user.name }}
                     </template>
                     <template v-else>
-                      {{selectFri.name}}
+                      {{ selectFri.name }}
                     </template>
                   </div>
                 </div>
                 <div class="maintalk-main-talkitem-time">{{ item.time }}</div>
-                <div class="maintalk-main-talkitem-content" :class="[item.sendID == account ? 'floatR greenMessage' : 'floatL blueMessage']">
-                  {{ item.message }}
+                <div
+                  class="maintalk-main-talkitem-content"
+                  :class="[
+                    item.sendID == account
+                      ? 'floatR greenMessage'
+                      : 'floatL blueMessage',
+                  ]"
+                >
+                  <template v-if="item.isImg == 0">
+                    <div>{{ item.message }}</div>
+                  </template>
+                  <template v-else>
+                    <div><img :src="item.base64"></div>
+                  </template>
                 </div>
               </div>
             </div>
@@ -128,8 +140,17 @@
 
         <div class="maintalk-footer">
           <div class="maintalk-footer-header">
-            <div class="maintalk-footer-header-expression"><img src="../assets/expression.png"></div>
-            <div class="maintalk-footer-header-expression"></div>
+            <div class="maintalk-footer-header-expression">
+              <img src="../assets/expression.png" />
+            </div>
+            <div class="maintalk-footer-header-outer">
+              <img src="../assets/img.png" /><input
+                type="file"
+                @change="sendBase64"
+                class="maintalk-footer-header-sendImg"
+              />
+            </div>
+
             <div class="maintalk-footer-header-expression"></div>
 
             <div
@@ -190,9 +211,9 @@ export default {
       this.router.push({ name: pageName });
     },
     handleChangeSelectFri(item) {
-      for(let i=0;i<this.friendList;i++){
-        if(this.friendList[i].account==this.selectFri.account){
-          this.selectFri.name=this.friendList[i].name;
+      for (let i = 0; i < this.friendList; i++) {
+        if (this.friendList[i].account == this.selectFri.account) {
+          this.selectFri.name = this.friendList[i].name;
         }
       }
       this.selectFri = item;
@@ -297,7 +318,7 @@ export default {
                 type: "success",
                 message: "对方账号是:" + value + ",发送成功",
               });
-              this.getFriendList()
+              this.getFriendList();
             } else {
               this.$message({
                 type: "error",
@@ -312,6 +333,85 @@ export default {
             message: "取消输入",
           });
         });
+    },
+    compressImg(base64String, w, quality) {
+      var getMimeType = function (urlData) {
+        var arr = urlData.split(",");
+        var mime = arr[0].match(/:(.*?);/)[1];
+        return mime;
+      };
+      var newImage = new Image();
+      var imgWidth, imgHeight;
+
+      var promise = new Promise((resolve) => (newImage.onload = resolve));
+      newImage.src = base64String;
+      return promise.then(() => {
+        imgWidth = newImage.width;
+        imgHeight = newImage.height;
+        var canvas = document.createElement("canvas");
+        var ctx = canvas.getContext("2d");
+        if (Math.max(imgWidth, imgHeight) > w) {
+          if (imgWidth > imgHeight) {
+            canvas.width = w;
+            canvas.height = (w * imgHeight) / imgWidth;
+          } else {
+            canvas.height = w;
+            canvas.width = (w * imgWidth) / imgHeight;
+          }
+        } else {
+          canvas.width = imgWidth;
+          canvas.height = imgHeight;
+        }
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        ctx.drawImage(newImage, 0, 0, canvas.width, canvas.height);
+        var base64 = canvas.toDataURL(getMimeType(base64String), quality);
+        console.log(base64);
+        return base64;
+      });
+    },
+    sendBase64(e) {
+      let file = e.target.files[0];
+      if (window.FileReader) {
+        let reader = new FileReader();
+        reader.readAsDataURL(file);
+        reader.onload = (e) => {
+          let base64String = e.target.result;
+          // console.log(base64String);
+          let base64Img = this.compressImg(base64String, 100, 0.7);
+          base64Img.then((res) => {
+            // console.log(res);
+            console.log(res.length);
+            // console.log(base64Img);
+            if (res.length > 12000) {
+              this.$message({
+                type: "error",
+                message: "发送失败,图片过大",
+              });
+              return;
+            }
+
+            axios({
+              method: "POST",
+              url: "http://127.0.0.1:80/message/sendImg",
+              params: [res, this.account, this.selectFri.account],
+              headers: { "Content-Type": "application/x-www-form-urlencoded" },
+            }).then((res) => {
+              if (res.data.state == "success") {
+                this.$message({
+                  type: "success",
+                  message: "发送成功",
+                });
+                this.getMessage();
+              } else {
+                this.$message({
+                  type: "error",
+                  message: "发送失败",
+                });
+              }
+            });
+          });
+        };
+      }
     },
   },
 };
@@ -580,13 +680,12 @@ export default {
   color: #111;
   flex: 1;
 }
-.floatR{
+.floatR {
   text-align: left;
   float: right;
   margin-left: 200px;
 }
-.floatL{
-
+.floatL {
   margin-right: 200px;
 }
 .isMe {
@@ -617,9 +716,39 @@ export default {
 
   display: inline-block;
 }
-.maintalk-footer-header-expression img{
+.maintalk-footer-header-expression img {
+  box-sizing: border-box;
+  padding: 10%;
   width: 100%;
   height: 100%;
+}
+.maintalk-footer-header-outer {
+  /* opacity: 0; */
+  height: 100%;
+  width: 5%;
+  box-sizing: border-box;
+  border-right: 1px solid #999;
+  cursor: pointer;
+  vertical-align: top;
+
+  display: inline-block;
+  position: relative;
+}
+.maintalk-footer-header-outer img {
+  position: absolute;
+  width: 80%;
+  height: 80%;
+  top: 50%;
+  left: 50%;
+  transform: translateY(-50%) translateX(-50%);
+}
+.maintalk-footer-header-sendImg {
+  opacity: 0;
+  vertical-align: top;
+  width: 100%;
+  height: 100%;
+  cursor: pointer;
+  position: absolute;
 }
 .maintalk-footer-header-send {
   background-color: #ccccff;
@@ -695,12 +824,12 @@ body {
 .currentSelect {
   background-color: #ddd;
 }
-.greenMessage{
-  background-color: #95EB6C;
+.greenMessage {
+  background-color: #95eb6c;
   color: #111;
 }
-.blueMessage{
-  background-color: #1099FE;
-  color:white
+.blueMessage {
+  background-color: #1099fe;
+  color: white;
 }
 </style>
