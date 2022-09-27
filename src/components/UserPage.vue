@@ -65,11 +65,27 @@
                 style="margin-left: 50px; width: 400px"
               >
                 <div class="aside-user-desc-name">{{ item.name }}</div>
-                <div class="aside-user-desc-signature">你要好好上课啊</div>
+                <div class="aside-user-desc-signature">
+                  <template v-if="item.isMe"> 我: </template>
+                  <template v-else> {{ item.name }}: </template>
+                  <template v-if="item.isImg == 0">
+                    {{ item.lastMsg }}
+                  </template>
+                  <template v-else> [图片] </template>
+                </div>
               </div>
               <div class="aside-talkblock-talkitem-right">
-                <div class="aside-talkblock-talkitem-right-isread"></div>
-                <div class="aside-talkblock-talkitem-right-time">12:27</div>
+                <div class="aside-talkblock-talkitem-right-isread">
+                  <template v-if="item.isRead == 1">
+                    <img src="../assets/isRead.png" />
+                  </template>
+                  <template v-else>
+                    <img src="../assets/notRead.png" />
+                  </template>
+                </div>
+                <div class="aside-talkblock-talkitem-right-time">
+                  {{ item.time }}
+                </div>
               </div>
             </div>
           </template>
@@ -109,9 +125,7 @@
                 <div class="maintalk-main-talkitem-user">
                   <div class="maintalk-main-talkitem-user-profilepicture"></div>
                   <div class="maintalk-main-talkitem-user-name">
-                    <template v-if="item.sendID == account">
-                      {{ user.name }}
-                    </template>
+                    <template v-if="item.sendID == account"> 我 </template>
                     <template v-else>
                       {{ selectFri.name }}
                     </template>
@@ -130,7 +144,7 @@
                     <div>{{ item.message }}</div>
                   </template>
                   <template v-else>
-                    <div><img :src="item.base64"></div>
+                    <div><img :src="item.base64" /></div>
                   </template>
                 </div>
               </div>
@@ -203,7 +217,7 @@ export default {
     // console.log(this.$route.query.account);
     this.getUserInfo();
     this.getFriendList();
-
+    // this.getLastMessage();
     // console.log(this.store.state);
   },
   methods: {
@@ -230,17 +244,28 @@ export default {
       axios.get(url).then((res) => {
         // console.log(res.data.message);
         this.messageList = res.data.message;
-        console.log(this.messageList);
+        // console.log(this.messageList);
         this.scrollToBottom();
       });
     },
+    // getLastMessage(){
+    //   let url =
+    //     this.store.state.requestUrl + "/message/last?account=" + this.account;
+    //   // console.log(url);
+    //   axios.get(url).then((res) => {
+    //     console.log(res);
+    //     // this.selectFri=this.friendList[0];
+    //   });
+    // },
     getFriendList() {
       let url =
         this.store.state.requestUrl + "/user/friend?account=" + this.account;
       // console.log(url);
       axios.get(url).then((res) => {
         this.friendList = res.data.friendList;
-        this.handleChangeSelectFri(this.friendList[0]);
+        console.log(this.friendList);
+        // this.handleChangeSelectFri(this.friendList[0]);
+
         // this.selectFri=this.friendList[0];
       });
     },
@@ -248,6 +273,13 @@ export default {
       const msg = this.send;
       if (msg.trim() == "") {
         this.send = "";
+        return;
+      }
+      if (this.selectFri == "") {
+        this.$message({
+          type: "error",
+          message: "发送失败",
+        });
         return;
       }
       let url =
@@ -291,6 +323,7 @@ export default {
       axios.post(url).then((res) => {
         // console.log(res.data.user);
         if (res.data.user) {
+          // console.log(res.data.user);
           this.user = res.data.user;
         } else {
           console.log(res.data.message);
@@ -570,11 +603,19 @@ export default {
 }
 .aside-talkblock-talkitem-right-isread {
   position: absolute;
-  top: 40%;
+  top: 37%;
+  width: 20px;
+  height: 20px;
+  left: -20%;
+}
+.aside-talkblock-talkitem-right-isread img {
+  width: 100%;
+  height: 100%;
 }
 .aside-talkblock-talkitem-right-time {
   position: absolute;
-  top: 60%;
+  top: 56%;
+  left: -50%;
 }
 .aside-talkblockbottom {
   height: 40px;
