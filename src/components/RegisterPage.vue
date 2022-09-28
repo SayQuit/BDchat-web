@@ -110,6 +110,12 @@ export default {
           message: "两次输入的密码不一致",
         });
         return;
+      } else if (this.name.length > 20) {
+        this.$message({
+          type: "error",
+          message: "昵称长度太长",
+        });
+        return;
       }
       //   console.log(this.name);
       //   console.log(this.psw);
@@ -142,7 +148,6 @@ export default {
 </script>
 
 <style scoped>
-
 * {
   font-size: 28px;
 }

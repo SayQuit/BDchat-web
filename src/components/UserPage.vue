@@ -38,11 +38,17 @@
           <div class="aside-user-profilepicture"></div>
           <div class="aside-user-desc">
             <div class="aside-user-desc-name">{{ user.name }}</div>
+            <div class="aside-user-desc-edit">
+              <el-button type="primary" @click="handleChangeName()"
+                >更换昵称</el-button
+              >
+              <el-button type="success">更换头像</el-button>
+              <el-button type="warning" @click="handleChangeSignature()"
+                >更换签名</el-button
+              >
+            </div>
             <div class="aside-user-desc-signature">
-              我只爱你 You are my only 我只爱你 You are my only 我只爱你 You are
-              my only 我只爱你 You are my only 我只爱你 You are my only 我只爱你
-              You are my only 我只爱你 You are my only 我只爱你 You are my only
-              我只爱你 You are my only
+              {{user.signature}}
             </div>
           </div>
         </div>
@@ -94,7 +100,10 @@
         <div class="aside-talkblockbottom">
           <div class="aside-talkblockbottom-operation">
             <div class="aside-talkblockbottom-operation-cloud">词云</div>
-            <div class="aside-talkblockbottom-operation-add" @click="open">
+            <div
+              class="aside-talkblockbottom-operation-add"
+              @click="handleAddFriend"
+            >
               +
             </div>
             <!-- <el-button type="text" @click="open">点击打开 Message Box</el-button> -->
@@ -109,10 +118,7 @@
             <div class="aside-user-desc" style="left: 180px">
               <div class="aside-user-desc-name">{{ selectFri.name }}</div>
               <div class="aside-user-desc-signature">
-                我只爱你 You are my only 我只爱你 You are my only 我只爱你 You
-                are my only 我只爱你 You are my only 我只爱你 You are my only
-                我只爱你 You are my only 我只爱你 You are my only 我只爱你 You
-                are my only 我只爱你 You are my only
+                {{selectFri.signature}}
               </div>
             </div>
           </div>
@@ -174,7 +180,6 @@
               发送
             </div>
           </div>
-
           <textarea
             class="maintalk-footer-input"
             v-model="send"
@@ -220,6 +225,7 @@ export default {
     // this.getLastMessage();
     // console.log(this.store.state);
   },
+  
   methods: {
     goPage(pageName) {
       this.router.push({ name: pageName });
@@ -231,10 +237,10 @@ export default {
       //   }
       // }
       this.selectFri = item;
+      // console.log(this.friendList);
       // console.log(this.selectFri);
-      this.handleReadMessage(item.account); 
-      this.getMessage(); 
-      
+      this.handleReadMessage(item.account);
+      this.getMessage();
     },
     handleReadMessage(acc){
       let url =
@@ -243,14 +249,97 @@ export default {
         this.account +
         "&hisaccount=" +
         this.selectFri.account;
-
         
-
       axios.post(url).then(() => {
-
           // console.log('handleReadMessage',this.selectFri);
           this.getFriendList(acc);
         
+      });
+    },
+    handleChangeName() {
+      this.$prompt("请输入新昵称", "提示", {
+        confirmButtonText: "确定",
+        cancelButtonText: "取消",
+        inputErrorMessage: "昵称格式不正确",
+        // customClass: 'message-signature'
+      })
+        .then(({ value }) => {
+          if (value.length > 20) {
+            this.$message({
+              type: "error",
+              message: "昵称长度太长",
+            });
+            return;
+          }
+          const url =
+            this.store.state.requestUrl +
+            "/user/name?account=" +
+            this.account +
+            "&name=" +
+            value;
+          axios.post(url).then((res) => {
+            // 这里要做一次好友是否存在的检验，直接在前端做
+            console.log(res.data);
+            if (res.data.state == "success") {
+              this.$message({
+                type: "success",
+                message: "您的昵称是:" + value + " 发送成功",
+              });
+              this.getUserInfo();
+            } else {
+              this.$message({
+                type: "error",
+                message: res.data.message,
+              });
+            }
+          });
+        })
+        .catch(() => {
+          this.$message({
+            type: "info",
+            message: "取消输入",
+          });
+        });
+    },
+    handleChangeSignature() {
+      // const h = _this.$createElement;
+      this.$alert(
+        "<textarea class='signatureInput' id='signature'></textarea>",
+        "",
+        {
+          dangerouslyUseHTMLString: true,
+          confirmButtonText: "确定",
+        }
+      ).then(() => {
+        let value = document.getElementById("signature").value;
+        if (value.length > 100) {
+          this.$message({
+            type: "error",
+            message: "签名长度太长",
+          });
+          return;
+        }
+        const url =
+          this.store.state.requestUrl +
+          "/user/signature?account=" +
+          this.account +
+          "&signature=" +
+          value;
+        axios.post(url).then((res) => {
+          console.log(res.data);
+          if (res.data.state == "success") {
+            this.$message({
+              type: "success",
+              message: "签名设置成功",
+            });
+            this.getUserInfo();
+          } else {
+            this.$message({
+              type: "error",
+              message: res.data.message,
+            });
+          }
+        });
       });
     },
     getMessage() {
@@ -262,8 +351,8 @@ export default {
         this.selectFri.account;
 
       axios.get(url).then((res) => {
-
         this.messageList = res.data.message;
+        this.getFriendList(this.selectFri.account);
         // console.log(this.messageList);
         // console.log('getMessage',this.selectFri);
         this.scrollToBottom();
@@ -276,12 +365,12 @@ export default {
 
       axios.get(url).then((res) => {
         this.friendList = res.data.friendList;
-        for(let i=0;i<this.friendList.length;i++){
-          if(this.friendList[i].account==acc){
-            this.selectFri=this.friendList[i];
+        console.log(res.data);
+        for (let i = 0; i < this.friendList.length; i++) {
+          if (this.friendList[i].account == acc) {
+            this.selectFri = this.friendList[i];
           }
         }
-        
       });
     },
     handleSendMessage() {
@@ -313,7 +402,9 @@ export default {
             type: "success",
             message: "发送成功",
           });
+          this.send = "";
           this.getMessage();
+          // this.getFriendList();
         } else {
           this.$message({
             type: "error",
@@ -321,7 +412,6 @@ export default {
           });
         }
       });
-      this.send = "";
     },
     goBack() {
       this.$router.back();
@@ -334,18 +424,15 @@ export default {
     getUserInfo() {
       let url =
         this.store.state.requestUrl + "/user/info?account=" + this.account;
-      // console.log(url);
       axios.post(url).then((res) => {
-        // console.log(res.data.user);
         if (res.data.user) {
-          // console.log(res.data.user);
           this.user = res.data.user;
         } else {
           console.log(res.data.message);
         }
       });
     },
-    open() {
+    handleAddFriend() {
       this.$prompt("请输入对方账号", "提示", {
         confirmButtonText: "确定",
         cancelButtonText: "取消",
@@ -360,11 +447,10 @@ export default {
             value;
           axios.post(url).then((res) => {
             // 这里要做一次好友是否存在的检验，直接在前端做
-            // console.log(res.data);
             if (res.data.state == "success") {
               this.$message({
                 type: "success",
-                message: "对方账号是:" + value + ",发送成功",
+                message: "对方账号是:" + value + " 发送成功",
               });
               this.getFriendList();
             } else {
@@ -543,6 +629,16 @@ export default {
 .aside-user-desc-name {
   height: 40px;
   line-height: 40px;
+
+  display: inline-block;
+}
+.aside-user-desc-edit {
+  /* display: inline-block; */
+  float: right;
+  height: 40px;
+}
+.aside-user-desc-edit .el-button {
+  margin-left: 8px;
 }
 .aside-user-desc-signature {
   height: 40px;
@@ -552,6 +648,8 @@ export default {
   overflow: hidden;
   white-space: nowrap;
   text-overflow: ellipsis;
+
+  display: block;
 }
 
 .aside-search {
@@ -721,6 +819,7 @@ export default {
   vertical-align: middle;
   color: #444;
 }
+
 .maintalk-main-talkitem-time {
   margin-top: 10px;
   color: #777;
@@ -887,5 +986,17 @@ body {
 .blueMessage {
   background-color: #1099fe;
   color: white;
+}
+</style>
+
+<style>
+/* .message-signature input{
+    height:200px;
+  } */
+.signatureInput {
+  width: 300px;
+  height: 100px;
+  padding: 10px;
+  outline: none;
 }
 </style>
