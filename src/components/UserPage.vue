@@ -225,13 +225,33 @@ export default {
       this.router.push({ name: pageName });
     },
     handleChangeSelectFri(item) {
-      for (let i = 0; i < this.friendList; i++) {
-        if (this.friendList[i].account == this.selectFri.account) {
-          this.selectFri.name = this.friendList[i].name;
-        }
-      }
+      // for (let i = 0; i < this.friendList; i++) {
+      //   if (this.friendList[i].account == this.selectFri.account) {
+      //     this.selectFri.name = this.friendList[i].name;
+      //   }
+      // }
       this.selectFri = item;
-      this.getMessage();
+      // console.log(this.selectFri);
+      this.handleReadMessage(item.account); 
+      this.getMessage(); 
+      
+    },
+    handleReadMessage(acc){
+      let url =
+        this.store.state.requestUrl +
+        "/message/read?myaccount=" +
+        this.account +
+        "&hisaccount=" +
+        this.selectFri.account;
+
+        
+
+      axios.post(url).then(() => {
+
+          // console.log('handleReadMessage',this.selectFri);
+          this.getFriendList(acc);
+        
+      });
     },
     getMessage() {
       let url =
@@ -240,33 +260,28 @@ export default {
         this.account +
         "&hisaccount=" +
         this.selectFri.account;
-      // console.log(url);
+
       axios.get(url).then((res) => {
-        // console.log(res.data.message);
+
         this.messageList = res.data.message;
         // console.log(this.messageList);
+        // console.log('getMessage',this.selectFri);
         this.scrollToBottom();
       });
     },
-    // getLastMessage(){
-    //   let url =
-    //     this.store.state.requestUrl + "/message/last?account=" + this.account;
-    //   // console.log(url);
-    //   axios.get(url).then((res) => {
-    //     console.log(res);
-    //     // this.selectFri=this.friendList[0];
-    //   });
-    // },
-    getFriendList() {
+
+    getFriendList(acc) {
       let url =
         this.store.state.requestUrl + "/user/friend?account=" + this.account;
-      // console.log(url);
+
       axios.get(url).then((res) => {
         this.friendList = res.data.friendList;
-        console.log(this.friendList);
-        // this.handleChangeSelectFri(this.friendList[0]);
-
-        // this.selectFri=this.friendList[0];
+        for(let i=0;i<this.friendList.length;i++){
+          if(this.friendList[i].account==acc){
+            this.selectFri=this.friendList[i];
+          }
+        }
+        
       });
     },
     handleSendMessage() {
