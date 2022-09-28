@@ -48,7 +48,7 @@
               >
             </div>
             <div class="aside-user-desc-signature">
-              {{user.signature}}
+              {{ user.signature }}
             </div>
           </div>
         </div>
@@ -118,7 +118,7 @@
             <div class="aside-user-desc" style="left: 180px">
               <div class="aside-user-desc-name">{{ selectFri.name }}</div>
               <div class="aside-user-desc-signature">
-                {{selectFri.signature}}
+                {{ selectFri.signature }}
               </div>
             </div>
           </div>
@@ -160,7 +160,7 @@
 
         <div class="maintalk-footer">
           <div class="maintalk-footer-header">
-            <div class="maintalk-footer-header-expression">
+            <div class="maintalk-footer-header-expression" @click="handleClickEmoji()" :style="[emojiIsOpen?'background-color:#EEE;':'']">
               <img src="../assets/expression.png" />
             </div>
             <div class="maintalk-footer-header-outer">
@@ -185,6 +185,13 @@
             v-model="send"
             @keyup.enter="handleSendMessage()"
           ></textarea>
+          
+            <div class="emojiBlock" v-show="emojiIsOpen">
+            <template v-for="(item, index) in emojiList" :key="index">
+              <div @click="handleAddEmoji(item)">{{ item }}</div>
+            </template>
+          </div>
+          
         </div>
       </div>
     </div>
@@ -214,6 +221,8 @@ export default {
       send: "",
       selectFri: "",
       messageList: [],
+      emojiList: [],
+      emojiIsOpen:false
     };
   },
   created() {
@@ -222,10 +231,12 @@ export default {
     // console.log(this.$route.query.account);
     this.getUserInfo();
     this.getFriendList();
+    this.emojiList = this.store.state.emojiList;
+    console.log(this.emojiList.length);
     // this.getLastMessage();
     // console.log(this.store.state);
   },
-  
+
   methods: {
     goPage(pageName) {
       this.router.push({ name: pageName });
@@ -242,18 +253,23 @@ export default {
       this.handleReadMessage(item.account);
       this.getMessage();
     },
-    handleReadMessage(acc){
+    handleClickEmoji(){
+      this.emojiIsOpen=!this.emojiIsOpen;
+    },
+    handleAddEmoji(emoji){
+      this.send+=emoji
+    },
+    handleReadMessage(acc) {
       let url =
         this.store.state.requestUrl +
         "/message/read?myaccount=" +
         this.account +
         "&hisaccount=" +
         this.selectFri.account;
-        
+
       axios.post(url).then(() => {
-          // console.log('handleReadMessage',this.selectFri);
-          this.getFriendList(acc);
-        
+        // console.log('handleReadMessage',this.selectFri);
+        this.getFriendList(acc);
       });
     },
     handleChangeName() {
@@ -855,6 +871,8 @@ export default {
   height: 20%;
   width: 100%;
   box-sizing: border-box;
+
+  position: relative;
 }
 .maintalk-footer-header {
   height: 30%;
@@ -986,6 +1004,33 @@ body {
 .blueMessage {
   background-color: #1099fe;
   color: white;
+}
+.emojiBlock {
+  width: 500px;
+  background-color: white;
+  margin: 20px;
+  border-radius: 10px;
+  border: 1px solid #777;
+
+  position: absolute;
+  top: -244%;
+  left: -30%;
+}
+.emojiBlock div {
+  width: 50px;
+  height: 50px;
+  display: inline-block;
+  border-radius: 1px;
+  box-sizing: border-box;
+  /* border-right: 1px solid black;
+  border-bottom: 1px solid black; */
+  font-size: 30px;
+  text-align: center;
+  line-height: 50px;
+  cursor: pointer;
+}
+.emojiBlock div:hover{
+  background-color: #DDD;
 }
 </style>
 
