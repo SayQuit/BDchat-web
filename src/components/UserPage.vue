@@ -35,17 +35,36 @@
 
       <div class="aside">
         <div class="aside-user">
-          <div class="aside-user-profilepicture"></div>
+          <el-avatar
+            v-if="avatarUrl"
+            :src="avatarUrl"
+            class="aside-user-profilepicture"
+          ></el-avatar>
+          <el-avatar
+            v-else
+            src="https://cube.elemecdn.com/0/88/03b0d39583f48206768a7534e55bcpng.png"
+            class="aside-user-profilepicture"
+          ></el-avatar>
           <div class="aside-user-desc">
             <div class="aside-user-desc-name">{{ user.name }}</div>
             <div class="aside-user-desc-edit">
               <el-button type="primary" @click="handleChangeName()"
                 >更换昵称</el-button
               >
-              <el-button type="success">更换头像</el-button>
-              <el-button type="warning" @click="handleChangeSignature()"
+              <el-button type="success" @click="handleChangeSignature()"
                 >更换签名</el-button
               >
+              <el-button type="warning">更换头像</el-button>
+              <div class="avatar-uploader" :show-file-list="false">
+                <img v-if="avatarUrl" :src="avatarUrl" class="avatar" />
+                <div v-else class="el-icon-plus avatar-uploader-icon">+</div>
+                <input
+                  type="file"
+                  class="maintalk-footer-header-sendImg"
+                  style="top: 0"
+                  @change="handleAvatarSuccess"
+                />
+              </div>
             </div>
             <div class="aside-user-desc-signature">
               {{ user.signature }}
@@ -65,7 +84,11 @@
               :class="{ currentSelect: selectFri == item }"
               @click="handleChangeSelectFri(item)"
             >
-              <div class="aside-user-profilepicture" style="left: 40px"></div>
+              <el-avatar
+                src="https://cube.elemecdn.com/0/88/03b0d39583f48206768a7534e55bcpng.png"
+                class="aside-user-profilepicture"
+                style="left: 40px"
+              ></el-avatar>
               <div
                 class="aside-user-desc"
                 style="margin-left: 50px; width: 400px"
@@ -111,10 +134,14 @@
         </div>
       </div>
 
-      <div class="maintalk">
+      <div class="maintalk" v-if="selectFri">
         <div class="maintalk-header">
           <div class="maintalk-header-desc">
-            <div class="aside-user-profilepicture" style="left: 60px"></div>
+            <el-avatar
+              src="https://cube.elemecdn.com/0/88/03b0d39583f48206768a7534e55bcpng.png"
+              class="aside-user-profilepicture"
+              style="left: 60px"
+            ></el-avatar>
             <div class="aside-user-desc" style="left: 180px">
               <div class="aside-user-desc-name">{{ selectFri.name }}</div>
               <div class="aside-user-desc-signature">
@@ -160,7 +187,11 @@
 
         <div class="maintalk-footer">
           <div class="maintalk-footer-header">
-            <div class="maintalk-footer-header-expression" @click="handleClickEmoji()" :style="[emojiIsOpen?'background-color:#EEE;':'']">
+            <div
+              class="maintalk-footer-header-expression"
+              @click="handleClickEmoji()"
+              :style="[emojiIsOpen ? 'background-color:#EEE;' : '']"
+            >
               <img src="../assets/expression.png" />
             </div>
             <div class="maintalk-footer-header-outer">
@@ -185,13 +216,12 @@
             v-model="send"
             @keyup.enter="handleSendMessage()"
           ></textarea>
-          
-            <div class="emojiBlock" v-show="emojiIsOpen">
+
+          <div class="emojiBlock" v-show="emojiIsOpen">
             <template v-for="(item, index) in emojiList" :key="index">
               <div @click="handleAddEmoji(item)">{{ item }}</div>
             </template>
           </div>
-          
         </div>
       </div>
     </div>
@@ -222,7 +252,8 @@ export default {
       selectFri: "",
       messageList: [],
       emojiList: [],
-      emojiIsOpen:false
+      avatarUrl: "",
+      emojiIsOpen: false,
     };
   },
   created() {
@@ -253,11 +284,38 @@ export default {
       this.handleReadMessage(item.account);
       this.getMessage();
     },
-    handleClickEmoji(){
-      this.emojiIsOpen=!this.emojiIsOpen;
+    handleClickEmoji() {
+      this.emojiIsOpen = !this.emojiIsOpen;
     },
-    handleAddEmoji(emoji){
-      this.send+=emoji
+    handleAddEmoji(emoji) {
+      this.send += emoji;
+    },
+    handleAvatarSuccess(e) {
+      let file = e.target.files[0];
+      if (window.FileReader) {
+        let reader = new FileReader();
+        reader.readAsDataURL(file);
+        reader.onload = (e) => {
+          let base64String = e.target.result;
+          // console.log(base64String);
+          let base64Img = this.compressImg(base64String, 100, 0.5);
+          base64Img.then((res) => {
+            console.log(res.length);
+            if (res.length > 12000) {
+              this.$message({
+                type: "error",
+                message: "发送失败,图片过大",
+              });
+              return;
+            }
+
+            console.log(base64Img);
+            base64Img.then((res) => {
+              this.avatarUrl = res;
+            });
+          });
+        };
+      }
     },
     handleReadMessage(acc) {
       let url =
@@ -529,9 +587,7 @@ export default {
           // console.log(base64String);
           let base64Img = this.compressImg(base64String, 100, 0.7);
           base64Img.then((res) => {
-            // console.log(res);
             console.log(res.length);
-            // console.log(base64Img);
             if (res.length > 12000) {
               this.$message({
                 type: "error",
@@ -1029,8 +1085,39 @@ body {
   line-height: 50px;
   cursor: pointer;
 }
-.emojiBlock div:hover{
-  background-color: #DDD;
+.emojiBlock div:hover {
+  background-color: #ddd;
+}
+.avatar-uploader {
+  width: 178px;
+  display: inline-block;
+  position: absolute;
+  background-color: white;
+  top: -50%;
+  border: 1px dashed;
+}
+.avatar-uploader .el-upload {
+  border: 1px dashed #d9d9d9;
+  border-radius: 6px;
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+}
+.avatar-uploader .el-upload:hover {
+  border-color: #409eff;
+}
+.avatar-uploader .avatar-uploader-icon {
+  font-size: 28px;
+  color: #8c939d;
+  width: 178px;
+  height: 178px;
+  line-height: 178px;
+  text-align: center;
+}
+.avatar {
+  width: 178px;
+  height: 178px;
+  display: block;
 }
 </style>
 
@@ -1043,5 +1130,9 @@ body {
   height: 100px;
   padding: 10px;
   outline: none;
+}
+.el-avatar img {
+  width: 100%;
+  height: 100%;
 }
 </style>
