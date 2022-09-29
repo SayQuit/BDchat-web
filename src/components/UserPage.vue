@@ -36,8 +36,8 @@
       <div class="aside">
         <div class="aside-user">
           <el-avatar
-            v-if="avatarUrl"
-            :src="avatarUrl"
+            v-if="user.avatar"
+            :src="user.avatar"
             class="aside-user-profilepicture"
           ></el-avatar>
           <el-avatar
@@ -54,10 +54,10 @@
               <el-button type="success" @click="handleChangeSignature()"
                 >更换签名</el-button
               >
-              <el-button type="warning">更换头像</el-button>
-              <div class="avatar-uploader" :show-file-list="false">
-                <img v-if="avatarUrl" :src="avatarUrl" class="avatar" />
-                <div v-else class="el-icon-plus avatar-uploader-icon">+</div>
+              <el-button type="warning" @click="handleChangeAvatar()">更换头像</el-button>
+              <div class="avatar-uploader" :show-file-list="false" v-show="avatarFileIsOpen">
+                <!-- <img v-if="user.avatar" :src="user.avatar" class="avatar" /> -->
+                <div class="el-icon-plus avatar-uploader-icon">+</div>
                 <input
                   type="file"
                   class="maintalk-footer-header-sendImg"
@@ -85,6 +85,13 @@
               @click="handleChangeSelectFri(item)"
             >
               <el-avatar
+                v-if="item.avatar"
+                :src="item.avatar"
+                class="aside-user-profilepicture"
+                style="left: 40px"
+              ></el-avatar>
+              <el-avatar
+                v-else
                 src="https://cube.elemecdn.com/0/88/03b0d39583f48206768a7534e55bcpng.png"
                 class="aside-user-profilepicture"
                 style="left: 40px"
@@ -138,9 +145,16 @@
         <div class="maintalk-header">
           <div class="maintalk-header-desc">
             <el-avatar
+              v-if="selectFri.avatar"
+              :src="selectFri.avatar"
+              class="aside-user-profilepicture"
+              style="left: 40px"
+            ></el-avatar>
+            <el-avatar
+              v-else
               src="https://cube.elemecdn.com/0/88/03b0d39583f48206768a7534e55bcpng.png"
               class="aside-user-profilepicture"
-              style="left: 60px"
+              style="left: 40px"
             ></el-avatar>
             <div class="aside-user-desc" style="left: 180px">
               <div class="aside-user-desc-name">{{ selectFri.name }}</div>
@@ -156,7 +170,46 @@
             <div :class="[item.sendID == account ? 'isMe' : 'isFri']">
               <div class="maintalk-main-talkitem">
                 <div class="maintalk-main-talkitem-user">
-                  <div class="maintalk-main-talkitem-user-profilepicture"></div>
+                  <!-- <el-avatar v-if="selectFri.avatar"
+                :src="selectFri.avatar"
+                class="aside-user-profilepicture"
+                style="left: 40px"
+              ></el-avatar>
+              <el-avatar v-else
+                src="https://cube.elemecdn.com/0/88/03b0d39583f48206768a7534e55bcpng.png"
+                class="aside-user-profilepicture"
+                style="left: 40px"
+              ></el-avatar> -->
+
+                  <template v-if="item.sendID == account">
+                    <el-avatar
+                      v-if="user.avatar"
+                      :src="user.avatar"
+                      class="maintalk-main-talkitem-user-profilepicture"
+                      style="left: 40px"
+                    ></el-avatar>
+                    <el-avatar
+                      v-else
+                      src="https://cube.elemecdn.com/0/88/03b0d39583f48206768a7534e55bcpng.png"
+                      class="maintalk-main-talkitem-user-profilepicture"
+                      style="left: 40px"
+                    ></el-avatar>
+                  </template>
+                  <template v-else>
+                    <el-avatar
+                      v-if="selectFri.avatar"
+                      :src="selectFri.avatar"
+                      class="maintalk-main-talkitem-user-profilepicture"
+                      style="left: 40px"
+                    ></el-avatar>
+                    <el-avatar
+                      v-else
+                      src="https://cube.elemecdn.com/0/88/03b0d39583f48206768a7534e55bcpng.png"
+                      class="maintalk-main-talkitem-user-profilepicture"
+                      style="left: 40px"
+                    ></el-avatar>
+                  </template>
+
                   <div class="maintalk-main-talkitem-user-name">
                     <template v-if="item.sendID == account"> 我 </template>
                     <template v-else>
@@ -224,6 +277,7 @@
           </div>
         </div>
       </div>
+      <!-- <CropperComponent  ref="iscropper" style="width:100%;height: 200px;"></CropperComponent> -->
     </div>
   </div>
 </template>
@@ -232,6 +286,8 @@
 import { useRouter } from "vue-router";
 import axios from "axios";
 import { useStore } from "vuex";
+// import CropperComponent from "./CropperComponent.vue";
+
 export default {
   setup() {
     const router = useRouter();
@@ -247,13 +303,15 @@ export default {
       user: {
         name: "",
         account: "",
+        avatar: "",
       },
       send: "",
       selectFri: "",
       messageList: [],
       emojiList: [],
-      avatarUrl: "",
+      // avatarUrl: "",
       emojiIsOpen: false,
+      avatarFileIsOpen:false
     };
   },
   created() {
@@ -267,7 +325,6 @@ export default {
     // this.getLastMessage();
     // console.log(this.store.state);
   },
-
   methods: {
     goPage(pageName) {
       this.router.push({ name: pageName });
@@ -287,6 +344,9 @@ export default {
     handleClickEmoji() {
       this.emojiIsOpen = !this.emojiIsOpen;
     },
+    handleChangeAvatar() {
+      this.avatarFileIsOpen = !this.avatarFileIsOpen;
+    },
     handleAddEmoji(emoji) {
       this.send += emoji;
     },
@@ -298,9 +358,9 @@ export default {
         reader.onload = (e) => {
           let base64String = e.target.result;
           // console.log(base64String);
-          let base64Img = this.compressImg(base64String, 100, 0.5);
+          let base64Img = this.compressImg(base64String, 100, 0.3);
           base64Img.then((res) => {
-            console.log(res.length);
+            // console.log(res.length);
             if (res.length > 12000) {
               this.$message({
                 type: "error",
@@ -308,10 +368,38 @@ export default {
               });
               return;
             }
-
-            console.log(base64Img);
+            // console.log(base64Img);
             base64Img.then((res) => {
-              this.avatarUrl = res;
+              // this.avatarUrl = res;
+              // console.log(res);
+              let url =
+                this.store.state.requestUrl +
+                "/user/avatar?avatar=" +
+                this.account +
+                "&avatar=" +
+                res;
+              console.log(url);
+              axios({
+                method: "POST",
+                url: "http://127.0.0.1:80/user/avatar",
+                params: [res, this.account],
+                headers: {
+                  "Content-Type": "application/x-www-form-urlencoded",
+                },
+              }).then((res) => {
+                if (res.data.state == "success") {
+                  this.$message({
+                    type: "success",
+                    message: "发送成功",
+                  });
+                  this.getUserInfo();
+                } else {
+                  this.$message({
+                    type: "error",
+                    message: "发送失败",
+                  });
+                }
+              });
             });
           });
         };
@@ -324,7 +412,6 @@ export default {
         this.account +
         "&hisaccount=" +
         this.selectFri.account;
-
       axios.post(url).then(() => {
         // console.log('handleReadMessage',this.selectFri);
         this.getFriendList(acc);
@@ -423,7 +510,6 @@ export default {
         this.account +
         "&hisaccount=" +
         this.selectFri.account;
-
       axios.get(url).then((res) => {
         this.messageList = res.data.message;
         this.getFriendList(this.selectFri.account);
@@ -432,11 +518,9 @@ export default {
         this.scrollToBottom();
       });
     },
-
     getFriendList(acc) {
       let url =
         this.store.state.requestUrl + "/user/friend?account=" + this.account;
-
       axios.get(url).then((res) => {
         this.friendList = res.data.friendList;
         console.log(res.data);
@@ -501,8 +585,12 @@ export default {
       axios.post(url).then((res) => {
         if (res.data.user) {
           this.user = res.data.user;
+          console.log(this.user);
         } else {
-          console.log(res.data.message);
+          this.$message({
+            type: "error",
+            message: res.data.message,
+          });
         }
       });
     },
@@ -550,7 +638,6 @@ export default {
       };
       var newImage = new Image();
       var imgWidth, imgHeight;
-
       var promise = new Promise((resolve) => (newImage.onload = resolve));
       newImage.src = base64String;
       return promise.then(() => {
@@ -595,7 +682,6 @@ export default {
               });
               return;
             }
-
             axios({
               method: "POST",
               url: "http://127.0.0.1:80/message/sendImg",
@@ -1095,6 +1181,8 @@ body {
   background-color: white;
   top: -50%;
   border: 1px dashed;
+  z-index: 10;
+  left: 95%;
 }
 .avatar-uploader .el-upload {
   border: 1px dashed #d9d9d9;
