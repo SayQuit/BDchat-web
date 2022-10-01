@@ -25,11 +25,19 @@
             @click="goPage('AccountManage')"
             >最小化</el-button
           >
-          <el-button class="header-operation-close" type="warning" @click="handleClickApply()" v-if="applyLength==0"
+          <el-button
+            class="header-operation-close"
+            type="warning"
+            @click="handleClickApply()"
+            v-if="applyLength == 0"
             >好友申请</el-button
           >
-          <el-button class="header-operation-close" type="warning" @click="handleClickApply()" v-else
-            >好友申请({{applyLength}})</el-button
+          <el-button
+            class="header-operation-close"
+            type="warning"
+            @click="handleClickApply()"
+            v-else
+            >好友申请({{ applyLength }})</el-button
           >
           <el-button class="header-operation-close" type="danger"
             >退出</el-button
@@ -115,7 +123,9 @@
             class="aside-user-profilepicture"
           ></el-avatar>
           <div class="aside-user-desc">
-            <div class="aside-user-desc-name">{{ user.name }}({{user.account}})</div>
+            <div class="aside-user-desc-name">
+              {{ user.name }}({{ user.account }})
+            </div>
             <div class="aside-user-desc-edit">
               <el-button type="primary" @click="handleChangeName()"
                 >更换昵称</el-button
@@ -148,12 +158,12 @@
         </div>
 
         <div class="aside-search">
-          <input type="text" class="aside-search-input" />
-          <div class="aside-search-button">搜索</div>
+          <input type="text" class="aside-search-input" v-model="searchWord"/>
+          <div class="aside-search-button" @click="handleSearch">搜索</div>
         </div>
 
         <div class="aside-talkblock">
-          <template v-for="(item, index) in friendList" :key="index">
+          <template v-for="(item, index) in tempFriendList" :key="index">
             <div
               class="aside-talkblock-talkitem"
               :class="{ currentSelect: selectFri == item }"
@@ -175,7 +185,9 @@
                 class="aside-user-desc"
                 style="margin-left: 50px; width: 400px"
               >
-                <div class="aside-user-desc-name">{{ item.name }}({{item.account}})</div>
+                <div class="aside-user-desc-name">
+                  {{ item.name }}({{ item.account }})
+                </div>
                 <div class="aside-user-desc-signature">
                   <template v-if="item.isMe"> 我: </template>
                   <template v-else> {{ item.name }}: </template>
@@ -232,7 +244,9 @@
               style="left: 40px"
             ></el-avatar>
             <div class="aside-user-desc" style="left: 180px">
-              <div class="aside-user-desc-name">{{ selectFri.name }}({{ selectFri.account }})</div>
+              <div class="aside-user-desc-name">
+                {{ selectFri.name }}({{ selectFri.account }})
+              </div>
               <div class="aside-user-desc-signature">
                 {{ selectFri.signature }}
               </div>
@@ -245,17 +259,6 @@
             <div :class="[item.sendID == account ? 'isMe' : 'isFri']">
               <div class="maintalk-main-talkitem">
                 <div class="maintalk-main-talkitem-user">
-                  <!-- <el-avatar v-if="selectFri.avatar"
-                :src="selectFri.avatar"
-                class="aside-user-profilepicture"
-                style="left: 40px"
-              ></el-avatar>
-              <el-avatar v-else
-                src="https://cube.elemecdn.com/0/88/03b0d39583f48206768a7534e55bcpng.png"
-                class="aside-user-profilepicture"
-                style="left: 40px"
-              ></el-avatar> -->
-
                   <template v-if="item.sendID == account">
                     <el-avatar
                       v-if="user.avatar"
@@ -293,6 +296,12 @@
                   </div>
                 </div>
                 <div class="maintalk-main-talkitem-time">{{ item.time }}</div>
+
+                <template v-if="item.sendID == account">
+                  <div v-if="item.isRead == 1" class="isread">已读</div>
+                  <div v-else class="notread">未读</div>
+                </template>
+
                 <div
                   class="maintalk-main-talkitem-content"
                   :class="[
@@ -376,6 +385,7 @@ export default {
       store: "",
       account: "",
       friendList: [],
+      tempFriendList:[],
       user: {
         name: "",
         account: "",
@@ -389,21 +399,18 @@ export default {
       emojiIsOpen: false,
       avatarFileIsOpen: false,
       applyList: [],
-      ApplyIsOpen:false,
-      applyLength:0
+      ApplyIsOpen: false,
+      applyLength: 0,
+      searchWord:''
     };
   },
   created() {
     this.store = useStore();
     this.account = this.$route.query.account;
-    // console.log(this.$route.query.account);
     this.getUserInfo();
     this.getFriendList();
     this.getApply();
     this.emojiList = this.store.state.emojiList;
-    // console.log(this.emojiList.length);
-    // this.getLastMessage();
-    // console.log(this.store.state);
   },
   methods: {
     goPage(pageName) {
@@ -416,8 +423,6 @@ export default {
       //   }
       // }
       this.selectFri = item;
-      // console.log(this.friendList);
-      // console.log(this.selectFri);
       this.handleReadMessage(item.account);
       this.getMessage();
     },
@@ -440,10 +445,8 @@ export default {
         reader.readAsDataURL(file);
         reader.onload = (e) => {
           let base64String = e.target.result;
-          // console.log(base64String);
           let base64Img = this.compressImg(base64String, 100, 0.3);
           base64Img.then((res) => {
-            // console.log(res.length);
             if (res.length > 12000) {
               this.$message({
                 type: "error",
@@ -451,10 +454,7 @@ export default {
               });
               return;
             }
-            // console.log(base64Img);
             base64Img.then((res) => {
-              // this.avatarUrl = res;
-              // console.log(res);
               let url =
                 this.store.state.requestUrl +
                 "/user/avatar?avatar=" +
@@ -544,6 +544,23 @@ export default {
             message: "取消输入",
           });
         });
+    },    
+    handleSearch(){
+     console.log(this.searchWord);
+      if(this.searchWord==''){
+        this.tempFriendList=[]
+        for (let i = 0; i < this.friendList.length; i++) {
+          this.tempFriendList.push(this.friendList[i])
+          
+        }
+        return;
+      }
+      this.tempFriendList=[]
+      for(let i=0;i<this.friendList.length;i++){
+        if(this.friendList[i].name.search(this.searchWord)!=-1||this.friendList[i].account.search(this.searchWord)!=-1){
+          this.tempFriendList.push(this.friendList[i])
+        }
+      }
     },
     handleChangeSignature() {
       // const h = _this.$createElement;
@@ -596,7 +613,7 @@ export default {
       axios.get(url).then((res) => {
         this.messageList = res.data.message;
         this.getFriendList(this.selectFri.account);
-        // console.log(this.messageList);
+        console.log(this.messageList);
         // console.log('getMessage',this.selectFri);
         this.scrollToBottom();
       });
@@ -606,9 +623,9 @@ export default {
         this.store.state.requestUrl + "/apply/get?account=" + this.account;
       axios.get(url).then((res) => {
         this.applyList = res.data.applyList;
-        this.applyLength=0
-        this.applyList.forEach(element => {
-          if(element.sendID!=this.account&&element.isSuccess==0){
+        this.applyLength = 0;
+        this.applyList.forEach((element) => {
+          if (element.sendID != this.account && element.isSuccess == 0) {
             this.applyLength++;
           }
         });
@@ -621,9 +638,12 @@ export default {
       axios.get(url).then((res) => {
         this.friendList = res.data.friendList;
         // console.log(res.data);
+        
+        this.tempFriendList=[]
         for (let i = 0; i < this.friendList.length; i++) {
-          if (this.friendList[i].account == acc) {
-            this.selectFri = this.friendList[i];
+          this.tempFriendList.push(this.friendList[i])
+          if (this.tempFriendList[i].account == acc) {
+            this.selectFri = this.tempFriendList[i];
           }
         }
       });
@@ -1445,6 +1465,14 @@ body {
   left: 50%;
   transform: translateY(-50%) translateX(-50%);
 }
+.maintalk-main-talkitem .isread {
+  color: #444;
+  padding-top: 5px;
+}
+.maintalk-main-talkitem .notread {
+  color: #777;
+  padding-top: 5px;
+}
 </style>
 
 <style>
@@ -1461,10 +1489,11 @@ body {
   width: 100%;
   height: 100%;
 }
-.reject{
-  color: #FF0000;
+.reject {
+  color: #ff0000;
 }
-.allow{
-  color: #00FF00;
+.allow {
+  color: #00ff00;
 }
+
 </style>

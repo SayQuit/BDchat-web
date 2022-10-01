@@ -28,6 +28,7 @@
       <div class="main">
         <template v-for="(item, index) in user" :key="index">
           <div class="item" @click="handleClickAccount(item.account)">
+            <div class="avatar"><img :src="item.avatar"></div>
             <div class="account">账号:{{ item.account }}</div>
             <div class="name">昵称:{{ item.name }}</div>
           </div>
@@ -135,10 +136,24 @@ export default {
 .item:last-child {
   margin-right: auto;
 }
+.avatar{
+  width: 100px;
+  height: 100px;
+
+  
+  margin: 0 auto;
+  margin-top: 20px;
+}
+.avatar img{
+  width: 100%;
+  height: 100%;  
+  border-radius: 50px;
+
+}
 .account {
-  margin-top: 50px;
+  margin-top: 20px;
 }
 .name {
-  margin-top: 20px;
+  margin-top: 10px;
 }
 </style>
