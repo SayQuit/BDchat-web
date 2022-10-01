@@ -24,12 +24,81 @@
             type="primary"
             @click="goPage('AccountManage')"
             >最小化</el-button
-          ><el-button class="header-operation-close" type="warning"
-            >消息</el-button
+          >
+          <el-button class="header-operation-close" type="warning" @click="handleClickApply()" v-if="applyLength==0"
+            >好友申请</el-button
+          >
+          <el-button class="header-operation-close" type="warning" @click="handleClickApply()" v-else
+            >好友申请({{applyLength}})</el-button
           >
           <el-button class="header-operation-close" type="danger"
             >退出</el-button
           >
+          <div class="friendApply" v-show="ApplyIsOpen">
+            <template v-for="(item, index) in applyList" :key="index">
+              <div class="apply-item">
+                <template v-if="item.sendID != account">
+                  <div class="apply-item-desc">
+                    <div>{{ item.sendID }} 申请加你为好友</div>
+                  </div>
+
+                  <template v-if="item.isSuccess == 0">
+                    <div class="apply-item-opration">
+                      <div class="apply-item-operation-success">
+                        <el-button
+                          type="success"
+                          @click="handleSendAllowOrRejectApply(1, item)"
+                          >同意</el-button
+                        >
+                      </div>
+                      <div class="apply-item-operation-reject">
+                        <el-button
+                          type="danger"
+                          @click="handleSendAllowOrRejectApply(-1, item)"
+                          >拒绝</el-button
+                        >
+                      </div>
+                    </div>
+                  </template>
+
+                  <template v-if="item.isSuccess == -1">
+                    <div class="apply-item-hasReject reject">
+                      <div class="mid">已拒绝</div>
+                    </div>
+                  </template>
+
+                  <template v-if="item.isSuccess == 1">
+                    <div class="apply-item-hasReject allow">
+                      <div class="mid">已同意</div>
+                    </div>
+                  </template>
+                </template>
+                <template v-else>
+                  <div class="apply-item-desc">
+                    <div>您申请添加 {{ item.getID }} 为好友</div>
+                  </div>
+
+                  <template v-if="item.isSuccess == 0">
+                    <div class="apply-item-hasReject">
+                      <div class="mid">等待中</div>
+                    </div>
+                  </template>
+
+                  <template v-if="item.isSuccess == -1">
+                    <div class="apply-item-hasReject reject">
+                      <div class="mid">已拒绝</div>
+                    </div>
+                  </template>
+
+                  <template v-if="item.isSuccess == 1">
+                    <div class="apply-item-hasReject allow">
+                      <div class="mid">已同意</div>
+                    </div>
+                  </template>
+                </template>
+              </div>
+            </template>
+          </div>
         </div>
       </div>
 
@@ -46,7 +115,7 @@
             class="aside-user-profilepicture"
           ></el-avatar>
           <div class="aside-user-desc">
-            <div class="aside-user-desc-name">{{ user.name }}</div>
+            <div class="aside-user-desc-name">{{ user.name }}({{user.account}})</div>
             <div class="aside-user-desc-edit">
               <el-button type="primary" @click="handleChangeName()"
                 >更换昵称</el-button
@@ -54,8 +123,14 @@
               <el-button type="success" @click="handleChangeSignature()"
                 >更换签名</el-button
               >
-              <el-button type="warning" @click="handleChangeAvatar()">更换头像</el-button>
-              <div class="avatar-uploader" :show-file-list="false" v-show="avatarFileIsOpen">
+              <el-button type="warning" @click="handleChangeAvatar()"
+                >更换头像</el-button
+              >
+              <div
+                class="avatar-uploader"
+                :show-file-list="false"
+                v-show="avatarFileIsOpen"
+              >
                 <!-- <img v-if="user.avatar" :src="user.avatar" class="avatar" /> -->
                 <div class="el-icon-plus avatar-uploader-icon">+</div>
                 <input
@@ -100,7 +175,7 @@
                 class="aside-user-desc"
                 style="margin-left: 50px; width: 400px"
               >
-                <div class="aside-user-desc-name">{{ item.name }}</div>
+                <div class="aside-user-desc-name">{{ item.name }}({{item.account}})</div>
                 <div class="aside-user-desc-signature">
                   <template v-if="item.isMe"> 我: </template>
                   <template v-else> {{ item.name }}: </template>
@@ -157,7 +232,7 @@
               style="left: 40px"
             ></el-avatar>
             <div class="aside-user-desc" style="left: 180px">
-              <div class="aside-user-desc-name">{{ selectFri.name }}</div>
+              <div class="aside-user-desc-name">{{ selectFri.name }}({{ selectFri.account }})</div>
               <div class="aside-user-desc-signature">
                 {{ selectFri.signature }}
               </div>
@@ -277,6 +352,7 @@
           </div>
         </div>
       </div>
+
       <!-- <CropperComponent  ref="iscropper" style="width:100%;height: 200px;"></CropperComponent> -->
     </div>
   </div>
@@ -311,7 +387,10 @@ export default {
       emojiList: [],
       // avatarUrl: "",
       emojiIsOpen: false,
-      avatarFileIsOpen:false
+      avatarFileIsOpen: false,
+      applyList: [],
+      ApplyIsOpen:false,
+      applyLength:0
     };
   },
   created() {
@@ -320,8 +399,9 @@ export default {
     // console.log(this.$route.query.account);
     this.getUserInfo();
     this.getFriendList();
+    this.getApply();
     this.emojiList = this.store.state.emojiList;
-    console.log(this.emojiList.length);
+    // console.log(this.emojiList.length);
     // this.getLastMessage();
     // console.log(this.store.state);
   },
@@ -343,6 +423,9 @@ export default {
     },
     handleClickEmoji() {
       this.emojiIsOpen = !this.emojiIsOpen;
+    },
+    handleClickApply() {
+      this.ApplyIsOpen = !this.ApplyIsOpen;
     },
     handleChangeAvatar() {
       this.avatarFileIsOpen = !this.avatarFileIsOpen;
@@ -518,12 +601,26 @@ export default {
         this.scrollToBottom();
       });
     },
+    getApply() {
+      let url =
+        this.store.state.requestUrl + "/apply/get?account=" + this.account;
+      axios.get(url).then((res) => {
+        this.applyList = res.data.applyList;
+        this.applyLength=0
+        this.applyList.forEach(element => {
+          if(element.sendID!=this.account&&element.isSuccess==0){
+            this.applyLength++;
+          }
+        });
+        // console.log(this.applyList);
+      });
+    },
     getFriendList(acc) {
       let url =
         this.store.state.requestUrl + "/user/friend?account=" + this.account;
       axios.get(url).then((res) => {
         this.friendList = res.data.friendList;
-        console.log(res.data);
+        // console.log(res.data);
         for (let i = 0; i < this.friendList.length; i++) {
           if (this.friendList[i].account == acc) {
             this.selectFri = this.friendList[i];
@@ -585,7 +682,61 @@ export default {
       axios.post(url).then((res) => {
         if (res.data.user) {
           this.user = res.data.user;
-          console.log(this.user);
+          // console.log(this.user);
+        } else {
+          this.$message({
+            type: "error",
+            message: res.data.message,
+          });
+        }
+      });
+    },
+    handleSendAllowOrRejectApply(allow, item) {
+      for (let i = 0; i < this.friendList.length; i++) {
+        if (
+          this.friendList[i].account == item.sendID ||
+          this.friendList[i].account == item.getID
+        ) {
+          this.$message({
+            type: "error",
+            message: "对方已经是您的好友",
+          });
+
+          const url =
+            this.store.state.requestUrl +
+            "/apply/hasBeFriend?id=" +
+            item.id +
+            "&allow=" +
+            1;
+          axios.post(url).then((res) => {
+            if (res.data.state == "success") {
+              this.getApply();
+            } else {
+              this.$message({
+                type: "error",
+                message: res.data.message,
+              });
+            }
+          });
+
+          return;
+        }
+      }
+
+      const url =
+        this.store.state.requestUrl +
+        "/apply/allow?id=" +
+        item.id +
+        "&allow=" +
+        allow +
+        "&account1=" +
+        this.account +
+        "&account2=" +
+        item.sendID;
+      axios.post(url).then((res) => {
+        if (res.data.state == "success") {
+          this.getFriendList();
+          this.getApply();
         } else {
           this.$message({
             type: "error",
@@ -601,20 +752,30 @@ export default {
         inputErrorMessage: "账号格式不正确",
       })
         .then(({ value }) => {
+          for (let i = 0; i < this.friendList.length; i++) {
+            if (this.friendList[i].account == value) {
+              this.$message({
+                type: "error",
+                message: "对方已经是您的好友",
+              });
+              return;
+            }
+          }
+
           const url =
             this.store.state.requestUrl +
-            "/user/add?account1=" +
+            "/apply/send?myaccount=" +
             this.account +
-            "&account2=" +
+            "&hisaccount=" +
             value;
           axios.post(url).then((res) => {
-            // 这里要做一次好友是否存在的检验，直接在前端做
             if (res.data.state == "success") {
               this.$message({
                 type: "success",
                 message: "对方账号是:" + value + " 发送成功",
               });
               this.getFriendList();
+              this.getApply();
             } else {
               this.$message({
                 type: "error",
@@ -724,13 +885,14 @@ export default {
   width: 100%;
   height: 50px;
   margin-top: 10px;
+  position: relative;
 }
 .header-operation {
   height: 100%;
   float: right;
   margin-right: 30px;
 }
-.header-operation div {
+.header-operation > div {
   height: 100%;
   width: 33%;
   display: inline-block;
@@ -1207,6 +1369,82 @@ body {
   height: 178px;
   display: block;
 }
+.header .friendApply {
+  /* display: block; */
+  width: 350px;
+  height: 500px;
+  background-color: white;
+  position: absolute;
+  left: 75%;
+  top: 50%;
+  border-radius: 10px;
+  overflow: scroll;
+  overflow-x: hidden;
+  box-sizing: border-box;
+  z-index: 10;
+  border: 1px solid #ddd;
+}
+.header .friendApply .apply-item {
+  height: 125px;
+  width: 100%;
+  border-bottom: 1px solid #ddd;
+  box-sizing: border-box;
+  z-index: 10;
+  display: flex;
+
+  /* display: block; */
+}
+.apply-item-desc {
+  flex: 7;
+  position: relative;
+}
+.apply-item-desc > div {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  text-align: center;
+  width: 100%;
+  color: #444;
+}
+.apply-item-opration {
+  flex: 3;
+  display: flex;
+  flex-direction: column;
+  padding: 15px 0;
+}
+.apply-item-operation-success {
+  flex: 1;
+  position: relative;
+}
+.apply-item-operation-reject {
+  flex: 1;
+  position: relative;
+}
+.apply-item-operation-success > .el-button {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%) translateX(-50%);
+  left: 50%;
+}
+.apply-item-operation-reject > .el-button {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%) translateX(-50%);
+  left: 50%;
+}
+.apply-item-operation-reject .header .friendApply .apply-item:last-of-type {
+  border: none;
+}
+.apply-item-hasReject {
+  position: relative;
+  flex: 3;
+}
+.mid {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translateY(-50%) translateX(-50%);
+}
 </style>
 
 <style>
@@ -1222,5 +1460,11 @@ body {
 .el-avatar img {
   width: 100%;
   height: 100%;
+}
+.reject{
+  color: #FF0000;
+}
+.allow{
+  color: #00FF00;
 }
 </style>
