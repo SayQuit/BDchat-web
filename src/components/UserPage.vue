@@ -148,6 +148,7 @@
                   class="maintalk-footer-header-sendImg"
                   style="top: 0"
                   @change="handleAvatarSuccess"
+                  ref="avatar"
                 />
               </div>
             </div>
@@ -363,7 +364,13 @@
               />
             </div>
 
-            <div class="maintalk-footer-header-expression"></div>
+            <div
+              class="maintalk-footer-header-expression"
+              @click="handleClickEmotion()"
+              :style="[emotionIsOpen ? 'background-color:#EEE;' : '']"
+            >
+              <img src="../assets/emoticon.png" />
+            </div>
 
             <div
               class="maintalk-footer-header-send"
@@ -383,10 +390,23 @@
               <div @click="handleAddEmoji(item)">{{ item }}</div>
             </template>
           </div>
+
+          <div class="emotionBlock" v-show="emotionIsOpen">
+            <div>+</div>
+            <input
+              type="file"
+              @change="handleAddEmotion"
+              class="addEmotion"
+              ref="emotion"
+            />
+            <template v-for="(item, index) in emotionList" :key="index">
+              <div @click="handleSendEmotionMessage(item.id)">
+                <img :src="item.emotionBase64" class="mid" />
+              </div>
+            </template>
+          </div>
         </div>
       </div>
-
-      <!-- <CropperComponent  ref="iscropper" style="width:100%;height: 200px;"></CropperComponent> -->
     </div>
   </div>
 </template>
@@ -395,7 +415,6 @@
 import { useRouter } from "vue-router";
 import axios from "axios";
 import { useStore } from "vuex";
-// import CropperComponent from "./CropperComponent.vue";
 
 export default {
   setup() {
@@ -426,6 +445,8 @@ export default {
       ApplyIsOpen: false,
       applyLength: 0,
       searchWord: "",
+      emotionIsOpen: false,
+      emotionList: [],
     };
   },
   created() {
@@ -435,6 +456,7 @@ export default {
     this.getFriendList();
     this.getApply();
     this.emojiList = this.store.state.emojiList;
+    this.getEmotion();
   },
   methods: {
     goPage(pageName) {
@@ -453,6 +475,54 @@ export default {
     },
     handleClickEmoji() {
       this.emojiIsOpen = !this.emojiIsOpen;
+    },
+    handleClickEmotion() {
+      this.emotionIsOpen = !this.emotionIsOpen;
+    },
+    handleAddEmotion(e) {
+      let file = e.target.files[0];
+      if (window.FileReader) {
+        let reader = new FileReader();
+        reader.readAsDataURL(file);
+        reader.onload = (e) => {
+          let base64String = e.target.result;
+          // console.log(base64String);
+          let base64Img = this.compressImg(base64String, 100, 0.5);
+          base64Img.then((res) => {
+            console.log(res.length);
+            if (res.length > 15000) {
+              this.$refs.emotion.value = "";
+              this.$message({
+                type: "error",
+                message: "发送失败,图片过大",
+              });
+              return;
+            }
+            axios({
+              method: "POST",
+              url: "http://127.0.0.1:80/user/emotionSend",
+              params: [this.account, res],
+              headers: { "Content-Type": "application/x-www-form-urlencoded" },
+            }).then((res) => {
+              if (res.data.state == "success") {
+                this.$refs.emotion.value = "";
+                this.$message({
+                  type: "success",
+                  message: "发送成功",
+                });
+                // this.getMessage();
+                this.getEmotion();
+              } else {
+                this.$refs.emotion.value = "";
+                this.$message({
+                  type: "error",
+                  message: "发送失败",
+                });
+              }
+            });
+          });
+        };
+      }
     },
     handleClickApply() {
       this.ApplyIsOpen = !this.ApplyIsOpen;
@@ -473,6 +543,7 @@ export default {
           let base64Img = this.compressImg(base64String, 100, 0.3);
           base64Img.then((res) => {
             if (res.length > 12000) {
+              this.$refs.avatar.value = "";
               this.$message({
                 type: "error",
                 message: "发送失败,图片过大",
@@ -496,12 +567,14 @@ export default {
                 },
               }).then((res) => {
                 if (res.data.state == "success") {
+                  this.$refs.avatar.value = "";
                   this.$message({
                     type: "success",
                     message: "发送成功",
                   });
                   this.getUserInfo();
                 } else {
+                  this.$refs.avatar.value = "";
                   this.$message({
                     type: "error",
                     message: "发送失败",
@@ -727,7 +800,6 @@ export default {
               });
               this.getFriendList();
               this.selectFri = "";
-
             } else {
               this.$message({
                 type: "error",
@@ -742,6 +814,34 @@ export default {
             message: "已取消",
           });
         });
+    },
+    handleSendEmotionMessage(id) {
+      // console.log(id);
+      // console.log(this.selectFri.account);
+      let url =
+        this.store.state.requestUrl +
+        "/user/emotionSendMessage?myaccount=" +
+        this.account +
+        "&hisaccount=" +
+        this.selectFri.account +
+        "&id=" +
+        id;
+      axios.post(url).then((res) => {
+        if (res.data.state == "success") {
+          this.$message({
+            type: "success",
+            message: "发送成功",
+          });
+          this.send = "";
+          this.getMessage();
+          this.emotionIsOpen=false
+        } else {
+          this.$message({
+            type: "error",
+            message: "发送失败",
+          });
+        }
+      });
     },
     getMessage() {
       let url =
@@ -784,6 +884,23 @@ export default {
           if (this.tempFriendList[i].account == acc) {
             this.selectFri = this.tempFriendList[i];
           }
+        }
+      });
+    },
+    getEmotion() {
+      let url =
+        this.store.state.requestUrl +
+        "/user/emotionGet?account=" +
+        this.account;
+      axios.get(url).then((res) => {
+        console.log(res.data);
+        if (res.data.state == "success") {
+          this.emotionList = res.data.emotionList;
+        } else {
+          this.$message({
+            type: "error",
+            message: "获取表情包失败",
+          });
         }
       });
     },
@@ -1500,8 +1617,49 @@ body {
   line-height: 50px;
   cursor: pointer;
 }
+.emotionBlock {
+  width: 500px;
+  background-color: white;
+  margin: 20px;
+  border-radius: 10px;
+  border: 1px solid #777;
+
+  position: absolute;
+  top: 0%;
+  left: 12%;
+}
+
 .emojiBlock div:hover {
   background-color: #ddd;
+}
+.emotionBlock div {
+  width: 125px;
+  height: 125px;
+  display: inline-block;
+  border-radius: 1px;
+  box-sizing: border-box;
+  font-size: 50px;
+  text-align: center;
+  line-height: 125px;
+  font-weight: 300;
+  color: #ccccff;
+  cursor: pointer;
+  vertical-align: top;
+  position: relative;
+}
+
+.emotionBlock div:hover {
+  background-color: #eee;
+}
+.addEmotion {
+  position: absolute;
+  width: 125px;
+  height: 125px;
+  opacity: 0;
+  z-index: 100;
+  left: 0;
+  top: 0;
+  cursor: pointer;
 }
 .avatar-uploader {
   width: 178px;
