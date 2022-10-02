@@ -152,7 +152,7 @@
                 />
               </div>
             </div>
-            <div class="aside-user-desc-signature">
+            <div class="aside-user-desc-signature" :title="user.signature">
               {{ user.signature }}
             </div>
           </div>
@@ -251,15 +251,26 @@
               class="aside-user-profilepicture"
               style="left: 40px"
             ></el-avatar>
-            <div class="aside-user-desc" style="left: 180px">
+            <div
+              class="aside-user-desc"
+              style="left: 180px; width: 50%; display: inline-block"
+            >
               <div class="aside-user-desc-name">
                 {{ selectFri.name }}({{ selectFri.account }})
               </div>
-              <div class="aside-user-desc-signature">
+              <div
+                class="aside-user-desc-signature"
+                :title="selectFri.signature"
+              >
                 {{ selectFri.signature }}
               </div>
             </div>
+            <div class="closeimg mid" style="left: 70%">
+              <img src="../assets/close.png" />
+              <div>{{ selectFri.close }}</div>
+            </div>
           </div>
+
           <div class="maintalk-header-operation">
             <el-button
               type="warning"
@@ -551,13 +562,8 @@ export default {
               return;
             }
             base64Img.then((res) => {
-              let url =
-                this.store.state.requestUrl +
-                "/user/avatar?avatar=" +
-                this.account +
-                "&avatar=" +
-                res;
-              console.log(url);
+              // console.log(url);
+              let b = res;
               axios({
                 method: "POST",
                 url: "http://127.0.0.1:80/user/avatar",
@@ -572,6 +578,13 @@ export default {
                     type: "success",
                     message: "发送成功",
                   });
+                  console.log(res);
+                  const u = {
+                    account: this.account,
+                    base64: b,
+                  };
+
+                  this.store.commit("changeAvatar", u);
                   this.getUserInfo();
                 } else {
                   this.$refs.avatar.value = "";
@@ -627,6 +640,11 @@ export default {
                 type: "success",
                 message: "您的昵称是:" + value + " 发送成功",
               });
+              const u = {
+                account: this.account,
+                name: value,
+              };
+              this.store.commit("changeName", u);
               this.getUserInfo();
             } else {
               this.$message({
@@ -834,7 +852,8 @@ export default {
           });
           this.send = "";
           this.getMessage();
-          this.emotionIsOpen=false
+          this.UpdateClose();
+          this.emotionIsOpen = false;
         } else {
           this.$message({
             type: "error",
@@ -853,7 +872,6 @@ export default {
       axios.get(url).then((res) => {
         this.messageList = res.data.message;
         this.getFriendList(this.selectFri.account);
-        console.log(this.messageList);
         this.scrollToBottom();
       });
     },
@@ -876,8 +894,6 @@ export default {
         this.store.state.requestUrl + "/user/friend?account=" + this.account;
       axios.get(url).then((res) => {
         this.friendList = res.data.friendList;
-        // console.log(res.data);
-        // console.log(res.data.friendList);
         this.tempFriendList = [];
         for (let i = 0; i < this.friendList.length; i++) {
           this.tempFriendList.push(this.friendList[i]);
@@ -893,7 +909,6 @@ export default {
         "/user/emotionGet?account=" +
         this.account;
       axios.get(url).then((res) => {
-        console.log(res.data);
         if (res.data.state == "success") {
           this.emotionList = res.data.emotionList;
         } else {
@@ -935,7 +950,7 @@ export default {
           });
           this.send = "";
           this.getMessage();
-          // this.getFriendList();
+          this.UpdateClose();
         } else {
           this.$message({
             type: "error",
@@ -946,6 +961,25 @@ export default {
     },
     goBack() {
       this.$router.back();
+    },
+    UpdateClose() {
+      let num = Number(this.selectFri.close) + Number(5);
+      let url =
+        this.store.state.requestUrl +
+        "/message/setClose?myaccount=" +
+        this.account +
+        "&hisaccount=" +
+        this.selectFri.account +
+        "&close=" +
+        num;
+      //   console.log(num);
+
+      // console.log(url);
+      axios.post(url).then((res) => {
+        if (res.data.state == "success") {
+          this.getFriendList(this.selectFri.account);
+        }
+      });
     },
     scrollToBottom: function () {
       this.$nextTick(() => {
@@ -1131,6 +1165,8 @@ export default {
                   message: "发送成功",
                 });
                 this.getMessage();
+
+                this.UpdateClose();
               } else {
                 this.$message({
                   type: "error",
@@ -1221,6 +1257,24 @@ export default {
   top: 50%;
   transform: translateY(-50%);
   left: 140px;
+}
+.closeimg {
+  display: inline-block;
+  width: 100px;
+  height: 50px;
+}
+.closeimg img {
+  height: 100%;
+  display: inline-block;
+  vertical-align: middle;
+}
+.closeimg div {
+  display: inline-block;
+  line-height: 50px;
+  vertical-align: middle;
+  margin-left: 10px;
+  font-size: 18px;
+  color: #ffb6c1;
 }
 .aside-user-desc-name {
   height: 40px;
@@ -1579,7 +1633,7 @@ body {
   background-size: cover;
   width: 100%;
 
-  height: 1200px;
+  height: 1400px;
   opacity: 1;
 }
 .currentSelect {

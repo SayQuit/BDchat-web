@@ -94,7 +94,7 @@ export default {
             psw: this.psw,
             avatar: dt.avatar,
           };
-          console.log(u);
+          // console.log(u);
           this.store.commit("handlePushUser", u);
           var ac = this.account;
           this.$message({

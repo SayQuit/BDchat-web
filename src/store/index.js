@@ -100,9 +100,31 @@ export default createStore({
     ]
   },
   mutations: {
+
+
     handlePushUser(state, TheUser) {
+      // 这里避免同时登录两个
       state.user.push(TheUser);
+    },
+    changeName(state,u){
+      // console.log(this.state.user.length);
+      for(let i=0;i<state.user.length;i++){
+        if(state.user[i].account==u.account){
+          state.user[i].name=u.name
+        }
+      }
+    },
+    changeAvatar(state,u){
+      // console.log(u);
+      for(let i=0;i<state.user.length;i++){
+        if(state.user[i].account==u.account){
+          state.user[i].avatar=u.base64
+        }
+      }
     }
+
+
+
   },
   actions: {
   },
