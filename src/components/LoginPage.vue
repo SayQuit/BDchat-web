@@ -78,6 +78,7 @@ export default {
           });
         return;
       }
+      // 做一些不能同时登录两个的判断
       let url =
         "http://127.0.0.1/user/login?account=" +
         this.account +

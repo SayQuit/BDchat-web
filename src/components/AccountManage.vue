@@ -28,7 +28,8 @@
       <div class="main">
         <template v-for="(item, index) in user" :key="index">
           <div class="item" @click="handleClickAccount(item.account)">
-            <div class="avatar"><img :src="item.avatar"></div>
+            <div class="avatar" v-if="item.avatar"><img :src="item.avatar"></div>
+            <div class="avatar" v-else><img src="https://cube.elemecdn.com/0/88/03b0d39583f48206768a7534e55bcpng.png"></div>
             <div class="account">账号:{{ item.account }}</div>
             <div class="name">昵称:{{ item.name }}</div>
           </div>

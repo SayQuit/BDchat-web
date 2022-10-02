@@ -158,7 +158,7 @@
         </div>
 
         <div class="aside-search">
-          <input type="text" class="aside-search-input" v-model="searchWord"/>
+          <input type="text" class="aside-search-input" v-model="searchWord" />
           <div class="aside-search-button" @click="handleSearch">搜索</div>
         </div>
 
@@ -199,11 +199,18 @@
               </div>
               <div class="aside-talkblock-talkitem-right">
                 <div class="aside-talkblock-talkitem-right-isread">
-                  <template v-if="item.isRead == 1">
-                    <img src="../assets/isRead.png" />
-                  </template>
+                  <template v-if="item.ign == 1"
+                    ><div style="width: 50px; text-align: left">
+                      已屏蔽
+                    </div></template
+                  >
                   <template v-else>
-                    <img src="../assets/notRead.png" />
+                    <template v-if="item.isRead == 1">
+                      <img src="../assets/isRead.png" />
+                    </template>
+                    <template v-else>
+                      <img src="../assets/notRead.png" />
+                    </template>
                   </template>
                 </div>
                 <div class="aside-talkblock-talkitem-right-time">
@@ -251,6 +258,23 @@
                 {{ selectFri.signature }}
               </div>
             </div>
+          </div>
+          <div class="maintalk-header-operation">
+            <el-button
+              type="warning"
+              @click="handleIgnoreFri()"
+              v-if="selectFri.ign == 0"
+              >屏蔽此人</el-button
+            >
+            <el-button
+              type="warning"
+              @click="handleCancelIgnoreFri()"
+              v-if="selectFri.ign == 1"
+              >取消屏蔽</el-button
+            >
+            <el-button type="danger" @click="handleDeleteFri()"
+              >删除好友</el-button
+            >
           </div>
         </div>
 
@@ -345,7 +369,7 @@
               class="maintalk-footer-header-send"
               @click="handleSendMessage()"
             >
-              发送
+              发 送
             </div>
           </div>
           <textarea
@@ -385,7 +409,7 @@ export default {
       store: "",
       account: "",
       friendList: [],
-      tempFriendList:[],
+      tempFriendList: [],
       user: {
         name: "",
         account: "",
@@ -401,7 +425,7 @@ export default {
       applyList: [],
       ApplyIsOpen: false,
       applyLength: 0,
-      searchWord:''
+      searchWord: "",
     };
   },
   created() {
@@ -423,6 +447,7 @@ export default {
       //   }
       // }
       this.selectFri = item;
+      // console.log(item);
       this.handleReadMessage(item.account);
       this.getMessage();
     },
@@ -544,21 +569,23 @@ export default {
             message: "取消输入",
           });
         });
-    },    
-    handleSearch(){
-     console.log(this.searchWord);
-      if(this.searchWord==''){
-        this.tempFriendList=[]
+    },
+    handleSearch() {
+      console.log(this.searchWord);
+      if (this.searchWord == "") {
+        this.tempFriendList = [];
         for (let i = 0; i < this.friendList.length; i++) {
-          this.tempFriendList.push(this.friendList[i])
-          
+          this.tempFriendList.push(this.friendList[i]);
         }
         return;
       }
-      this.tempFriendList=[]
-      for(let i=0;i<this.friendList.length;i++){
-        if(this.friendList[i].name.search(this.searchWord)!=-1||this.friendList[i].account.search(this.searchWord)!=-1){
-          this.tempFriendList.push(this.friendList[i])
+      this.tempFriendList = [];
+      for (let i = 0; i < this.friendList.length; i++) {
+        if (
+          this.friendList[i].name.search(this.searchWord) != -1 ||
+          this.friendList[i].account.search(this.searchWord) != -1
+        ) {
+          this.tempFriendList.push(this.friendList[i]);
         }
       }
     },
@@ -603,6 +630,119 @@ export default {
         });
       });
     },
+    handleDeleteFri() {
+      this.$confirm("删除该好友?", "提示", {
+        confirmButtonText: "确定",
+        cancelButtonText: "取消",
+        type: "warning",
+      })
+        .then(() => {
+          let url =
+            this.store.state.requestUrl +
+            "/user/delete?myaccount=" +
+            this.account +
+            "&hisaccount=" +
+            this.selectFri.account;
+          axios.post(url).then((res) => {
+            if (res.data.state == "success") {
+              this.$message({
+                type: "success",
+                message: "删除成功",
+              });
+              this.getFriendList();
+              this.selectFri = "";
+            } else {
+              this.$message({
+                type: "error",
+                message: "删除失败",
+              });
+            }
+          });
+        })
+        .catch(() => {
+          this.$message({
+            type: "info",
+            message: "已取消删除",
+          });
+        });
+    },
+    handleIgnoreFri() {
+      this.$confirm("屏蔽该好友?", "提示", {
+        confirmButtonText: "确定",
+        cancelButtonText: "取消",
+        type: "warning",
+      })
+        .then(() => {
+          let url =
+            this.store.state.requestUrl +
+            "/user/ignore?myaccount=" +
+            this.account +
+            "&hisaccount=" +
+            this.selectFri.account +
+            "&ignore=" +
+            1;
+          axios.post(url).then((res) => {
+            if (res.data.state == "success") {
+              this.$message({
+                type: "success",
+                message: "屏蔽成功",
+              });
+              this.getFriendList();
+              this.selectFri = "";
+            } else {
+              this.$message({
+                type: "error",
+                message: "屏蔽失败",
+              });
+            }
+          });
+        })
+        .catch(() => {
+          this.$message({
+            type: "info",
+            message: "已取消屏蔽",
+          });
+        });
+    },
+    handleCancelIgnoreFri() {
+      this.$confirm("取消屏蔽该好友?", "提示", {
+        confirmButtonText: "确定",
+        cancelButtonText: "取消",
+        type: "warning",
+      })
+        .then(() => {
+          let url =
+            this.store.state.requestUrl +
+            "/user/ignore?myaccount=" +
+            this.account +
+            "&hisaccount=" +
+            this.selectFri.account +
+            "&ignore=" +
+            0;
+          axios.post(url).then((res) => {
+            if (res.data.state == "success") {
+              this.$message({
+                type: "success",
+                message: "取消屏蔽成功",
+              });
+              this.getFriendList();
+              this.selectFri = "";
+
+            } else {
+              this.$message({
+                type: "error",
+                message: "取消屏蔽失败",
+              });
+            }
+          });
+        })
+        .catch(() => {
+          this.$message({
+            type: "info",
+            message: "已取消",
+          });
+        });
+    },
     getMessage() {
       let url =
         this.store.state.requestUrl +
@@ -614,7 +754,6 @@ export default {
         this.messageList = res.data.message;
         this.getFriendList(this.selectFri.account);
         console.log(this.messageList);
-        // console.log('getMessage',this.selectFri);
         this.scrollToBottom();
       });
     },
@@ -638,10 +777,10 @@ export default {
       axios.get(url).then((res) => {
         this.friendList = res.data.friendList;
         // console.log(res.data);
-        
-        this.tempFriendList=[]
+        // console.log(res.data.friendList);
+        this.tempFriendList = [];
         for (let i = 0; i < this.friendList.length; i++) {
-          this.tempFriendList.push(this.friendList[i])
+          this.tempFriendList.push(this.friendList[i]);
           if (this.tempFriendList[i].account == acc) {
             this.selectFri = this.tempFriendList[i];
           }
@@ -1113,18 +1252,26 @@ export default {
   height: 20%;
   width: 100%;
   border-bottom: 1px solid #999;
-
+  display: flex;
   box-sizing: border-box;
 }
 .maintalk-header-desc {
   height: 100%;
-  width: 70%;
+  flex: 7;
 
-  border-right: 1px solid #999;
+  /* border-right: 1px solid #999; */
 
   position: relative;
 }
-
+.maintalk-header-operation {
+  flex: 3;
+  height: 100%;
+}
+.maintalk-header-operation .el-button {
+  display: block;
+  margin-top: 40px;
+  margin-left: 150px;
+}
 .maintalk-main {
   height: 60%;
   width: 100%;
@@ -1418,6 +1565,7 @@ body {
   flex: 7;
   position: relative;
 }
+
 .apply-item-desc > div {
   position: absolute;
   top: 50%;
@@ -1495,5 +1643,4 @@ body {
 .allow {
   color: #00ff00;
 }
-
 </style>
