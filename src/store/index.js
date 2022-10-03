@@ -97,6 +97,41 @@ export default createStore({
       "🤮",
       "🤯",
       "🧐"
+    ],
+    fontFamily:[
+      "'Segoe UI', Tahoma, Geneva, Verdana, sans-serif",
+      "'Courier New', Courier, monospace",
+      "'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif",
+      "'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif",
+      "'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif",
+      "'Times New Roman', Times, serif",
+      "'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif",
+      "Arial, Helvetica, sans-serif",
+      "Cambria, Cochin, Georgia, Times, 'Times New Roman', serif",
+      "Georgia, 'Times New Roman', Times, serif",
+      "Impact, Haettenschweiler, 'Arial Narrow Bold', sans-serif",
+      "Verdana, Geneva, Tahoma, sans-serif",
+      "system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif"    
+    ],
+    fontStyle:[
+      {name:'普通',style:'normal'},
+      // {name:'italic',style:'italic'},
+      {name:'倾斜',style:'oblique'},
+    ],
+    textDecoration:[
+      {name:'none',style:'none'},
+      {name:'dashed',style:'dashed'},
+      {name:'dotted',style:'dotted'},
+      {name:'double',style:'double'},
+      {name:'line-through',style:'line-through'},
+      {name:'overline',style:'overline'},
+      {name:'solid',style:'solid'},
+      {name:'underline',style:'underline'},
+      {name:'wavy',style:'wavy'},
+
+    ],
+    fontWeight:[
+      100,200,300,400,500,600,700,800,900
     ]
   },
   mutations: {

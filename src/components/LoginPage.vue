@@ -63,6 +63,7 @@ export default {
     goBack() {
       this.$router.back();
     },
+
     handleLogin() {
       if (this.account === "") {
         this.$message({
@@ -87,14 +88,12 @@ export default {
       axios.post(url).then((data) => {
         var dt = data.data;
         if (dt.isLogin) {
-          console.log(dt);
           const u = {
             name: dt.name,
             account: this.account,
             psw: this.psw,
             avatar: dt.avatar,
           };
-          // console.log(u);
           this.store.commit("handlePushUser", u);
           var ac = this.account;
           this.$message({
@@ -109,6 +108,7 @@ export default {
           });
         }
       });
+
       //   this.goPage("UserPage");
     },
 

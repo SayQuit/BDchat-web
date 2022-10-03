@@ -85,6 +85,14 @@ export default {
     };
   },
   methods: {
+    handleFont(){
+      let url =
+        "http://127.0.0.1/user/newfont?account=" +
+        this.account;
+      axios.post(url).then(() => {
+        
+      });
+    },
     goPage(pageName) {
       this.router.push({ name: pageName });
     },
@@ -127,6 +135,7 @@ export default {
         if (data.data.account) {
           var dt = data.data;
           this.account = dt.account;
+          this.handleFont()
           this.$message({
             type: "success",
             message: "注册成功",

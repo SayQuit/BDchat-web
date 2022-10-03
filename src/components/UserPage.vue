@@ -347,7 +347,12 @@
                   ]"
                 >
                   <template v-if="item.isImg == 0">
-                    <div>{{ item.message }}</div>
+                    <template v-if="item.sendID == account">
+                      <div :style="myStyle">{{ item.message }}</div>
+                    </template>
+                    <template v-else>
+                      <div :style="friStyle">{{ item.message }}</div>
+                    </template>
                   </template>
                   <template v-else>
                     <div><img :src="item.base64" /></div>
@@ -384,6 +389,14 @@
             </div>
 
             <div
+              class="maintalk-footer-header-expression"
+              @click="handleClickFont()"
+              :style="[fontIsOpen ? 'background-color:#EEE;' : '']"
+            >
+              <img src="../assets/font.png" />
+            </div>
+
+            <div
               class="maintalk-footer-header-send"
               @click="handleSendMessage()"
             >
@@ -416,6 +429,84 @@
               </div>
             </template>
           </div>
+
+          <div class="FontSetup" v-show="fontIsOpen">
+            <span class="FontSetup-title">文字设置</span>
+
+            <div class="FontSetup-select">
+              <span>字体:</span>
+              <el-input
+                v-model="tempFont.fontSize"
+                placeholder="请输入"
+                type="number"
+                style="width: 80%"
+              ></el-input>
+            </div>
+
+            <div class="FontSetup-select">
+              <span>字号:</span>
+              <el-select v-model="tempFont.fontFamily" placeholder="请选择">
+                <el-option
+                  v-for="(item,index) in family"
+                  :key="item"
+                  :label="item"
+                  :value="index"
+                >
+                </el-option>
+              </el-select>
+            </div>
+
+            <div class="FontSetup-select">
+              <span>粗细:</span>
+              <el-select v-model="tempFont.fontWeight" placeholder="请选择">
+                <el-option
+                  v-for="item in weight"
+                  :key="item"
+                  :label="item"
+                  :value="item"
+                >
+                </el-option>
+              </el-select>
+            </div>
+
+            <div class="FontSetup-select">
+              <span>装饰:</span>
+              <el-select v-model="tempFont.textDecoration" placeholder="请选择">
+                <el-option
+                  v-for="item in decoration"
+                  :key="item.style"
+                  :label="item.name"
+                  :value="item.style"
+                >
+                </el-option>
+              </el-select>
+            </div>
+
+            <div class="FontSetup-select">
+              <span>风格:</span>
+              <el-select v-model="tempFont.fontStyle" placeholder="请选择">
+                <el-option
+                  v-for="item in style"
+                  :key="item.style"
+                  :label="item.name"
+                  :value="item.style"
+                >
+                </el-option>
+              </el-select>
+            </div>
+
+            <div class="FontSetup-select">
+              <span>颜色:</span>
+              <el-color-picker v-model="tempFont.color"></el-color-picker>
+            </div>
+
+            <div class="FontSetup-select">
+              <el-button type="primary" class="FontSetup-select-yes" @click="handleSendFont()"
+                >确定</el-button
+              >
+              <el-button class="FontSetup-select-no">取消</el-button>
+            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -445,6 +536,7 @@ export default {
         account: "",
         avatar: "",
       },
+      txtcolor: "#000000",
       send: "",
       selectFri: "",
       messageList: [],
@@ -457,8 +549,45 @@ export default {
       applyLength: 0,
       searchWord: "",
       emotionIsOpen: false,
+      fontIsOpen:false,
       emotionList: [],
+      userFont: {
+        fontSize: "16px",
+        fontWeight: "400",
+        textDecoration: "none",
+        color: "#000000",
+        fontStyle: "normal",
+        fontFamily: "'Segoe UI', Tahoma, Geneva, Verdana, sans-serif",
+      },
+      selectFriFont: {
+        fontSize: "16px",
+        fontWeight: "400",
+        textDecoration: "none",
+        color: "#000000",
+        fontStyle: "normal",
+        fontFamily: "'Segoe UI', Tahoma, Geneva, Verdana, sans-serif",
+      },
+      tempFont: {
+        fontSize: 16,
+        fontWeight: 400,
+        textDecoration: "none",
+        color: "#000000",
+        fontStyle: "normal",
+        fontFamily: 0,
+      },
+      style: [],
+      decoration: [],
+      family: [],
+      weight: [],
     };
+  },
+  computed: {
+    myStyle() {
+      return this.userFont;
+    },
+    friStyle() {
+      return this.selectFriFont;
+    },
   },
   created() {
     this.store = useStore();
@@ -468,22 +597,23 @@ export default {
     this.getApply();
     this.emojiList = this.store.state.emojiList;
     this.getEmotion();
+    this.getFont();
+    this.style = this.store.state.fontStyle;
+    this.decoration = this.store.state.textDecoration;
+    this.family = this.store.state.fontFamily;
+    this.weight = this.store.state.fontWeight;
   },
   methods: {
     goPage(pageName) {
       this.router.push({ name: pageName });
     },
     handleChangeSelectFri(item) {
-      // for (let i = 0; i < this.friendList; i++) {
-      //   if (this.friendList[i].account == this.selectFri.account) {
-      //     this.selectFri.name = this.friendList[i].name;
-      //   }
-      // }
       this.selectFri = item;
-      // console.log(item);
       this.handleReadMessage(item.account);
       this.getMessage();
+      this.getSelectFriFont()
     },
+
     handleClickEmoji() {
       this.emojiIsOpen = !this.emojiIsOpen;
     },
@@ -535,8 +665,98 @@ export default {
         };
       }
     },
+    handleClickFont(){
+      this.fontIsOpen=!this.fontIsOpen
+    },
     handleClickApply() {
       this.ApplyIsOpen = !this.ApplyIsOpen;
+    },
+    handleCancelFontSetup() {
+      this.tempFont = {
+        fontSize: 16,
+        fontWeight: 400,
+        textDecoration: "none",
+        color: "#000000",
+        fontStyle: "normal",
+        fontFamily: "'Segoe UI', Tahoma, Geneva, Verdana, sans-serif",
+      };
+    },
+    handleSendFont() {
+      let color='%23'+this.tempFont.color.replace('#','')
+      let url =
+        "http://127.0.0.1/user/font?account=" +
+        this.account +
+        "&fontSize=" +
+        this.tempFont.fontSize+
+        "&fontWeight=" +
+        this.tempFont.fontWeight+
+        "&fontFamily=" +
+        this.tempFont.fontFamily+
+        "&fontStyle=" +
+        this.tempFont.fontStyle+
+        "&color=" +
+        color+
+        "&textDecoration=" +
+        this.tempFont.textDecoration;
+        console.log(url);
+      axios.post(url).then((res) => {
+        if (res.data.state == "success") {
+          this.getFont();
+          this.$message({
+            type: "success",
+            message: "修改成功",
+          });
+        } else {
+          this.$message({
+            type: "error",
+            message: "修改失败",
+          });
+        }
+      });
+    },
+    getTempFont(){
+      this.tempFont=this.userFont;
+      for(let i=0;i<this.store.state.fontFamily.length;i++){
+        if(this.store.state.fontFamily[i]==this.tempFont.fontFamily)
+        {
+          this.tempFont.fontFamily=i;
+          break;
+        }
+      }
+    },
+    getSelectFriFont(){
+      let url =
+        "http://127.0.0.1/user/font?account=" +
+        this.selectFri.account;
+      axios.get(url).then((res) => {
+        if (res.data.state == "success") {
+          
+          // console.log(res.data.font);
+          this.selectFriFont=res.data.font;
+          this.selectFriFont.fontFamily=this.store.state.fontFamily[res.data.font.fontFamily]
+          
+        } else {
+          console.log('fail');
+        }
+      });
+    },
+    getFont(){
+      let url =
+        "http://127.0.0.1/user/font?account=" +
+        this.account;
+      axios.get(url).then((res) => {
+        if (res.data.state == "success") {
+          
+          // console.log(res.data.font);
+          this.userFont=res.data.font;
+          this.userFont.fontFamily=this.store.state.fontFamily[res.data.font.fontFamily]
+          this.getTempFont();
+          // console.log(this.userFont);
+          
+        } else {
+          console.log('fail');
+        }
+      });
     },
     handleChangeAvatar() {
       this.avatarFileIsOpen = !this.avatarFileIsOpen;
@@ -1832,6 +2052,47 @@ body {
 .maintalk-main-talkitem .notread {
   color: #777;
   padding-top: 5px;
+}
+.FontSetup {
+  background-color: white;
+  width: 400px;
+  height: 500px;
+  border: 1px solid;
+  margin: 10px;
+  display: flex;
+  justify-content: center;
+  align-content: center;
+  align-items: center;
+  flex-direction: column;
+
+  padding-bottom: 40px;
+  border-radius: 10px;
+  position: absolute;
+  left: 18%;
+  top: -250%;
+
+  box-sizing: border-box;
+}
+.FontSetup .FontSetup-title {
+  font-size: 28px;
+  text-align: center;
+  flex: 1;
+  margin: 20px 0;
+}
+.FontSetup .FontSetup-select {
+  flex: 2;
+}
+.FontSetup .FontSetup-select > span {
+  margin-right: 20px;
+}
+.FontSetup-select-yes {
+  margin-right: 40px;
+  margin-top: 15px;
+}
+.FontSetup-select-no {
+  margin-left: 40px;
+  margin-top: 15px;
+  color: black;
 }
 </style>
 
