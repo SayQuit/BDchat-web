@@ -247,7 +247,13 @@
 
         <div class="aside-talkblockbottom">
           <div class="aside-talkblockbottom-operation">
-            <div class="aside-talkblockbottom-operation-cloud">词云</div>
+            <div
+              class="aside-talkblockbottom-operation-cloud"
+              @click="handleChangeWordCloud()"
+              :style="[wordCloudIsOpen ? 'background-color:#EEE;' : '']"
+            >
+              词云
+            </div>
             <div
               class="aside-talkblockbottom-operation-add"
               @click="handleAddFriend"
@@ -256,6 +262,11 @@
             </div>
             <!-- <el-button type="text" @click="open">点击打开 Message Box</el-button> -->
           </div>
+          <WordCloudChart
+            class="wordCloud"
+            :word="word"
+            v-if="wordCloudIsOpen"
+          ></WordCloudChart>
         </div>
       </div>
 
@@ -290,7 +301,7 @@
             </div>
 
             <template v-if="selectFri.moodindex != 8">
-              <div class="closeimg mid" style="left: 75%">
+              <div class="closeimg mid" style="left: 72.5%">
                 <img :src="mood[selectFri.moodindex].link" />
                 <div :style="'color:#' + mood[selectFri.moodindex].color">
                   {{ mood[selectFri.moodindex].state }}
@@ -557,13 +568,16 @@
 import { useRouter } from "vue-router";
 import axios from "axios";
 import { useStore } from "vuex";
-
+import WordCloudChart from "./WordCloudChart.vue";
 export default {
   setup() {
     const router = useRouter();
     return {
       router,
     };
+  },
+  components: {
+    WordCloudChart,
   },
   data() {
     return {
@@ -592,6 +606,7 @@ export default {
       emotionIsOpen: false,
       fontIsOpen: false,
       moodIsOpen: false,
+      wordCloudIsOpen: false,
 
       emotionList: [],
       userFont: {
@@ -623,6 +638,7 @@ export default {
       family: [],
       weight: [],
       moodIndex: 9,
+      word: [],
     };
   },
   computed: {
@@ -654,6 +670,7 @@ export default {
     },
     handleChangeSelectFri(item) {
       this.selectFri = item;
+      this.wordCloudIsOpen=false
       this.handleReadMessage(item.account);
       this.getMessage();
       this.getSelectFriFont();
@@ -713,8 +730,8 @@ export default {
     handleClickFont() {
       this.fontIsOpen = !this.fontIsOpen;
     },
-    handleClickMood(){
-      this.moodIsOpen=!this.moodIsOpen
+    handleClickMood() {
+      this.moodIsOpen = !this.moodIsOpen;
     },
     handleSendMoodIndex(index) {
       let url =
@@ -729,6 +746,7 @@ export default {
           if (index != 8)
             this.handleSendFont(this.mood[this.user.moodindex].color);
           else this.handleSendFont("000000");
+          this.handleClickMood();
         }
       });
     },
@@ -830,6 +848,40 @@ export default {
           console.log("fail");
         }
       });
+    },
+    handleChangeWordCloud() {
+      if(!this.selectFri){
+        this.$message({
+            type: "error",
+            message: "未选中好友",
+          });
+          return;
+      }
+      if (this.wordCloudIsOpen == false) {
+        let url =
+          this.store.state.requestUrl +
+          "/message/word?myaccount=" +
+          this.account +
+          "&hisaccount=" +
+          this.selectFri.account;
+        axios.get(url).then((res) => {
+          // console.log(res.data.word);
+          if(res.data.state=='success'){
+            this.word=res.data.word
+            this.wordCloudIsOpen=!this.wordCloudIsOpen
+          }
+          else{
+            this.$message({
+                type: "error",
+                message: '生成失败',
+              });
+          }
+        });
+      }
+      else{
+        this.wordCloudIsOpen=!this.wordCloudIsOpen
+      }
+      
     },
     handleChangeAvatar() {
       this.avatarFileIsOpen = !this.avatarFileIsOpen;
@@ -1187,7 +1239,7 @@ export default {
         this.store.state.requestUrl + "/user/friend?account=" + this.account;
       axios.get(url).then((res) => {
         this.friendList = res.data.friendList;
-        console.log(this.friendList);
+        // console.log(this.friendList);
         this.tempFriendList = [];
         for (let i = 0; i < this.friendList.length; i++) {
           this.tempFriendList.push(this.friendList[i]);
@@ -1703,6 +1755,7 @@ export default {
   background-color: white;
   border-bottom-left-radius: 10px;
   border-bottom-right-radius: 10px;
+  position: relative;
 }
 .aside-talkblockbottom-operation {
   float: right;
@@ -2220,6 +2273,15 @@ body {
 .moodBlock img {
   width: 50px;
   height: 50px;
+}
+.wordCloud {
+
+  background-color: white;
+  border-radius: 10px;
+  position: absolute;
+  top: -650%;
+  left: 85%;
+  z-index: 1000;
 }
 </style>
 
