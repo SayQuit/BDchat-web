@@ -126,6 +126,20 @@
             <div class="aside-user-desc-name">
               {{ user.name }}({{ user.account }})
             </div>
+
+            <template v-if="user.moodindex != 8">
+              <div class="mood" @click="handleClickMood()">
+                <img :src="mood[user.moodindex].link" />
+                <div :style="'color:#' + mood[user.moodindex].color">
+                  {{ mood[user.moodindex].state }}
+                </div>
+              </div>
+            </template>
+
+            <template v-else>
+              <div class="mood" @click="handleClickMood()">无状态</div>
+            </template>
+
             <div class="aside-user-desc-edit">
               <el-button type="primary" @click="handleChangeName()"
                 >更换昵称</el-button
@@ -150,6 +164,15 @@
                   @change="handleAvatarSuccess"
                   ref="avatar"
                 />
+              </div>
+
+              <div class="moodBlock" v-show="moodIsOpen">
+                <div @click="handleSendMoodIndex(8)">无</div>
+                <template v-for="(item, index) in mood" :key="index">
+                  <div @click="handleSendMoodIndex(index)">
+                    <img :src="item.link" class="mid" />
+                  </div>
+                </template>
               </div>
             </div>
             <div class="aside-user-desc-signature" :title="user.signature">
@@ -265,7 +288,17 @@
                 {{ selectFri.signature }}
               </div>
             </div>
-            <div class="closeimg mid" style="left: 70%">
+
+            <template v-if="selectFri.moodindex != 8">
+              <div class="closeimg mid" style="left: 75%">
+                <img :src="mood[selectFri.moodindex].link" />
+                <div :style="'color:#' + mood[selectFri.moodindex].color">
+                  {{ mood[selectFri.moodindex].state }}
+                </div>
+              </div>
+            </template>
+
+            <div class="closeimg mid" style="left: 90%">
               <img src="../assets/close.png" />
               <div>{{ selectFri.close }}</div>
             </div>
@@ -447,7 +480,7 @@
               <span>字号:</span>
               <el-select v-model="tempFont.fontFamily" placeholder="请选择">
                 <el-option
-                  v-for="(item,index) in family"
+                  v-for="(item, index) in family"
                   :key="item"
                   :label="item"
                   :value="index"
@@ -501,10 +534,17 @@
             </div>
 
             <div class="FontSetup-select">
-              <el-button type="primary" class="FontSetup-select-yes" @click="handleSendFont()"
+              <el-button
+                type="primary"
+                class="FontSetup-select-yes"
+                @click="handleSendFont()"
                 >确定</el-button
               >
-              <el-button class="FontSetup-select-no">取消</el-button>
+              <el-button
+                class="FontSetup-select-no"
+                @click="handleCancelFontSetup()"
+                >取消</el-button
+              >
             </div>
           </div>
         </div>
@@ -528,6 +568,7 @@ export default {
   data() {
     return {
       store: "",
+      mood: [],
       account: "",
       friendList: [],
       tempFriendList: [],
@@ -541,15 +582,17 @@ export default {
       selectFri: "",
       messageList: [],
       emojiList: [],
-      // avatarUrl: "",
-      emojiIsOpen: false,
-      avatarFileIsOpen: false,
       applyList: [],
-      ApplyIsOpen: false,
       applyLength: 0,
       searchWord: "",
+
+      emojiIsOpen: false,
+      avatarFileIsOpen: false,
+      ApplyIsOpen: false,
       emotionIsOpen: false,
-      fontIsOpen:false,
+      fontIsOpen: false,
+      moodIsOpen: false,
+
       emotionList: [],
       userFont: {
         fontSize: "16px",
@@ -579,6 +622,7 @@ export default {
       decoration: [],
       family: [],
       weight: [],
+      moodIndex: 9,
     };
   },
   computed: {
@@ -602,6 +646,7 @@ export default {
     this.decoration = this.store.state.textDecoration;
     this.family = this.store.state.fontFamily;
     this.weight = this.store.state.fontWeight;
+    this.mood = this.store.state.mood;
   },
   methods: {
     goPage(pageName) {
@@ -611,7 +656,7 @@ export default {
       this.selectFri = item;
       this.handleReadMessage(item.account);
       this.getMessage();
-      this.getSelectFriFont()
+      this.getSelectFriFont();
     },
 
     handleClickEmoji() {
@@ -665,40 +710,66 @@ export default {
         };
       }
     },
-    handleClickFont(){
-      this.fontIsOpen=!this.fontIsOpen
+    handleClickFont() {
+      this.fontIsOpen = !this.fontIsOpen;
+    },
+    handleClickMood(){
+      this.moodIsOpen=!this.moodIsOpen
+    },
+    handleSendMoodIndex(index) {
+      let url =
+        this.store.state.requestUrl +
+        "/user/mood?account=" +
+        this.account +
+        "&index=" +
+        index;
+      axios.post(url).then((res) => {
+        if (res.data.state == "success") {
+          this.user.moodindex = index;
+          if (index != 8)
+            this.handleSendFont(this.mood[this.user.moodindex].color);
+          else this.handleSendFont("000000");
+        }
+      });
     },
     handleClickApply() {
       this.ApplyIsOpen = !this.ApplyIsOpen;
     },
     handleCancelFontSetup() {
-      this.tempFont = {
-        fontSize: 16,
-        fontWeight: 400,
-        textDecoration: "none",
-        color: "#000000",
-        fontStyle: "normal",
-        fontFamily: "'Segoe UI', Tahoma, Geneva, Verdana, sans-serif",
-      };
+      this.tempFont = JSON.parse(JSON.stringify(this.userFont));
+      this.tempFont.fontSize = this.userFont.fontSize;
+
+      this.tempFont.fontSize = parseInt(this.tempFont.fontSize);
+
+      // console.log(this.tempFont);
+      // console.log(this.userFont);
+      for (let i = 0; i < this.store.state.fontFamily.length; i++) {
+        if (this.store.state.fontFamily[i] == this.tempFont.fontFamily) {
+          this.tempFont.fontFamily = i;
+          break;
+        }
+      }
+      this.fontIsOpen = !this.fontIsOpen;
     },
-    handleSendFont() {
-      let color='%23'+this.tempFont.color.replace('#','')
+    handleSendFont(sendColor) {
+      let color = "";
+      if (!sendColor) color = "%23" + this.tempFont.color.replace("#", "");
+      else color = "%23" + sendColor;
       let url =
         "http://127.0.0.1/user/font?account=" +
         this.account +
         "&fontSize=" +
-        this.tempFont.fontSize+
+        this.tempFont.fontSize +
         "&fontWeight=" +
-        this.tempFont.fontWeight+
+        this.tempFont.fontWeight +
         "&fontFamily=" +
-        this.tempFont.fontFamily+
+        this.tempFont.fontFamily +
         "&fontStyle=" +
-        this.tempFont.fontStyle+
+        this.tempFont.fontStyle +
         "&color=" +
-        color+
+        color +
         "&textDecoration=" +
         this.tempFont.textDecoration;
-        console.log(url);
       axios.post(url).then((res) => {
         if (res.data.state == "success") {
           this.getFont();
@@ -706,6 +777,7 @@ export default {
             type: "success",
             message: "修改成功",
           });
+          if (this.fontIsOpen) this.fontIsOpen = !this.fontIsOpen;
         } else {
           this.$message({
             type: "error",
@@ -714,47 +786,48 @@ export default {
         }
       });
     },
-    getTempFont(){
-      this.tempFont=this.userFont;
-      for(let i=0;i<this.store.state.fontFamily.length;i++){
-        if(this.store.state.fontFamily[i]==this.tempFont.fontFamily)
-        {
-          this.tempFont.fontFamily=i;
+    getTempFont() {
+      this.tempFont = JSON.parse(JSON.stringify(this.userFont));
+      this.tempFont.fontSize = parseInt(this.tempFont.fontSize);
+
+      for (let i = 0; i < this.store.state.fontFamily.length; i++) {
+        if (this.store.state.fontFamily[i] == this.tempFont.fontFamily) {
+          this.tempFont.fontFamily = i;
           break;
         }
       }
     },
-    getSelectFriFont(){
+    getSelectFriFont() {
       let url =
-        "http://127.0.0.1/user/font?account=" +
+        this.store.state.requestUrl +
+        "/user/font?account=" +
         this.selectFri.account;
       axios.get(url).then((res) => {
         if (res.data.state == "success") {
-          
           // console.log(res.data.font);
-          this.selectFriFont=res.data.font;
-          this.selectFriFont.fontFamily=this.store.state.fontFamily[res.data.font.fontFamily]
-          
+          this.selectFriFont = res.data.font;
+          this.selectFriFont.fontFamily =
+            this.store.state.fontFamily[res.data.font.fontFamily];
+          this.selectFriFont.fontSize = this.selectFriFont.fontSize + "px";
         } else {
-          console.log('fail');
+          console.log("fail");
         }
       });
     },
-    getFont(){
+    getFont() {
       let url =
-        "http://127.0.0.1/user/font?account=" +
-        this.account;
+        this.store.state.requestUrl + "/user/font?account=" + this.account;
       axios.get(url).then((res) => {
         if (res.data.state == "success") {
-          
           // console.log(res.data.font);
-          this.userFont=res.data.font;
-          this.userFont.fontFamily=this.store.state.fontFamily[res.data.font.fontFamily]
+          this.userFont = res.data.font;
+          this.userFont.fontFamily =
+            this.store.state.fontFamily[res.data.font.fontFamily];
+          this.userFont.fontSize = res.data.font.fontSize + "px";
           this.getTempFont();
           // console.log(this.userFont);
-          
         } else {
-          console.log('fail');
+          console.log("fail");
         }
       });
     },
@@ -1114,6 +1187,7 @@ export default {
         this.store.state.requestUrl + "/user/friend?account=" + this.account;
       axios.get(url).then((res) => {
         this.friendList = res.data.friendList;
+        console.log(this.friendList);
         this.tempFriendList = [];
         for (let i = 0; i < this.friendList.length; i++) {
           this.tempFriendList.push(this.friendList[i]);
@@ -1212,7 +1286,7 @@ export default {
       axios.post(url).then((res) => {
         if (res.data.user) {
           this.user = res.data.user;
-          // console.log(this.user);
+          console.log(this.user);
         } else {
           this.$message({
             type: "error",
@@ -1410,6 +1484,28 @@ export default {
 *:hover {
   opacity: 1;
 } */
+.mood {
+  width: 60px;
+  height: 30px;
+  display: inline-block;
+  vertical-align: middle;
+  margin-left: 20px;
+  cursor: pointer;
+  line-height: 28px;
+}
+.mood img {
+  width: 50%;
+  height: 100%;
+  vertical-align: middle;
+}
+.mood div {
+  width: 40%;
+  height: 100%;
+  display: inline-block;
+  vertical-align: middle;
+  line-height: 30px;
+  margin-left: 10%;
+}
 .el-button {
   color: white;
 }
@@ -2093,6 +2189,37 @@ body {
   margin-left: 40px;
   margin-top: 15px;
   color: black;
+}
+.moodBlock {
+  width: 200px;
+  background-color: white;
+  margin: 20px;
+  border-radius: 10px;
+  border: 1px solid #777;
+
+  position: absolute;
+  top: -100%;
+  left: 30%;
+}
+.moodBlock div {
+  width: 50px;
+  height: 50px;
+  position: relative;
+  display: inline-block;
+  text-align: center;
+  line-height: 50px;
+  vertical-align: top;
+  cursor: pointer;
+}
+.moodBlock div:hover {
+  background-color: #ddd;
+}
+.moodBlock img:hover {
+  background-color: #ddd;
+}
+.moodBlock img {
+  width: 50px;
+  height: 50px;
 }
 </style>
 

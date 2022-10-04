@@ -132,6 +132,49 @@ export default createStore({
     ],
     fontWeight:[
       100,200,300,400,500,600,700,800,900
+    ],
+    mood:[
+      {
+        link:require('../assets/Anger.png'),
+        state:'生气',
+        color:'F0494F'
+      },
+      {
+        link:require('../assets/Surprise.png'),
+        state:'惊讶',
+        color:'F47B39'
+
+      },
+      {
+        link:require('../assets/Happy.png'),
+        state:'快乐',
+        color:'F4E932'
+      },
+      {
+        link:require('../assets/Trust.png'),
+        state:'信任',
+        color:'A5FD3C'
+      },
+      {
+        link:require('../assets/Fear.png'),
+        state:'害怕',
+        color:'34B5A9'
+      },
+      {
+        link:require('../assets/Expectations.png'),
+        state:'期待',
+        color:'33B4D6'
+      },
+      {
+        link:require('../assets/Sadness.png'),
+        state:'悲伤',
+        color:'3477B7'
+      },
+      {
+        link:require('../assets/Disgust.png'),
+        state:'厌倦',
+        color:'B869AD'
+      },
     ]
   },
   mutations: {
