@@ -125,13 +125,19 @@ export default {
         });
         return;
       }
-      //   console.log(this.name);
-      //   console.log(this.psw);
-      //   console.log(this.makesurePsw);
+      var reg = /^(?![a-zA-Z]+$)(?![A-Z0-9]+$)(?![A-Z\W_]+$)(?![a-z0-9]+$)(?![a-z\W_]+$)(?![0-9\W_]+$)[a-zA-Z0-9\W_]{8,16}$/;
+      if(!reg.test(this.psw)){
+        this.$message({
+          type: "error",
+          message: "密码不符合要求,密码长度应为8到16为并且包含小写字母、大写字母、数字、特殊字符四种里面的三种",
+        });
+        return;
+      }
       let url =
         "http://127.0.0.1/user/register?name=" + this.name + "&psw=" + this.psw;
-      console.log(url);
+      // console.log(url);
       axios.post(url).then((data) => {
+        
         if (data.data.account) {
           var dt = data.data;
           this.account = dt.account;
@@ -148,6 +154,9 @@ export default {
         }
       });
     },
+
+
+
 
     handleClear() {
       (this.name = ""), (this.psw = ""), (this.makesurePsw = "");

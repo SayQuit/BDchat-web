@@ -66,6 +66,7 @@ export default {
   mounted() {
     const store = useStore(); // 该方法用于返回store 实例
 
+
     this.store = store;
     this.user = this.store.state.user;
     // console.log(this.user); // store 实例对象
