@@ -1,5 +1,5 @@
 <template>
-  <div id="echartsWordcloud" style="width:510px;height:400px;border:1px solid"></div>
+  <div id="echartsWordcloud" style="width:510px;height:400px;border:1px solid;padding-top: 20px;"></div>
 </template>
 <script>
 
@@ -26,7 +26,8 @@ methods:{
       let option = {
         title: {
           text: "聊天词云",
-          x: "center"
+          x: "center",
+          // y:'0px'
         },
         // backgroundColor: "#fff",
         series: [
@@ -51,17 +52,17 @@ methods:{
             top: "center",
             right: null,
             bottom: null,
-            width: "120%",
-            height: "150%",
+            width: "90%",
+            height: "90%",
             //数据
             data: data
           }
         ]
       };
       echartsWordcloud.setOption(option);
-      echartsWordcloud.on("click",function(e){
-        alert(e)
-      })
+      // echartsWordcloud.on("click",function(e){
+      //   alert(e)
+      // })
   }
 }
 }

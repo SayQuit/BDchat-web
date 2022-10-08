@@ -421,6 +421,7 @@
                 type="file"
                 @change="sendBase64"
                 class="maintalk-footer-header-sendImg"
+                ref="sendimg"
               />
             </div>
 
@@ -451,6 +452,7 @@
             class="maintalk-footer-input"
             v-model="send"
             @keyup.enter="handleSendMessage()"
+            ref="txtarea"
           ></textarea>
 
           <div class="emojiBlock" v-show="emojiIsOpen">
@@ -483,7 +485,9 @@
                 v-model="tempFont.fontSize"
                 placeholder="请输入"
                 type="number"
-                style="width: 80%"
+                style="width: 50%"
+                max="40"
+                min="12"
               ></el-input>
             </div>
 
@@ -670,16 +674,27 @@ export default {
     },
     handleChangeSelectFri(item) {
       this.selectFri = item;
-      this.wordCloudIsOpen=false
+      this.wordCloudIsOpen = false;
       this.handleReadMessage(item.account);
       this.getMessage();
       this.getSelectFriFont();
     },
-
+    hideAllIsOpen(){
+      this.emojiIsOpen= false;
+      this.avatarFileIsOpen= false;
+      this.ApplyIsOpen= false;
+      this.emotionIsOpen= false;
+      this.fontIsOpen= false;
+      this.moodIsOpen= false;
+      this.wordCloudIsOpen= false;
+    },
     handleClickEmoji() {
+      this.$refs.txtarea.focus()
+      if(!this.emojiIsOpen)this.hideAllIsOpen();
       this.emojiIsOpen = !this.emojiIsOpen;
     },
     handleClickEmotion() {
+      if(!this.emotionIsOpen)this.hideAllIsOpen();
       this.emotionIsOpen = !this.emotionIsOpen;
     },
     handleAddEmotion(e) {
@@ -701,36 +716,55 @@ export default {
               });
               return;
             }
-            axios({
-              method: "POST",
-              url: "http://127.0.0.1:80/user/emotionSend",
-              params: [this.account, res],
-              headers: { "Content-Type": "application/x-www-form-urlencoded" },
-            }).then((res) => {
-              if (res.data.state == "success") {
+
+            this.$confirm("是否保存表情包?", "提示", {
+              confirmButtonText: "确定",
+              cancelButtonText: "取消",
+              type: "warning",
+            })
+              .then(() => {
+                axios({
+                  method: "POST",
+                  url: "http://127.0.0.1:80/user/emotionSend",
+                  params: [this.account, res],
+                  headers: {
+                    "Content-Type": "application/x-www-form-urlencoded",
+                  },
+                }).then((res) => {
+                  if (res.data.state == "success") {
+                    this.$refs.emotion.value = "";
+                    this.$message({
+                      type: "success",
+                      message: "发送成功",
+                    });
+                    // this.getMessage();
+                    this.getEmotion();
+                  } else {
+                    this.$refs.emotion.value = "";
+                    this.$message({
+                      type: "error",
+                      message: "发送失败",
+                    });
+                  }
+                });
+              })
+              .catch(() => {
                 this.$refs.emotion.value = "";
                 this.$message({
-                  type: "success",
-                  message: "发送成功",
+                  type: "info",
+                  message: "已取消",
                 });
-                // this.getMessage();
-                this.getEmotion();
-              } else {
-                this.$refs.emotion.value = "";
-                this.$message({
-                  type: "error",
-                  message: "发送失败",
-                });
-              }
-            });
+              });
           });
         };
       }
     },
     handleClickFont() {
+      if(!this.fontIsOpen)this.hideAllIsOpen();
       this.fontIsOpen = !this.fontIsOpen;
     },
     handleClickMood() {
+      if(!this.moodIsOpen)this.hideAllIsOpen();
       this.moodIsOpen = !this.moodIsOpen;
     },
     handleSendMoodIndex(index) {
@@ -751,6 +785,8 @@ export default {
       });
     },
     handleClickApply() {
+      
+      if(!this.ApplyIsOpen)this.hideAllIsOpen();
       this.ApplyIsOpen = !this.ApplyIsOpen;
     },
     handleCancelFontSetup() {
@@ -770,6 +806,13 @@ export default {
       this.fontIsOpen = !this.fontIsOpen;
     },
     handleSendFont(sendColor) {
+      if (this.tempFont.fontSize < 12 || this.tempFont.fontSize > 40) {
+        this.$message({
+          type: "error",
+          message: "修改失败,字体大小应该在12到40之间",
+        });
+        return;
+      }
       let color = "";
       if (!sendColor) color = "%23" + this.tempFont.color.replace("#", "");
       else color = "%23" + sendColor;
@@ -850,14 +893,16 @@ export default {
       });
     },
     handleChangeWordCloud() {
-      if(!this.selectFri){
+      if (!this.selectFri) {
         this.$message({
-            type: "error",
-            message: "未选中好友",
-          });
-          return;
+          type: "error",
+          message: "未选中好友",
+        });
+        return;
       }
       if (this.wordCloudIsOpen == false) {
+        
+        this.hideAllIsOpen();
         let url =
           this.store.state.requestUrl +
           "/message/word?myaccount=" +
@@ -866,28 +911,29 @@ export default {
           this.selectFri.account;
         axios.get(url).then((res) => {
           // console.log(res.data.word);
-          if(res.data.state=='success'){
-            this.word=res.data.word
-            this.wordCloudIsOpen=!this.wordCloudIsOpen
-          }
-          else{
+          if (res.data.state == "success") {
+            this.word = res.data.word;
+            this.wordCloudIsOpen = !this.wordCloudIsOpen;
+          } else {
             this.$message({
-                type: "error",
-                message: '生成失败',
-              });
+              type: "error",
+              message: "生成失败",
+            });
           }
         });
+      } else {
+        this.wordCloudIsOpen = !this.wordCloudIsOpen;
       }
-      else{
-        this.wordCloudIsOpen=!this.wordCloudIsOpen
-      }
-      
     },
     handleChangeAvatar() {
+      if(!this.avatarFileIsOpen)this.hideAllIsOpen();
       this.avatarFileIsOpen = !this.avatarFileIsOpen;
     },
     handleAddEmoji(emoji) {
+      
       this.send += emoji;
+      this.$refs.txtarea.focus()
+
     },
     handleAvatarSuccess(e) {
       let file = e.target.files[0];
@@ -909,36 +955,51 @@ export default {
             base64Img.then((res) => {
               // console.log(url);
               let b = res;
-              axios({
-                method: "POST",
-                url: "http://127.0.0.1:80/user/avatar",
-                params: [res, this.account],
-                headers: {
-                  "Content-Type": "application/x-www-form-urlencoded",
-                },
-              }).then((res) => {
-                if (res.data.state == "success") {
-                  this.$refs.avatar.value = "";
-                  this.$message({
-                    type: "success",
-                    message: "发送成功",
-                  });
-                  console.log(res);
-                  const u = {
-                    account: this.account,
-                    base64: b,
-                  };
 
-                  this.store.commit("changeAvatar", u);
-                  this.getUserInfo();
-                } else {
+              this.$confirm("是否修改头像?", "提示", {
+                confirmButtonText: "确定",
+                cancelButtonText: "取消",
+                type: "warning",
+              })
+                .then(() => {
+                  axios({
+                    method: "POST",
+                    url: "http://127.0.0.1:80/user/avatar",
+                    params: [res, this.account],
+                    headers: {
+                      "Content-Type": "application/x-www-form-urlencoded",
+                    },
+                  }).then((res) => {
+                    if (res.data.state == "success") {
+                      this.$refs.avatar.value = "";
+                      this.$message({
+                        type: "success",
+                        message: "发送成功",
+                      });
+                      console.log(res);
+                      const u = {
+                        account: this.account,
+                        base64: b,
+                      };
+
+                      this.store.commit("changeAvatar", u);
+                      this.getUserInfo();
+                    } else {
+                      this.$refs.avatar.value = "";
+                      this.$message({
+                        type: "error",
+                        message: "发送失败",
+                      });
+                    }
+                  });
+                })
+                .catch(() => {
                   this.$refs.avatar.value = "";
                   this.$message({
-                    type: "error",
-                    message: "发送失败",
+                    type: "info",
+                    message: "已取消",
                   });
-                }
-              });
+                });
             });
           });
         };
@@ -1499,27 +1560,45 @@ export default {
               });
               return;
             }
-            axios({
-              method: "POST",
-              url: "http://127.0.0.1:80/message/sendImg",
-              params: [res, this.account, this.selectFri.account],
-              headers: { "Content-Type": "application/x-www-form-urlencoded" },
-            }).then((res) => {
-              if (res.data.state == "success") {
-                this.$message({
-                  type: "success",
-                  message: "发送成功",
-                });
-                this.getMessage();
 
-                this.UpdateClose();
-              } else {
-                this.$message({
-                  type: "error",
-                  message: "发送失败",
+            this.$confirm("是否发送图片?", "提示", {
+              confirmButtonText: "确定",
+              cancelButtonText: "取消",
+              type: "warning",
+            })
+              .then(() => {
+                axios({
+                  method: "POST",
+                  url: "http://127.0.0.1:80/message/sendImg",
+                  params: [res, this.account, this.selectFri.account],
+                  headers: {
+                    "Content-Type": "application/x-www-form-urlencoded",
+                  },
+                }).then((res) => {
+                  this.$refs.sendimg.value = "";
+                  if (res.data.state == "success") {
+                    this.$message({
+                      type: "success",
+                      message: "发送成功",
+                    });
+                    this.getMessage();
+
+                    this.UpdateClose();
+                  } else {
+                    this.$message({
+                      type: "error",
+                      message: "发送失败",
+                    });
+                  }
                 });
-              }
-            });
+              })
+              .catch(() => {
+                this.$refs.sendimg.value = "";
+                this.$message({
+                  type: "info",
+                  message: "已取消",
+                });
+              });
           });
         };
       }
@@ -1537,7 +1616,7 @@ export default {
   opacity: 1;
 } */
 .mood {
-  width: 60px;
+  width: 100px;
   height: 30px;
   display: inline-block;
   vertical-align: middle;
@@ -1546,13 +1625,14 @@ export default {
   line-height: 28px;
 }
 .mood img {
-  width: 50%;
-  height: 100%;
+  display: inline-block;
+  width: 30px;
+  height: 30px;
   vertical-align: middle;
 }
 .mood div {
-  width: 40%;
-  height: 100%;
+  height: 30px;
+  width: 30px;
   display: inline-block;
   vertical-align: middle;
   line-height: 30px;
@@ -2092,7 +2172,8 @@ body {
   top: -50%;
   border: 1px dashed;
   z-index: 10;
-  left: 95%;
+  left: 92.5%;
+  z-index: 1000;
 }
 .avatar-uploader .el-upload {
   border: 1px dashed #d9d9d9;
@@ -2275,7 +2356,6 @@ body {
   height: 50px;
 }
 .wordCloud {
-
   background-color: white;
   border-radius: 10px;
   position: absolute;

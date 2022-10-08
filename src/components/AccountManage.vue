@@ -26,6 +26,14 @@
       </div>
 
       <div class="main">
+
+        <template v-if="user.length==0">
+          <div class="item" @click="goPage('LoginPage')">
+            <div class="noUser">当前无账户处于登录状态,点击前往登录</div>
+          </div>
+        </template>
+
+
         <template v-for="(item, index) in user" :key="index">
           <div class="item" @click="handleClickAccount(item.account)">
             <div class="avatar" v-if="item.avatar"><img :src="item.avatar"></div>
@@ -106,6 +114,12 @@ export default {
   margin-left: 10px;
   margin-top: 10px;
 }
+.noUser{
+  position: absolute;
+  left: 50%;
+  top: 40%;
+  transform: translateX(-50%) translateY(-50%);
+}
 .main {
   display: flex;
   justify-content: space-between;
@@ -118,6 +132,8 @@ export default {
 }
 .item {
   cursor: pointer;
+
+  position: relative;
 
   height: 220px;
   background: #fff;
