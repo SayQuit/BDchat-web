@@ -694,6 +694,22 @@ export default {
   created() {
     this.store = useStore();
     this.account = this.$route.query.account;
+
+
+    if(this.store.state.user.length==0)this.goPage('AccountManage')
+    for(let i=0;i<this.store.state.user.length;i++){
+      if(this.store.state.user[i].account==this.account)break;
+      else if(i==this.store.state.user.length-1){
+          this.$message({
+            type: "error",
+            message: "用户未登录",
+          });
+          this.goPage('AccountManage')
+        }
+      }
+
+    
+    
     this.getUserInfo();
     this.getFriendList();
     this.getApply();

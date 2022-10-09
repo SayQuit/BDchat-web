@@ -85,7 +85,15 @@ export default {
           });
         return;
       }
-      // 做一些不能同时登录两个的判断
+      for(let i=0;i<this.store.state.user.length;i++){
+        if(this.store.state.user[i].account==this.account){
+          this.$message({
+            type: "error",
+            message: "用户已登录",
+          });
+          return;
+        }
+      }
       let url =
         "http://127.0.0.1/user/login?account=" +
         this.account +
@@ -115,7 +123,6 @@ export default {
         }
       });
 
-      //   this.goPage("UserPage");
     },
 
   },
