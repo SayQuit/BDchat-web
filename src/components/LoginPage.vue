@@ -85,6 +85,7 @@ export default {
           });
         return;
       }
+      this.account=this.account.trim()
       for(let i=0;i<this.store.state.user.length;i++){
         if(this.store.state.user[i].account==this.account){
           this.$message({
@@ -104,17 +105,18 @@ export default {
         if (dt.isLogin) {
           const u = {
             name: dt.name,
-            account: this.account,
-            psw: this.psw,
+            token:dt.token,
             avatar: dt.avatar,
+            account:dt.account
           };
+          console.log(u);
           this.store.commit("handlePushUser", u);
-          var ac = this.account;
+          // var ac = this.account;
           this.$message({
             type: "success",
             message: "登录成功",
           });
-          this.$router.push({ path: "/UserPage", query: { account: ac } });
+          this.$router.push({ path: "/UserPage", query: { token: dt.token } });
         } else {
           this.$message({
             type: "error",
@@ -123,10 +125,12 @@ export default {
         }
       });
 
+      //   this.goPage("UserPage");
     },
 
   },
 };
+
 </script>
   
   <style scoped>

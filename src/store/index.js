@@ -181,8 +181,8 @@ export default createStore({
 
 
     handlePushUser(state, TheUser) {
-      // 这里避免同时登录两个
       state.user.push(TheUser);
+      console.log(state.user);
     },
     changeName(state,u){
       // console.log(this.state.user.length);

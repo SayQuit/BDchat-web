@@ -153,9 +153,9 @@ export default {
         this.oldpsw +
         "&newpsw=" +
         this.newpsw;
-        console.log(url);
+        // console.log(url);
       axios.post(url).then((res) => {
-        console.log(res);
+        // console.log(res);
         if (res.data.state == "success") {
           this.$message({
             type: "success",

@@ -52,7 +52,7 @@
           <div class="friendApply" v-show="ApplyIsOpen">
             <template v-for="(item, index) in applyList" :key="index">
               <div class="apply-item">
-                <template v-if="item.sendID != account">
+                <template v-if="!item.isMe">
                   <div class="apply-item-desc">
                     <div>{{ item.sendID }} 申请加你为好友</div>
                   </div>
@@ -343,10 +343,10 @@
 
         <div class="maintalk-main" ref="scrollWin" id="maintalk-main">
           <template v-for="(item, index) in messageList" :key="index">
-            <div :class="[item.sendID == account ? 'isMe' : 'isFri']">
+            <div :class="[item.isMe ? 'isMe' : 'isFri']">
               <div class="maintalk-main-talkitem">
                 <div class="maintalk-main-talkitem-user">
-                  <template v-if="item.sendID == account">
+                  <template v-if="item.isMe">
                     <el-avatar
                       v-if="user.avatar"
                       :src="user.avatar"
@@ -376,7 +376,7 @@
                   </template>
 
                   <div class="maintalk-main-talkitem-user-name">
-                    <template v-if="item.sendID == account"> 我 </template>
+                    <template v-if="item.isMe"> 我 </template>
                     <template v-else>
                       {{ selectFri.name }}
                     </template>
@@ -384,7 +384,7 @@
                 </div>
                 <div class="maintalk-main-talkitem-time">{{ item.time }}</div>
 
-                <template v-if="item.sendID == account">
+                <template v-if="item.isMe">
                   <div v-if="item.isRead == 1" class="isread">已读</div>
                   <div v-else class="notread">未读</div>
                 </template>
@@ -392,13 +392,13 @@
                 <div
                   class="maintalk-main-talkitem-content"
                   :class="[
-                    item.sendID == account
+                    item.isMe
                       ? 'floatR greenMessage'
                       : 'floatL blueMessage',
                   ]"
                 >
                   <template v-if="item.isImg == 0">
-                    <template v-if="item.sendID == account">
+                    <template v-if="item.isMe">
                       <div :style="myStyle">{{ item.message }}</div>
                     </template>
                     <template v-else>
@@ -623,12 +623,11 @@ export default {
     return {
       store: "",
       mood: [],
-      account: "",
+      token: "",
       friendList: [],
       tempFriendList: [],
       user: {
         name: "",
-        account: "",
         avatar: "",
       },
       txtcolor: "#000000",
@@ -693,18 +692,23 @@ export default {
   },
   created() {
     this.store = useStore();
-    this.account = this.$route.query.account;
+    this.token = this.$route.query.token;
+    if(!this.token){
+      this.goPage('AccountManage')
+    }
 
+    // console.log();
 
     if(this.store.state.user.length==0)this.goPage('AccountManage')
     for(let i=0;i<this.store.state.user.length;i++){
-      if(this.store.state.user[i].account==this.account)break;
+      if(this.store.state.user[i].token==this.token)break;
       else if(i==this.store.state.user.length-1){
           this.$message({
             type: "error",
             message: "用户未登录",
           });
           this.goPage('AccountManage')
+          return;
         }
       }
 
@@ -728,6 +732,7 @@ export default {
     },
     handleChangeSelectFri(item) {
       this.selectFri = item;
+      // console.log();
       this.wordCloudIsOpen = false;
       this.handleReadMessage(item.account);
       this.getMessage();
@@ -754,8 +759,8 @@ export default {
         this.closeIsOpen = true;
         const url =
           this.store.state.requestUrl +
-          "/user/closeRank?account=" +
-          this.account;
+          "/user/closeRank?token=" +
+          this.token;
         axios.post(url).then((res) => {
           if (res.data.state == "success") {
             this.closeRankList = res.data.closeRank;
@@ -780,7 +785,7 @@ export default {
           // console.log(base64String);
           let base64Img = this.compressImg(base64String, 100, 0.5);
           base64Img.then((res) => {
-            console.log(res.length);
+            // console.log(res.length);
             if (res.length > 15000) {
               this.$refs.emotion.value = "";
               this.$message({
@@ -799,7 +804,7 @@ export default {
                 axios({
                   method: "POST",
                   url: "http://127.0.0.1:80/user/emotionSend",
-                  params: [this.account, res],
+                  params: [this.token, res],
                   headers: {
                     "Content-Type": "application/x-www-form-urlencoded",
                   },
@@ -843,8 +848,8 @@ export default {
     handleSendMoodIndex(index) {
       let url =
         this.store.state.requestUrl +
-        "/user/mood?account=" +
-        this.account +
+        "/user/mood?token=" +
+        this.token +
         "&index=" +
         index;
       axios.post(url).then((res) => {
@@ -889,8 +894,8 @@ export default {
       if (!sendColor) color = "%23" + this.tempFont.color.replace("#", "");
       else color = "%23" + sendColor;
       let url =
-        "http://127.0.0.1/user/font?account=" +
-        this.account +
+        "http://127.0.0.1/user/font?token=" +
+        this.token +
         "&fontSize=" +
         this.tempFont.fontSize +
         "&fontWeight=" +
@@ -933,7 +938,7 @@ export default {
     getSelectFriFont() {
       let url =
         this.store.state.requestUrl +
-        "/user/font?account=" +
+        "/user/friFont?account=" +
         this.selectFri.account;
       axios.get(url).then((res) => {
         if (res.data.state == "success") {
@@ -947,12 +952,22 @@ export default {
         }
       });
     },
+
     getFont() {
+      
       let url =
-        this.store.state.requestUrl + "/user/font?account=" + this.account;
+        this.store.state.requestUrl + "/user/font?token=" + this.token;
+
+        // setTimeout(() => {
+        //   console.log(url);
+        // }, 3000);
       axios.get(url).then((res) => {
         if (res.data.state == "success") {
-          // console.log(res.data.font);
+
+          // setTimeout(() => {
+          //   console.log(res.data);
+
+          // }, 1000);
           this.userFont = res.data.font;
           this.userFont.fontFamily =
             this.store.state.fontFamily[res.data.font.fontFamily];
@@ -976,8 +991,8 @@ export default {
         this.hideAllIsOpen();
         let url =
           this.store.state.requestUrl +
-          "/message/word?myaccount=" +
-          this.account +
+          "/message/word?token=" +
+          this.token +
           "&hisaccount=" +
           this.selectFri.account;
         axios.get(url).then((res) => {
@@ -1034,7 +1049,7 @@ export default {
                   axios({
                     method: "POST",
                     url: "http://127.0.0.1:80/user/avatar",
-                    params: [res, this.account],
+                    params: [res, this.token],
                     headers: {
                       "Content-Type": "application/x-www-form-urlencoded",
                     },
@@ -1045,7 +1060,7 @@ export default {
                         type: "success",
                         message: "发送成功",
                       });
-                      console.log(res);
+                      // console.log(res);
                       const u = {
                         account: this.account,
                         base64: b,
@@ -1077,8 +1092,8 @@ export default {
     handleReadMessage(acc) {
       let url =
         this.store.state.requestUrl +
-        "/message/read?myaccount=" +
-        this.account +
+        "/message/read?token=" +
+        this.token +
         "&hisaccount=" +
         this.selectFri.account;
       axios.post(url).then(() => {
@@ -1103,8 +1118,8 @@ export default {
           }
           const url =
             this.store.state.requestUrl +
-            "/user/name?account=" +
-            this.account +
+            "/user/name?token=" +
+            this.token +
             "&name=" +
             value;
           axios.post(url).then((res) => {
@@ -1135,7 +1150,7 @@ export default {
         });
     },
     handleSearch() {
-      console.log(this.searchWord);
+      // console.log(this.searchWord);
       if (this.searchWord == "") {
         this.tempFriendList = [];
         for (let i = 0; i < this.friendList.length; i++) {
@@ -1173,12 +1188,12 @@ export default {
         }
         const url =
           this.store.state.requestUrl +
-          "/user/signature?account=" +
-          this.account +
+          "/user/signature?token=" +
+          this.token +
           "&signature=" +
           value;
         axios.post(url).then((res) => {
-          console.log(res.data);
+          // console.log(res.data);
           if (res.data.state == "success") {
             this.$message({
               type: "success",
@@ -1203,8 +1218,8 @@ export default {
         .then(() => {
           let url =
             this.store.state.requestUrl +
-            "/user/delete?myaccount=" +
-            this.account +
+            "/user/delete?token=" +
+            this.token +
             "&hisaccount=" +
             this.selectFri.account;
           axios.post(url).then((res) => {
@@ -1239,8 +1254,8 @@ export default {
         .then(() => {
           let url =
             this.store.state.requestUrl +
-            "/user/ignore?myaccount=" +
-            this.account +
+            "/user/ignore?token=" +
+            this.token +
             "&hisaccount=" +
             this.selectFri.account +
             "&ignore=" +
@@ -1277,8 +1292,8 @@ export default {
         .then(() => {
           let url =
             this.store.state.requestUrl +
-            "/user/ignore?myaccount=" +
-            this.account +
+            "/user/ignore?token=" +
+            this.token +
             "&hisaccount=" +
             this.selectFri.account +
             "&ignore=" +
@@ -1311,8 +1326,8 @@ export default {
       // console.log(this.selectFri.account);
       let url =
         this.store.state.requestUrl +
-        "/user/emotionSendMessage?myaccount=" +
-        this.account +
+        "/user/emotionSendMessage?token=" +
+        this.token +
         "&hisaccount=" +
         this.selectFri.account +
         "&id=" +
@@ -1338,11 +1353,14 @@ export default {
     getMessage() {
       let url =
         this.store.state.requestUrl +
-        "/message/get?myaccount=" +
-        this.account +
+        "/message/get?token=" +
+        this.token +
         "&hisaccount=" +
         this.selectFri.account;
       axios.get(url).then((res) => {
+        setTimeout(() => {
+          // console.log(res.data.message);
+        }, 3000);
         this.messageList = res.data.message;
         this.getFriendList(this.selectFri.account);
         this.scrollToBottom();
@@ -1350,21 +1368,21 @@ export default {
     },
     getApply() {
       let url =
-        this.store.state.requestUrl + "/apply/get?account=" + this.account;
+        this.store.state.requestUrl + "/apply/get?token=" + this.token;
       axios.get(url).then((res) => {
+        console.log(res.data.applyList);
         this.applyList = res.data.applyList;
         this.applyLength = 0;
         this.applyList.forEach((element) => {
-          if (element.sendID != this.account && element.isSuccess == 0) {
+          if ( element.isSuccess == 0) {
             this.applyLength++;
           }
         });
-        // console.log(this.applyList);
       });
     },
     getFriendList(acc) {
       let url =
-        this.store.state.requestUrl + "/user/friend?account=" + this.account;
+        this.store.state.requestUrl + "/user/friend?token=" + this.token;
       axios.get(url).then((res) => {
         this.friendList = res.data.friendList;
         // console.log(this.friendList);
@@ -1380,8 +1398,8 @@ export default {
     getEmotion() {
       let url =
         this.store.state.requestUrl +
-        "/user/emotionGet?account=" +
-        this.account;
+        "/user/emotionGet?token=" +
+        this.token;
       axios.get(url).then((res) => {
         if (res.data.state == "success") {
           this.emotionList = res.data.emotionList;
@@ -1408,8 +1426,8 @@ export default {
       }
       let url =
         this.store.state.requestUrl +
-        "/message/send?myaccount=" +
-        this.account +
+        "/message/send?token=" +
+        this.token +
         "&hisaccount=" +
         this.selectFri.account +
         "&message=" +
@@ -1441,8 +1459,8 @@ export default {
       let num = Number(this.selectFri.close) + Number(rand);
       let url =
         this.store.state.requestUrl +
-        "/message/setClose?myaccount=" +
-        this.account +
+        "/message/setClose?token=" +
+        this.token +
         "&hisaccount=" +
         this.selectFri.account +
         "&close=" +
@@ -1463,7 +1481,7 @@ export default {
     },
     getUserInfo() {
       let url =
-        this.store.state.requestUrl + "/user/info?account=" + this.account;
+        this.store.state.requestUrl + "/user/info?token=" + this.token;
       axios.post(url).then((res) => {
         if (res.data.user) {
           this.user = res.data.user;
@@ -1514,8 +1532,8 @@ export default {
         item.id +
         "&allow=" +
         allow +
-        "&account1=" +
-        this.account +
+        "&token=" +
+        this.token +
         "&account2=" +
         item.sendID;
       axios.post(url).then((res) => {
@@ -1549,8 +1567,8 @@ export default {
 
           const url =
             this.store.state.requestUrl +
-            "/apply/send?myaccount=" +
-            this.account +
+            "/apply/send?token=" +
+            this.token +
             "&hisaccount=" +
             value;
           axios.post(url).then((res) => {
@@ -1638,7 +1656,7 @@ export default {
                 axios({
                   method: "POST",
                   url: "http://127.0.0.1:80/message/sendImg",
-                  params: [res, this.account, this.selectFri.account],
+                  params: [res, this.token, this.selectFri.account],
                   headers: {
                     "Content-Type": "application/x-www-form-urlencoded",
                   },
