@@ -10,7 +10,7 @@
       <div class="info">
         <div class="info-name">
           <div class="info-name-title">账号</div>
-          <input type="text" v-model="account" />
+          <input type="text" v-model="account" ref="account"/>
         </div>
         <div class="info-psw">
           <div class="info-psw-title">密码</div>
@@ -21,7 +21,7 @@
           <el-button type="primary" size="medium" @click="handleLogin()"
             >登录</el-button
           >
-          <el-button type="warning" size="medium">清空</el-button>
+          <el-button type="warning" size="medium" @click="handleClear()">清空</el-button>
           <el-button type="danger" size="medium" @click="goBack()"
             >返回</el-button
           >
@@ -53,8 +53,9 @@ export default {
     this.store = useStore();
   },
   mounted() {
+    this.$refs.account.focus()
     // console.log(this.store.state.requestUrl);
-    console.log(this.store.state.user);
+    // console.log(this.store.state.user);
   },
   methods: {
     goPage(pageName) {
@@ -64,6 +65,11 @@ export default {
       this.$router.back();
     },
 
+    handleClear(){
+      this.account='';
+      this.psw='';
+      this.$refs.account.focus()
+    },
     handleLogin() {
       if (this.account === "") {
         this.$message({

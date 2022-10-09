@@ -3,6 +3,7 @@ const AccountManage=()=>import('@/components/AccountManage.vue');
 const LoginPage=()=>import('@/components/LoginPage.vue');
 const UserPage=()=>import('@/components/UserPage.vue');
 const RegisterPage=()=>import('@/components/RegisterPage.vue');
+const ChangePassword=()=>import('@/components/ChangePassword.vue');
 const routes = [
     {
         path: "/",
@@ -28,6 +29,10 @@ const routes = [
         path:'/RegisterPage',
         name:'RegisterPage',
         component:RegisterPage
+    },{
+        path:'/ChangePassword',
+        name:'ChangePassword',
+        component:ChangePassword
     }
 ]
 const router=createRouter(

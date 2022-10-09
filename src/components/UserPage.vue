@@ -16,6 +16,13 @@
           @click="goPage('RegisterPage')"
           >注册</el-button
         >
+        <el-button
+          type="warning"
+          class="login"
+          size="medium"
+          @click="goPage('ChangePassword')"
+          >修改密码</el-button
+        >
       </div>
       <div class="header">
         <div class="header-operation">
@@ -442,6 +449,14 @@
             </div>
 
             <div
+              class="maintalk-footer-header-expression"
+              @click="handleCloseRank()"
+              :style="[closeIsOpen ? 'background-color:#EEE;' : '']"
+            >
+              <img src="../assets/close.png" />
+            </div>
+
+            <div
               class="maintalk-footer-header-send"
               @click="handleSendMessage()"
             >
@@ -562,6 +577,27 @@
               >
             </div>
           </div>
+          <div class="closeRank" v-show="closeIsOpen" ref="closeRank">
+            <div class="title">亲密度排行榜</div>
+            <template v-for="(item, index) in closeRankList" :key="item">
+              <div class="item">
+                <div class="rank">{{ index + 1 }}</div>
+                <div class="avatar">
+                  <img v-if="item.avatar" :src="item.avatar" class="mid" />
+                  <img
+                    v-else
+                    src="https://cube.elemecdn.com/0/88/03b0d39583f48206768a7534e55bcpng.png"
+                    class="mid"
+                  />
+                </div>
+                <div class="name">{{ item.name }}</div>
+                <div class="close">
+                  <img src="../assets/close.png" />
+                  <div>{{ item.close }}</div>
+                </div>
+              </div>
+            </template>
+          </div>
         </div>
       </div>
     </div>
@@ -601,6 +637,7 @@ export default {
       messageList: [],
       emojiList: [],
       applyList: [],
+      closeRankList: [],
       applyLength: 0,
       searchWord: "",
 
@@ -611,6 +648,7 @@ export default {
       fontIsOpen: false,
       moodIsOpen: false,
       wordCloudIsOpen: false,
+      closeIsOpen: false,
 
       emotionList: [],
       userFont: {
@@ -679,22 +717,41 @@ export default {
       this.getMessage();
       this.getSelectFriFont();
     },
-    hideAllIsOpen(){
-      this.emojiIsOpen= false;
-      this.avatarFileIsOpen= false;
-      this.ApplyIsOpen= false;
-      this.emotionIsOpen= false;
-      this.fontIsOpen= false;
-      this.moodIsOpen= false;
-      this.wordCloudIsOpen= false;
+    hideAllIsOpen() {
+      this.emojiIsOpen = false;
+      this.avatarFileIsOpen = false;
+      this.ApplyIsOpen = false;
+      this.emotionIsOpen = false;
+      this.fontIsOpen = false;
+      this.moodIsOpen = false;
+      this.wordCloudIsOpen = false;
+      this.closeIsOpen = false;
     },
     handleClickEmoji() {
-      this.$refs.txtarea.focus()
-      if(!this.emojiIsOpen)this.hideAllIsOpen();
+      this.$refs.txtarea.focus();
+      if (!this.emojiIsOpen) this.hideAllIsOpen();
       this.emojiIsOpen = !this.emojiIsOpen;
     },
+    handleCloseRank() {
+      if (this.closeIsOpen == false) {
+        this.hideAllIsOpen();
+        this.closeIsOpen = true;
+        const url =
+          this.store.state.requestUrl +
+          "/user/closeRank?account=" +
+          this.account;
+        axios.post(url).then((res) => {
+          if (res.data.state == "success") {
+            this.closeRankList = res.data.closeRank;
+            // console.log();
+          }
+        });
+      } else {
+        this.closeIsOpen = false;
+      }
+    },
     handleClickEmotion() {
-      if(!this.emotionIsOpen)this.hideAllIsOpen();
+      if (!this.emotionIsOpen) this.hideAllIsOpen();
       this.emotionIsOpen = !this.emotionIsOpen;
     },
     handleAddEmotion(e) {
@@ -760,11 +817,11 @@ export default {
       }
     },
     handleClickFont() {
-      if(!this.fontIsOpen)this.hideAllIsOpen();
+      if (!this.fontIsOpen) this.hideAllIsOpen();
       this.fontIsOpen = !this.fontIsOpen;
     },
     handleClickMood() {
-      if(!this.moodIsOpen)this.hideAllIsOpen();
+      if (!this.moodIsOpen) this.hideAllIsOpen();
       this.moodIsOpen = !this.moodIsOpen;
     },
     handleSendMoodIndex(index) {
@@ -785,8 +842,7 @@ export default {
       });
     },
     handleClickApply() {
-      
-      if(!this.ApplyIsOpen)this.hideAllIsOpen();
+      if (!this.ApplyIsOpen) this.hideAllIsOpen();
       this.ApplyIsOpen = !this.ApplyIsOpen;
     },
     handleCancelFontSetup() {
@@ -901,7 +957,6 @@ export default {
         return;
       }
       if (this.wordCloudIsOpen == false) {
-        
         this.hideAllIsOpen();
         let url =
           this.store.state.requestUrl +
@@ -926,14 +981,12 @@ export default {
       }
     },
     handleChangeAvatar() {
-      if(!this.avatarFileIsOpen)this.hideAllIsOpen();
+      if (!this.avatarFileIsOpen) this.hideAllIsOpen();
       this.avatarFileIsOpen = !this.avatarFileIsOpen;
     },
     handleAddEmoji(emoji) {
-      
       this.send += emoji;
-      this.$refs.txtarea.focus()
-
+      this.$refs.txtarea.focus();
     },
     handleAvatarSuccess(e) {
       let file = e.target.files[0];
@@ -1039,8 +1092,6 @@ export default {
             "&name=" +
             value;
           axios.post(url).then((res) => {
-            // 这里要做一次好友是否存在的检验，直接在前端做
-            console.log(res.data);
             if (res.data.state == "success") {
               this.$message({
                 type: "success",
@@ -1370,7 +1421,8 @@ export default {
       this.$router.back();
     },
     UpdateClose() {
-      let num = Number(this.selectFri.close) + Number(5);
+      let rand=Math.random()*10+1
+      let num = Number(this.selectFri.close) + Number(rand);
       let url =
         this.store.state.requestUrl +
         "/message/setClose?myaccount=" +
@@ -1608,12 +1660,76 @@ export default {
 </script>
 
 <style scoped>
-/* * {
-  color: #555555;
-  opacity: 0.9;
+.closeRank {
+  width: 400px;
+  height: 500px;
+  background-color: white;
+  border: 1px solid;
+  border-radius: 10px;
+  overflow-y: scroll;
+  position: absolute;
+  top: -230%;
+  left: 25%;
 }
-*:hover {
-  opacity: 1;
+.closeRank div {
+  width: 100%;
+}
+.closeRank .title {
+  font-weight: 500;
+  font-size: 26px;
+  text-align: center;
+  border-bottom: 1px solid #ddd;
+  padding: 10px 0;
+}
+.closeRank .item {
+  height: 90px;
+  width: 100%;
+  border-bottom: 1px solid #ddd;
+  display: flex;
+  align-items: center;
+  justify-items: center;
+  justify-content: center;
+}
+.closeRank .item > div {
+  flex: 2;
+}
+.closeRank .item .avatar {
+  height: 80%;
+  position: relative;
+}
+.closeRank .item .avatar img {
+  height: 100%;
+  border-radius: 50%;
+  border: 1px solid #ddd;
+}
+.closeRank .item .close {
+  height: 100%;
+}
+.closeRank .item > .rank {
+  flex: 1;
+  font-size: 16px;
+  text-align: center;
+}
+.closeRank .item .name {
+  font-size: 14px;
+  text-align: center;
+}
+.closeRank .item .close img {
+  height: 70%;
+  display: inline-block;
+  vertical-align: middle;
+  margin-top: 15%;
+}
+.closeRank .item .close div {
+  display: inline-block;
+  width: auto;
+  vertical-align: middle;
+  font-size: 18px;
+  color: #ffb6c1;
+  margin-left: 5px;
+}
+/* .closeRank .item:last-of-type{
+  border-bottom: none;
 } */
 .mood {
   width: 100px;
@@ -2067,7 +2183,7 @@ body {
   overflow-x: hidden;
 }
 .log {
-  width: 240px;
+  width: 100%;
   height: 50px;
   display: block;
   border-radius: 10px;

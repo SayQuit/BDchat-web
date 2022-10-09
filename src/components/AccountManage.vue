@@ -16,6 +16,13 @@
           @click="goPage('RegisterPage')"
           >注册</el-button
         >
+        <el-button
+          type="warning"
+          class="login"
+          size="medium"
+          @click="goPage('ChangePassword')"
+          >修改密码</el-button
+        >
         <!-- <el-button
           type="warning"
           class="login"
@@ -102,10 +109,10 @@ export default {
   background: url("../assets/2.png") no-repeat;
   background-size: cover;
   width: 100%;
-  height: 963px;
+  height: 1200px;
 }
 .log {
-  width: 240px;
+  width: 100%;
   height: 50px;
   display: block;
   border-radius: 10px;
@@ -125,11 +132,12 @@ export default {
   display: flex;
   justify-content: space-between;
   flex-wrap: wrap;
-  position: absolute;
-  top: 100px;
+  /* position: absolute; */
+  margin: 0 40px;
+  margin-top: 100px;
   left: 0;
   right: 0;
-  margin: 0 40px;
+  
 }
 .item {
   cursor: pointer;
