@@ -26,13 +26,13 @@
         </div>
 
         <div class="operation">
-          <el-button type="primary" size="medium" @click="handleChange()"
+          <el-button type="primary" @click="handleChange()"
             >修改</el-button
           >
-          <el-button type="warning" size="medium" @click="handleClear()"
+          <el-button type="warning" @click="handleClear()"
             >清空</el-button
           >
-          <el-button type="danger" size="medium" @click="goBack()"
+          <el-button type="danger" @click="goBack()"
             >返回</el-button
           >
         </div>
@@ -94,8 +94,6 @@ export default {
     this.store = useStore();
   },
   mounted() {
-    // console.log(this.store.state.requestUrl);
-    //   console.log(this.store.state.user);
     this.$refs.account.focus();
   },
   methods: {
@@ -153,9 +151,7 @@ export default {
         this.oldpsw +
         "&newpsw=" +
         this.newpsw;
-        // console.log(url);
       axios.post(url).then((res) => {
-        // console.log(res);
         if (res.data.state == "success") {
           this.$message({
             type: "success",

@@ -18,13 +18,13 @@
         </div>
 
         <div class="operation">
-          <el-button type="primary" size="medium" @click="handleLogin()"
+          <el-button type="primary" @click="handleLogin()"
             >登录</el-button
           >
-          <el-button type="warning" size="medium" @click="handleClear()"
+          <el-button type="warning" @click="handleClear()"
             >清空</el-button
           >
-          <el-button type="danger" size="medium" @click="goBack()"
+          <el-button type="danger" @click="goBack()"
             >返回</el-button
           >
         </div>
@@ -56,8 +56,6 @@ export default {
   },
   mounted() {
     this.$refs.account.focus();
-    // console.log(this.store.state.requestUrl);
-    // console.log(this.store.state.user);
   },
   methods: {
     goPage(pageName) {

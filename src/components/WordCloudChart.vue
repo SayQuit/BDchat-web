@@ -15,8 +15,6 @@ props:{
   }
 },
 mounted(){
-  // let rotate=(parseInt(Math.random() * 4))*90;
-  // console.log(rotate);
   this.initEcharts(this.word)
 },
 methods:{

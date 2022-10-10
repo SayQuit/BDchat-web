@@ -5,30 +5,21 @@
         <el-button
           type="primary"
           class="login"
-          size="medium"
           @click="goPage('LoginPage')"
           >登录</el-button
         >
         <el-button
           type="success"
           class="login"
-          size="medium"
           @click="goPage('RegisterPage')"
           >注册</el-button
         >
         <el-button
           type="warning"
           class="login"
-          size="medium"
           @click="goPage('ChangePassword')"
           >修改密码</el-button
         >
-        <!-- <el-button
-          type="warning"
-          class="login"
-          size="medium"
-          @click="giveImg()"
-          >传输图片</el-button> -->
       </div>
 
       <div class="main">

@@ -2,24 +2,15 @@
   <div>
     <div class="bgr">
       <div class="log">
-        <el-button
-          type="primary"
-          class="login"
-          size="medium"
-          @click="goPage('LoginPage')"
+        <el-button type="primary" class="login" @click="goPage('LoginPage')"
           >登录</el-button
         >
-        <el-button
-          type="success"
-          class="login"
-          size="medium"
-          @click="goPage('RegisterPage')"
+        <el-button type="success" class="login" @click="goPage('RegisterPage')"
           >注册</el-button
         >
         <el-button
           type="warning"
           class="login"
-          size="medium"
           @click="goPage('ChangePassword')"
           >修改密码</el-button
         >
@@ -137,9 +128,9 @@
               {{ user.name }}({{ user.account }})
             </div>
 
-            <template v-if="user.moodindex != 8">
+            <template v-if="mood.length!=0&&user.moodindex != 8">
               <div class="mood" @click="handleClickMood()">
-                <img :src="mood[user.moodindex].link" />
+                <img :src="mood[user.moodindex].link"/>
                 <div :style="'color:#' + mood[user.moodindex].color">
                   {{ mood[user.moodindex].state }}
                 </div>
@@ -165,7 +156,6 @@
                 :show-file-list="false"
                 v-show="avatarFileIsOpen"
               >
-                <!-- <img v-if="user.avatar" :src="user.avatar" class="avatar" /> -->
                 <div class="el-icon-plus avatar-uploader-icon">+</div>
                 <input
                   type="file"
@@ -578,7 +568,7 @@
               >
             </div>
           </div>
-          <div class="closeRank" v-show="closeIsOpen" ref="closeRank">
+          <div class="closeRank" v-show="closeIsOpen">
             <div class="title">亲密度排行榜</div>
             <template v-for="(item, index) in closeRankList" :key="item">
               <div class="item">
@@ -630,6 +620,7 @@ export default {
       user: {
         name: "",
         avatar: "",
+        moodindex:8
       },
       txtcolor: "#000000",
       send: "",
@@ -679,7 +670,7 @@ export default {
       decoration: [],
       family: [],
       weight: [],
-      moodIndex: 9,
+      moodIndex: 8,
       word: [],
 
       isIn: true,
@@ -693,6 +684,9 @@ export default {
       return this.selectFriFont;
     },
   },
+  beforeCreate(){
+    
+  },
   created() {
     this.isIn = true;
     this.store = useStore();
@@ -701,7 +695,6 @@ export default {
       this.isIn = false;
     }
 
-    // console.log();
 
     if (this.store.state.user.length == 0) this.isIn = false;
     for (let i = 0; i < this.store.state.user.length; i++) {
@@ -712,18 +705,22 @@ export default {
     }
 
     if (this.isIn) {
-      this.getUserInfo();
-      this.getFriendList();
-      this.getApply();
-      this.getEmotion();
-      this.getFont();
-
       this.emojiList = this.store.state.emojiList;
       this.style = this.store.state.fontStyle;
       this.decoration = this.store.state.textDecoration;
       this.family = this.store.state.fontFamily;
       this.weight = this.store.state.fontWeight;
       this.mood = this.store.state.mood;
+
+
+      this.getUserInfo();
+      this.getFriendList();
+      this.getApply();
+      this.getEmotion();
+      this.getFont();
+
+
+      
     } else {
       this.router.push("AccountManage");
     }
@@ -734,7 +731,6 @@ export default {
     },
     handleChangeSelectFri(item) {
       this.selectFri = item;
-      // console.log();
       this.wordCloudIsOpen = false;
       this.handleReadMessage(item.account);
       this.getMessage();
@@ -764,7 +760,6 @@ export default {
         axios.post(url).then((res) => {
           if (res.data.state == "success") {
             this.closeRankList = res.data.closeRank;
-            // console.log();
           }
         });
       } else {
@@ -782,10 +777,8 @@ export default {
         reader.readAsDataURL(file);
         reader.onload = (e) => {
           let base64String = e.target.result;
-          // console.log(base64String);
           let base64Img = this.compressImg(base64String, 100, 0.5);
           base64Img.then((res) => {
-            // console.log(res.length);
             if (res.length > 15000) {
               this.$refs.emotion.value = "";
               this.$message({
@@ -872,8 +865,6 @@ export default {
 
       this.tempFont.fontSize = parseInt(this.tempFont.fontSize);
 
-      // console.log(this.tempFont);
-      // console.log(this.userFont);
       for (let i = 0; i < this.store.state.fontFamily.length; i++) {
         if (this.store.state.fontFamily[i] == this.tempFont.fontFamily) {
           this.tempFont.fontFamily = i;
@@ -942,14 +933,11 @@ export default {
         this.selectFri.account;
       axios.get(url).then((res) => {
         if (res.data.state == "success") {
-          // console.log(res.data.font);
           this.selectFriFont = res.data.font;
           this.selectFriFont.fontFamily =
             this.store.state.fontFamily[res.data.font.fontFamily];
           this.selectFriFont.fontSize = this.selectFriFont.fontSize + "px";
-        } else {
-          console.log("fail");
-        }
+        } 
       });
     },
     handleLogout() {
@@ -976,24 +964,15 @@ export default {
     getFont() {
       let url = this.store.state.requestUrl + "/user/font?token=" + this.token;
 
-      // setTimeout(() => {
-      //   console.log(url);
-      // }, 3000);
+
       axios.get(url).then((res) => {
         if (res.data.state == "success") {
-          // setTimeout(() => {
-          //   console.log(res.data);
-
-          // }, 1000);
           this.userFont = res.data.font;
           this.userFont.fontFamily =
             this.store.state.fontFamily[res.data.font.fontFamily];
           this.userFont.fontSize = res.data.font.fontSize + "px";
           this.getTempFont();
-          // console.log(this.userFont);
-        } else {
-          console.log("fail");
-        }
+        } 
       });
     },
     handleChangeWordCloud() {
@@ -1013,7 +992,6 @@ export default {
           "&hisaccount=" +
           this.selectFri.account;
         axios.get(url).then((res) => {
-          // console.log(res.data.word);
           if (res.data.state == "success") {
             this.word = res.data.word;
             this.wordCloudIsOpen = !this.wordCloudIsOpen;
@@ -1054,7 +1032,6 @@ export default {
               return;
             }
             base64Img.then((res) => {
-              // console.log(url);
               let b = res;
 
               this.$confirm("是否修改头像?", "提示", {
@@ -1077,13 +1054,13 @@ export default {
                         type: "success",
                         message: "发送成功",
                       });
-                      // console.log(res);
                       const u = {
-                        account: this.account,
+                        token: this.token,
                         base64: b,
                       };
 
                       this.store.commit("changeAvatar", u);
+                      this.avatarFileIsOpen=false
                       this.getUserInfo();
                     } else {
                       this.$refs.avatar.value = "";
@@ -1114,7 +1091,6 @@ export default {
         "&hisaccount=" +
         this.selectFri.account;
       axios.post(url).then(() => {
-        // console.log('handleReadMessage',this.selectFri);
         this.getFriendList(acc);
       });
     },
@@ -1123,7 +1099,7 @@ export default {
         confirmButtonText: "确定",
         cancelButtonText: "取消",
         inputErrorMessage: "昵称格式不正确",
-        // customClass: 'message-signature'
+        inputPlaceholder:this.user.name
       })
         .then(({ value }) => {
           if (value.length > 20) {
@@ -1146,7 +1122,7 @@ export default {
                 message: "您的昵称是:" + value + " 发送成功",
               });
               const u = {
-                account: this.account,
+                token: this.token,
                 name: value,
               };
               this.store.commit("changeName", u);
@@ -1167,7 +1143,6 @@ export default {
         });
     },
     handleSearch() {
-      // console.log(this.searchWord);
       if (this.searchWord == "") {
         this.tempFriendList = [];
         for (let i = 0; i < this.friendList.length; i++) {
@@ -1210,7 +1185,6 @@ export default {
           "&signature=" +
           value;
         axios.post(url).then((res) => {
-          // console.log(res.data);
           if (res.data.state == "success") {
             this.$message({
               type: "success",
@@ -1339,8 +1313,6 @@ export default {
         });
     },
     handleSendEmotionMessage(id) {
-      // console.log(id);
-      // console.log(this.selectFri.account);
       let url =
         this.store.state.requestUrl +
         "/user/emotionSendMessage?token=" +
@@ -1376,7 +1348,6 @@ export default {
         this.selectFri.account;
       axios.get(url).then((res) => {
         setTimeout(() => {
-          // console.log(res.data.message);
         }, 3000);
         this.messageList = res.data.message;
         this.getFriendList(this.selectFri.account);
@@ -1386,7 +1357,6 @@ export default {
     getApply() {
       let url = this.store.state.requestUrl + "/apply/get?token=" + this.token;
       axios.get(url).then((res) => {
-        console.log(res.data.applyList);
         this.applyList = res.data.applyList;
         this.applyLength = 0;
         this.applyList.forEach((element) => {
@@ -1401,7 +1371,6 @@ export default {
         this.store.state.requestUrl + "/user/friend?token=" + this.token;
       axios.get(url).then((res) => {
         this.friendList = res.data.friendList;
-        // console.log(this.friendList);
         this.tempFriendList = [];
         for (let i = 0; i < this.friendList.length; i++) {
           this.tempFriendList.push(this.friendList[i]);
@@ -1446,9 +1415,7 @@ export default {
         this.selectFri.account +
         "&message=" +
         msg;
-      // console.log(url);
       axios.post(url).then((res) => {
-        // console.log(res.data);
         if (res.data.state == "success") {
           this.$message({
             type: "success",
@@ -1479,9 +1446,7 @@ export default {
         this.selectFri.account +
         "&close=" +
         num;
-      //   console.log(num);
 
-      // console.log(url);
       axios.post(url).then((res) => {
         if (res.data.state == "success") {
           this.getFriendList(this.selectFri.account);
@@ -1498,7 +1463,6 @@ export default {
       axios.post(url).then((res) => {
         if (res.data.user) {
           this.user = res.data.user;
-          console.log(this.user);
         } else {
           this.$message({
             type: "error",
@@ -1637,7 +1601,6 @@ export default {
         ctx.clearRect(0, 0, canvas.width, canvas.height);
         ctx.drawImage(newImage, 0, 0, canvas.width, canvas.height);
         var base64 = canvas.toDataURL(getMimeType(base64String), quality);
-        console.log(base64);
         return base64;
       });
     },
@@ -1648,10 +1611,8 @@ export default {
         reader.readAsDataURL(file);
         reader.onload = (e) => {
           let base64String = e.target.result;
-          // console.log(base64String);
           let base64Img = this.compressImg(base64String, 100, 0.7);
           base64Img.then((res) => {
-            console.log(res.length);
             if (res.length > 12000) {
               this.$message({
                 type: "error",

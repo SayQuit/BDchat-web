@@ -182,17 +182,15 @@ export default createStore({
       state.user.push(TheUser);
     },
     changeName(state,u){
-      // console.log(this.state.user.length);
       for(let i=0;i<state.user.length;i++){
-        if(state.user[i].account==u.account){
+        if(state.user[i].token==u.token){
           state.user[i].name=u.name
         }
       }
     },
     changeAvatar(state,u){
-      // console.log(u);
       for(let i=0;i<state.user.length;i++){
-        if(state.user[i].account==u.account){
+        if(state.user[i].token==u.token){
           state.user[i].avatar=u.base64
         }
       }

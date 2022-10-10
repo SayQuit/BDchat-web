@@ -22,13 +22,13 @@
             <input type="password" v-model="makesurePsw" />
           </div>
           <div class="operation">
-            <el-button type="success" size="medium" @click="handleRegister()"
+            <el-button type="success" @click="handleRegister()"
               >注册</el-button
             >
-            <el-button type="warning" size="medium" @click="handleClear()"
+            <el-button type="warning" @click="handleClear()"
               >清空</el-button
             >
-            <el-button type="danger" size="medium" @click="goBack()"
+            <el-button type="danger" @click="goBack()"
               >返回</el-button
             >
           </div>
@@ -139,7 +139,6 @@ export default {
       }
       let url =
         "http://127.0.0.1/user/register?name=" + this.name + "&psw=" + this.psw;
-      // console.log(url);
       axios.post(url).then((data) => {
         
         if (data.data.account) {
