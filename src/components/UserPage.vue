@@ -46,7 +46,10 @@
             v-else
             >好友申请({{ applyLength }})</el-button
           >
-          <el-button class="header-operation-close" type="danger"
+          <el-button
+            class="header-operation-close"
+            type="danger"
+            @click="handleLogout()"
             >退出</el-button
           >
           <div class="friendApply" v-show="ApplyIsOpen">
@@ -678,8 +681,8 @@ export default {
       weight: [],
       moodIndex: 9,
       word: [],
-      
-      isIn:true
+
+      isIn: true,
     };
   },
   computed: {
@@ -714,17 +717,15 @@ export default {
       this.getApply();
       this.getEmotion();
       this.getFont();
-      
+
       this.emojiList = this.store.state.emojiList;
       this.style = this.store.state.fontStyle;
       this.decoration = this.store.state.textDecoration;
       this.family = this.store.state.fontFamily;
       this.weight = this.store.state.fontWeight;
       this.mood = this.store.state.mood;
-    }
-
-    else{
-      this.router.push('AccountManage');
+    } else {
+      this.router.push("AccountManage");
     }
   },
   methods: {
@@ -951,7 +952,27 @@ export default {
         }
       });
     },
-
+    handleLogout() {
+      this.$confirm("是否退出当前账号?", "提示", {
+        confirmButtonText: "确定",
+        cancelButtonText: "取消",
+        type: "warning",
+      })
+        .then(() => {
+          this.store.commit("logout", this.token);
+          this.goPage("AccountManage");
+          this.$message({
+            type: "success",
+            message: "退出成功!",
+          });
+        })
+        .catch(() => {
+          this.$message({
+            type: "info",
+            message: "已取消",
+          });
+        });
+    },
     getFont() {
       let url = this.store.state.requestUrl + "/user/font?token=" + this.token;
 

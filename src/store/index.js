@@ -178,11 +178,8 @@ export default createStore({
     ]
   },
   mutations: {
-
-
     handlePushUser(state, TheUser) {
       state.user.push(TheUser);
-      console.log(state.user);
     },
     changeName(state,u){
       // console.log(this.state.user.length);
@@ -199,6 +196,27 @@ export default createStore({
           state.user[i].avatar=u.base64
         }
       }
+    },
+    logout(state,token){
+      
+
+      for(let i=0;i<state.user.length;i++){
+        if(token==state.user[i].token){
+          state.user.splice(i,1)
+          break;
+        }
+      }     
+      let TokenList=[]
+      if(localStorage.getItem('bd_chat_token'))TokenList=JSON.parse(localStorage.getItem('bd_chat_token'))
+
+      for(let i=0;i<TokenList.length;i++){
+        if(token==TokenList[i]){
+          TokenList.splice(i,1)
+          break;
+          
+        }
+      } 
+      localStorage.setItem('bd_chat_token',JSON.stringify(TokenList));
     }
 
 

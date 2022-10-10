@@ -119,8 +119,6 @@ export default {
           });
           let TokenList=[]
           if(localStorage.getItem('bd_chat_token'))TokenList=JSON.parse(localStorage.getItem('bd_chat_token'))
-          console.log(TokenList);
-          // let TokenList=[]
           TokenList.push(dt.token)
           localStorage.setItem('bd_chat_token',JSON.stringify(TokenList));
           this.$router.push({name:'UserPage', params:{token:dt.token}})
@@ -133,8 +131,6 @@ export default {
           });
         }
       });
-
-      //   this.goPage("UserPage");
     },
   },
 };

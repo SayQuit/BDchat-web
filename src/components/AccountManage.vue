@@ -94,8 +94,6 @@ export default {
       if (localStorage.getItem("bd_chat_token"))
         TokenList = JSON.parse(localStorage.getItem("bd_chat_token"));
       for (let i = 0; i < TokenList.length; i++) {
-
-
         let isNeedContinue=0;
         for(let j=0;j<this.store.state.user.length;j++){
           if(this.store.state.user[j].token==TokenList[i]){
@@ -169,7 +167,7 @@ export default {
   flex-wrap: wrap;
   /* position: absolute; */
   margin: 0 40px;
-  margin-top: 100px;
+  margin-top: 50px;
   left: 0;
   right: 0;
 }
@@ -178,7 +176,7 @@ export default {
 
   position: relative;
 
-  height: 220px;
+  height: 240px;
   background: #fff;
   border-radius: 10px;
 
