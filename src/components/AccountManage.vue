@@ -29,22 +29,25 @@
           size="medium"
           @click="giveImg()"
           >传输图片</el-button> -->
-        
       </div>
 
       <div class="main">
-
-        <template v-if="user.length==0">
+        <template v-if="user.length == 0">
           <div class="item" @click="goPage('LoginPage')">
             <div class="noUser">当前无账户处于登录状态,点击前往登录</div>
           </div>
         </template>
 
-
         <template v-for="(item, index) in user" :key="index">
           <div class="item" @click="handleClickAccount(item.token)">
-            <div class="avatar" v-if="item.avatar"><img :src="item.avatar"></div>
-            <div class="avatar" v-else><img src="https://cube.elemecdn.com/0/88/03b0d39583f48206768a7534e55bcpng.png"></div>
+            <div class="avatar" v-if="item.avatar">
+              <img :src="item.avatar" />
+            </div>
+            <div class="avatar" v-else>
+              <img
+                src="https://cube.elemecdn.com/0/88/03b0d39583f48206768a7534e55bcpng.png"
+              />
+            </div>
             <div class="account">账号:{{ item.account }}</div>
             <div class="name">昵称:{{ item.name }}</div>
           </div>
@@ -57,6 +60,7 @@
 <script>
 import { useRouter } from "vue-router";
 import { useStore } from "vuex";
+import axios from "axios";
 export default {
   setup() {
     const router = useRouter();
@@ -71,27 +75,58 @@ export default {
     };
   },
   mounted() {
-    const store = useStore(); // 该方法用于返回store 实例
-
+    const store = useStore();
 
     this.store = store;
     this.user = this.store.state.user;
-    // console.log(this.user); // store 实例对象
-    // console.log();
+    this.initUser();
   },
 
   methods: {
-    // giveImg(){
-    //   // console.log('img');
-
-    // },
     goPage(pageName) {
-      // console.log(pageName);
-      // console.log(this.router);
       this.router.push({ name: pageName });
     },
-    handleClickAccount(TheAccount) {
-      this.$router.push({ path: "/UserPage", query: { token: TheAccount } });
+    handleClickAccount(token) {
+      this.$router.push({ name: "UserPage", params: { token: token } });
+    },
+    initUser() {
+      let TokenList = [];
+      if (localStorage.getItem("bd_chat_token"))
+        TokenList = JSON.parse(localStorage.getItem("bd_chat_token"));
+      for (let i = 0; i < TokenList.length; i++) {
+
+
+        let isNeedContinue=0;
+        for(let j=0;j<this.store.state.user.length;j++){
+          if(this.store.state.user[j].token==TokenList[i]){
+            isNeedContinue=1;
+            break;
+          }
+        }
+        if(isNeedContinue)continue;
+
+        let url = "http://127.0.0.1/user/tokenLogin?token=" + TokenList[i];
+        axios.post(url).then((data) => {
+          var dt = data.data;
+          if (dt.message == "success") {
+            const u = {
+              name: dt.name,
+              token: dt.token,
+              avatar: dt.avatar,
+              account: dt.account,
+            };
+            this.store.commit("handlePushUser", u);
+            this.user = this.store.state.user;
+          }
+          else if(dt.message=='overdue'){
+            TokenList.splice(i,1)
+            localStorage.setItem('bd_chat_token',JSON.stringify(TokenList));
+          }
+        });
+
+
+
+      }
     },
   },
 };
@@ -122,7 +157,7 @@ export default {
   margin-left: 10px;
   margin-top: 10px;
 }
-.noUser{
+.noUser {
   position: absolute;
   left: 50%;
   top: 40%;
@@ -137,7 +172,6 @@ export default {
   margin-top: 100px;
   left: 0;
   right: 0;
-  
 }
 .item {
   cursor: pointer;
@@ -162,19 +196,17 @@ export default {
 .item:last-child {
   margin-right: auto;
 }
-.avatar{
+.avatar {
   width: 100px;
   height: 100px;
 
-  
   margin: 0 auto;
   margin-top: 20px;
 }
-.avatar img{
+.avatar img {
   width: 100%;
-  height: 100%;  
+  height: 100%;
   border-radius: 50px;
-
 }
 .account {
   margin-top: 20px;

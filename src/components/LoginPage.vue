@@ -10,7 +10,7 @@
       <div class="info">
         <div class="info-name">
           <div class="info-name-title">账号</div>
-          <input type="text" v-model="account" ref="account"/>
+          <input type="text" v-model="account" ref="account" />
         </div>
         <div class="info-psw">
           <div class="info-psw-title">密码</div>
@@ -21,7 +21,9 @@
           <el-button type="primary" size="medium" @click="handleLogin()"
             >登录</el-button
           >
-          <el-button type="warning" size="medium" @click="handleClear()">清空</el-button>
+          <el-button type="warning" size="medium" @click="handleClear()"
+            >清空</el-button
+          >
           <el-button type="danger" size="medium" @click="goBack()"
             >返回</el-button
           >
@@ -31,7 +33,7 @@
   </div>
 </template>
   
-  <script>
+<script>
 import { useRouter } from "vue-router";
 import axios from "axios";
 import { useStore } from "vuex";
@@ -53,7 +55,7 @@ export default {
     this.store = useStore();
   },
   mounted() {
-    this.$refs.account.focus()
+    this.$refs.account.focus();
     // console.log(this.store.state.requestUrl);
     // console.log(this.store.state.user);
   },
@@ -65,29 +67,29 @@ export default {
       this.$router.back();
     },
 
-    handleClear(){
-      this.account='';
-      this.psw='';
-      this.$refs.account.focus()
+    handleClear() {
+      this.account = "";
+      this.psw = "";
+      this.$refs.account.focus();
     },
     handleLogin() {
       if (this.account === "") {
         this.$message({
-            type: "error",
-            message: "账号不能为空",
-          });
+          type: "error",
+          message: "账号不能为空",
+        });
         return;
       }
       if (this.psw === "") {
         this.$message({
-            type: "error",
-            message: "密码不能为空",
-          });
+          type: "error",
+          message: "密码不能为空",
+        });
         return;
       }
-      this.account=this.account.trim()
-      for(let i=0;i<this.store.state.user.length;i++){
-        if(this.store.state.user[i].account==this.account){
+      this.account = this.account.trim();
+      for (let i = 0; i < this.store.state.user.length; i++) {
+        if (this.store.state.user[i].account == this.account) {
           this.$message({
             type: "error",
             message: "用户已登录",
@@ -105,18 +107,25 @@ export default {
         if (dt.isLogin) {
           const u = {
             name: dt.name,
-            token:dt.token,
+            token: dt.token,
             avatar: dt.avatar,
-            account:dt.account
+            account: dt.account,
           };
-          console.log(u);
           this.store.commit("handlePushUser", u);
           // var ac = this.account;
           this.$message({
             type: "success",
             message: "登录成功",
           });
-          this.$router.push({ path: "/UserPage", query: { token: dt.token } });
+          let TokenList=[]
+          if(localStorage.getItem('bd_chat_token'))TokenList=JSON.parse(localStorage.getItem('bd_chat_token'))
+          console.log(TokenList);
+          // let TokenList=[]
+          TokenList.push(dt.token)
+          localStorage.setItem('bd_chat_token',JSON.stringify(TokenList));
+          this.$router.push({name:'UserPage', params:{token:dt.token}})
+
+
         } else {
           this.$message({
             type: "error",
@@ -127,10 +136,8 @@ export default {
 
       //   this.goPage("UserPage");
     },
-
   },
 };
-
 </script>
   
   <style scoped>

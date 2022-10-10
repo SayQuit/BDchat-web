@@ -392,9 +392,7 @@
                 <div
                   class="maintalk-main-talkitem-content"
                   :class="[
-                    item.isMe
-                      ? 'floatR greenMessage'
-                      : 'floatL blueMessage',
+                    item.isMe ? 'floatR greenMessage' : 'floatL blueMessage',
                   ]"
                 >
                   <template v-if="item.isImg == 0">
@@ -680,6 +678,8 @@ export default {
       weight: [],
       moodIndex: 9,
       word: [],
+      
+      isIn:true
     };
   },
   computed: {
@@ -691,40 +691,41 @@ export default {
     },
   },
   created() {
+    this.isIn = true;
     this.store = useStore();
-    this.token = this.$route.query.token;
-    if(!this.token){
-      this.goPage('AccountManage')
+    this.token = this.$route.params.token;
+    if (!this.token) {
+      this.isIn = false;
     }
 
     // console.log();
 
-    if(this.store.state.user.length==0)this.goPage('AccountManage')
-    for(let i=0;i<this.store.state.user.length;i++){
-      if(this.store.state.user[i].token==this.token)break;
-      else if(i==this.store.state.user.length-1){
-          this.$message({
-            type: "error",
-            message: "用户未登录",
-          });
-          this.goPage('AccountManage')
-          return;
-        }
+    if (this.store.state.user.length == 0) this.isIn = false;
+    for (let i = 0; i < this.store.state.user.length; i++) {
+      if (this.store.state.user[i].token == this.token) break;
+      else if (i == this.store.state.user.length - 1) {
+        this.isIn = false;
       }
+    }
 
-    
-    
-    this.getUserInfo();
-    this.getFriendList();
-    this.getApply();
-    this.emojiList = this.store.state.emojiList;
-    this.getEmotion();
-    this.getFont();
-    this.style = this.store.state.fontStyle;
-    this.decoration = this.store.state.textDecoration;
-    this.family = this.store.state.fontFamily;
-    this.weight = this.store.state.fontWeight;
-    this.mood = this.store.state.mood;
+    if (this.isIn) {
+      this.getUserInfo();
+      this.getFriendList();
+      this.getApply();
+      this.getEmotion();
+      this.getFont();
+      
+      this.emojiList = this.store.state.emojiList;
+      this.style = this.store.state.fontStyle;
+      this.decoration = this.store.state.textDecoration;
+      this.family = this.store.state.fontFamily;
+      this.weight = this.store.state.fontWeight;
+      this.mood = this.store.state.mood;
+    }
+
+    else{
+      this.router.push('AccountManage');
+    }
   },
   methods: {
     goPage(pageName) {
@@ -758,9 +759,7 @@ export default {
         this.hideAllIsOpen();
         this.closeIsOpen = true;
         const url =
-          this.store.state.requestUrl +
-          "/user/closeRank?token=" +
-          this.token;
+          this.store.state.requestUrl + "/user/closeRank?token=" + this.token;
         axios.post(url).then((res) => {
           if (res.data.state == "success") {
             this.closeRankList = res.data.closeRank;
@@ -954,16 +953,13 @@ export default {
     },
 
     getFont() {
-      
-      let url =
-        this.store.state.requestUrl + "/user/font?token=" + this.token;
+      let url = this.store.state.requestUrl + "/user/font?token=" + this.token;
 
-        // setTimeout(() => {
-        //   console.log(url);
-        // }, 3000);
+      // setTimeout(() => {
+      //   console.log(url);
+      // }, 3000);
       axios.get(url).then((res) => {
         if (res.data.state == "success") {
-
           // setTimeout(() => {
           //   console.log(res.data);
 
@@ -1367,14 +1363,13 @@ export default {
       });
     },
     getApply() {
-      let url =
-        this.store.state.requestUrl + "/apply/get?token=" + this.token;
+      let url = this.store.state.requestUrl + "/apply/get?token=" + this.token;
       axios.get(url).then((res) => {
         console.log(res.data.applyList);
         this.applyList = res.data.applyList;
         this.applyLength = 0;
         this.applyList.forEach((element) => {
-          if ( element.isSuccess == 0) {
+          if (element.isSuccess == 0) {
             this.applyLength++;
           }
         });
@@ -1397,9 +1392,7 @@ export default {
     },
     getEmotion() {
       let url =
-        this.store.state.requestUrl +
-        "/user/emotionGet?token=" +
-        this.token;
+        this.store.state.requestUrl + "/user/emotionGet?token=" + this.token;
       axios.get(url).then((res) => {
         if (res.data.state == "success") {
           this.emotionList = res.data.emotionList;
@@ -1455,7 +1448,7 @@ export default {
       this.$router.back();
     },
     UpdateClose() {
-      let rand=Math.random()*10+1
+      let rand = Math.random() * 10 + 1;
       let num = Number(this.selectFri.close) + Number(rand);
       let url =
         this.store.state.requestUrl +
@@ -1480,8 +1473,7 @@ export default {
       });
     },
     getUserInfo() {
-      let url =
-        this.store.state.requestUrl + "/user/info?token=" + this.token;
+      let url = this.store.state.requestUrl + "/user/info?token=" + this.token;
       axios.post(url).then((res) => {
         if (res.data.user) {
           this.user = res.data.user;
