@@ -51,13 +51,6 @@
           @click="goPage('AccountManage')"
           >返回主页</el-button
         >
-        <el-button
-          type="primary"
-          class="info"
-          style="margin-top: 340px; width: 150px; height: auto; margin-left: 0"
-          @click="goPage('LoginPage')"
-          >前往登录</el-button
-        >
       </div>
     </template>
   </div>
