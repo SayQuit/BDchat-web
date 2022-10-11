@@ -735,7 +735,7 @@ export default {
           else{
             this.getMessage(false)
           }
-          console.log(this.lastLen,this.messageList.length);
+          // console.log(this.lastLen,this.messageList.length);
           this.lastLen=this.messageList.length
 
           // this.getMessage(true)
@@ -1378,9 +1378,14 @@ export default {
         "&hisaccount=" +
         this.selectFri.account;
       axios.get(url).then((res) => {
-        this.messageList = res.data.message;
+        if(res.data.state=='success'){
+          this.messageList = res.data.message;
         this.getFriendList(this.selectFri.account);
         if(Scroll)this.scrollToBottom();
+        }
+        else{
+          this.selectFri=''
+        }
       });
     },
     getApply() {
@@ -1490,7 +1495,6 @@ export default {
     getUserInfo() {
       let url = this.store.state.requestUrl + "/user/info?token=" + this.token;
       axios.post(url).then((res) => {
-        // console.log(res.data);
         if (res.data.user) {
           this.user = res.data.user;
         } else {
