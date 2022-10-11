@@ -679,6 +679,9 @@ export default {
       word: [],
 
       isIn: true,
+
+      lastLen:0,
+      messageTimer:''
     };
   },
   computed: {
@@ -719,9 +722,37 @@ export default {
       this.getApply();
       this.getEmotion();
       this.getFont();
+
+      this.messageTimer=setInterval(() => {
+      setTimeout(() => {
+        this.getApply()
+        this.getFriendList(this.selectFri.account)
+        // 
+        if(this.selectFri!=''){
+          if(this.lastLen!=this.messageList.length&&this.messageList[this.messageList.length-1].isMe!=1){
+            this.getMessage(true)
+          }
+          else{
+            this.getMessage(false)
+          }
+          console.log(this.lastLen,this.messageList.length);
+          this.lastLen=this.messageList.length
+
+          // this.getMessage(true)
+          this.getSelectFriFont()
+          this.handleReadMessage(this.selectFri.account)
+        }
+      }, 0);
+    }, 1800);
+
+      
+
     } else {
       this.router.push("AccountManage");
     }
+  },
+  beforeUnmount() {
+    window.clearInterval(this.messageTimer)
   },
   methods: {
     goPage(pageName) {
@@ -731,9 +762,10 @@ export default {
       this.selectFri = item;
       this.wordCloudIsOpen = false;
       this.handleReadMessage(item.account);
-      this.getMessage();
+      this.getMessage(true);
       this.getSelectFriFont();
       this.searchWord = "";
+      
     },
     hideAllIsOpen() {
       this.emojiIsOpen = false;
@@ -1327,7 +1359,7 @@ export default {
             message: "发送成功",
           });
           this.send = "";
-          this.getMessage();
+          this.getMessage(true);
           this.UpdateClose();
           this.emotionIsOpen = false;
         } else {
@@ -1338,7 +1370,7 @@ export default {
         }
       });
     },
-    getMessage() {
+    getMessage(Scroll) {
       let url =
         this.store.state.requestUrl +
         "/message/get?token=" +
@@ -1346,10 +1378,9 @@ export default {
         "&hisaccount=" +
         this.selectFri.account;
       axios.get(url).then((res) => {
-        setTimeout(() => {}, 3000);
         this.messageList = res.data.message;
         this.getFriendList(this.selectFri.account);
-        this.scrollToBottom();
+        if(Scroll)this.scrollToBottom();
       });
     },
     getApply() {
@@ -1420,7 +1451,7 @@ export default {
             message: "发送成功",
           });
           this.send = "";
-          this.getMessage();
+          this.getMessage(true);
           this.UpdateClose();
         } else {
           this.$message({
@@ -1640,7 +1671,7 @@ export default {
                       type: "success",
                       message: "发送成功",
                     });
-                    this.getMessage();
+                    this.getMessage(true);
 
                     this.UpdateClose();
                   } else {
