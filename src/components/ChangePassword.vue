@@ -26,15 +26,9 @@
         </div>
 
         <div class="operation">
-          <el-button type="primary" @click="handleChange()"
-            >修改</el-button
-          >
-          <el-button type="warning" @click="handleClear()"
-            >清空</el-button
-          >
-          <el-button type="danger" @click="goBack()"
-            >返回</el-button
-          >
+          <el-button type="primary" @click="handleChange()">修改</el-button>
+          <el-button type="warning" @click="handleClear()">清空</el-button>
+          <el-button type="danger" @click="goBack()">返回</el-button>
         </div>
       </div>
     </div>
@@ -60,7 +54,7 @@
         <el-button
           type="primary"
           class="info"
-          style="margin-top: 340px; width: 150px; height: auto;margin-left: 0;"
+          style="margin-top: 340px; width: 150px; height: auto; margin-left: 0"
           @click="goPage('LoginPage')"
           >前往登录</el-button
         >
@@ -87,7 +81,7 @@ export default {
       newpsw: "",
       surenewpsw: "",
       store: "",
-      success:false
+      success: false,
     };
   },
   beforeMount() {
@@ -133,8 +127,7 @@ export default {
         });
         return;
       }
-      var reg =
-      /^(?!([a-zA-Z]+|\d+)$)[a-zA-Z\d]{8,16}$/;
+      var reg = /^(?!([a-zA-Z]+|\d+)$)[a-zA-Z\d]{8,16}$/;
       if (!reg.test(this.newpsw)) {
         this.$message({
           type: "error",
@@ -145,7 +138,8 @@ export default {
       }
       // 做一些不能同时登录两个的判断
       let url =
-        "http://127.0.0.1/user/changePsw?account=" +
+        this.store.state.requestUrl +
+        "/user/changePsw?account=" +
         this.account +
         "&oldpsw=" +
         this.oldpsw +
@@ -157,7 +151,7 @@ export default {
             type: "success",
             message: "修改密码成功",
           });
-          this.success=true
+          this.success = true;
         } else {
           this.$message({
             type: "error",

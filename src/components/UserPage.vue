@@ -128,9 +128,9 @@
               {{ user.name }}({{ user.account }})
             </div>
 
-            <template v-if="mood.length!=0&&user.moodindex != 8">
+            <template v-if="mood.length != 0 && user.moodindex != 8">
               <div class="mood" @click="handleClickMood()">
-                <img :src="mood[user.moodindex].link"/>
+                <img :src="mood[user.moodindex].link" />
                 <div :style="'color:#' + mood[user.moodindex].color">
                   {{ mood[user.moodindex].state }}
                 </div>
@@ -182,7 +182,12 @@
         </div>
 
         <div class="aside-search">
-          <input type="text" class="aside-search-input" v-model="searchWord" />
+          <input
+            type="text"
+            class="aside-search-input"
+            v-model="searchWord"
+            @keyup.enter="handleSearch"
+          />
           <div class="aside-search-button" @click="handleSearch">搜索</div>
         </div>
 
@@ -207,7 +212,7 @@
               ></el-avatar>
               <div
                 class="aside-user-desc"
-                style="margin-left: 50px; width: 400px"
+                style="margin-left: 50px; width: 350px"
               >
                 <div class="aside-user-desc-name">
                   {{ item.name }}({{ item.account }})
@@ -620,7 +625,7 @@ export default {
       user: {
         name: "",
         avatar: "",
-        moodindex:8
+        moodindex: 8,
       },
       txtcolor: "#000000",
       send: "",
@@ -684,9 +689,7 @@ export default {
       return this.selectFriFont;
     },
   },
-  beforeCreate(){
-    
-  },
+  beforeCreate() {},
   created() {
     this.isIn = true;
     this.store = useStore();
@@ -694,7 +697,6 @@ export default {
     if (!this.token) {
       this.isIn = false;
     }
-
 
     if (this.store.state.user.length == 0) this.isIn = false;
     for (let i = 0; i < this.store.state.user.length; i++) {
@@ -712,15 +714,11 @@ export default {
       this.weight = this.store.state.fontWeight;
       this.mood = this.store.state.mood;
 
-
       this.getUserInfo();
       this.getFriendList();
       this.getApply();
       this.getEmotion();
       this.getFont();
-
-
-      
     } else {
       this.router.push("AccountManage");
     }
@@ -735,6 +733,7 @@ export default {
       this.handleReadMessage(item.account);
       this.getMessage();
       this.getSelectFriFont();
+      this.searchWord = "";
     },
     hideAllIsOpen() {
       this.emojiIsOpen = false;
@@ -796,7 +795,7 @@ export default {
               .then(() => {
                 axios({
                   method: "POST",
-                  url: "http://127.0.0.1:80/user/emotionSend",
+                  url: this.store.state.requestUrl + "/user/emotionSend",
                   params: [this.token, res],
                   headers: {
                     "Content-Type": "application/x-www-form-urlencoded",
@@ -885,7 +884,8 @@ export default {
       if (!sendColor) color = "%23" + this.tempFont.color.replace("#", "");
       else color = "%23" + sendColor;
       let url =
-        "http://127.0.0.1/user/font?token=" +
+        this.store.state.requestUrl +
+        "/user/font?token=" +
         this.token +
         "&fontSize=" +
         this.tempFont.fontSize +
@@ -937,7 +937,7 @@ export default {
           this.selectFriFont.fontFamily =
             this.store.state.fontFamily[res.data.font.fontFamily];
           this.selectFriFont.fontSize = this.selectFriFont.fontSize + "px";
-        } 
+        }
       });
     },
     handleLogout() {
@@ -964,7 +964,6 @@ export default {
     getFont() {
       let url = this.store.state.requestUrl + "/user/font?token=" + this.token;
 
-
       axios.get(url).then((res) => {
         if (res.data.state == "success") {
           this.userFont = res.data.font;
@@ -972,7 +971,7 @@ export default {
             this.store.state.fontFamily[res.data.font.fontFamily];
           this.userFont.fontSize = res.data.font.fontSize + "px";
           this.getTempFont();
-        } 
+        }
       });
     },
     handleChangeWordCloud() {
@@ -1042,7 +1041,7 @@ export default {
                 .then(() => {
                   axios({
                     method: "POST",
-                    url: "http://127.0.0.1:80/user/avatar",
+                    url: this.store.state.requestUrl + "/user/avatar",
                     params: [res, this.token],
                     headers: {
                       "Content-Type": "application/x-www-form-urlencoded",
@@ -1060,7 +1059,7 @@ export default {
                       };
 
                       this.store.commit("changeAvatar", u);
-                      this.avatarFileIsOpen=false
+                      this.avatarFileIsOpen = false;
                       this.getUserInfo();
                     } else {
                       this.$refs.avatar.value = "";
@@ -1099,7 +1098,7 @@ export default {
         confirmButtonText: "确定",
         cancelButtonText: "取消",
         inputErrorMessage: "昵称格式不正确",
-        inputPlaceholder:this.user.name
+        inputPlaceholder: this.user.name,
       })
         .then(({ value }) => {
           if (value.length > 20) {
@@ -1347,8 +1346,7 @@ export default {
         "&hisaccount=" +
         this.selectFri.account;
       axios.get(url).then((res) => {
-        setTimeout(() => {
-        }, 3000);
+        setTimeout(() => {}, 3000);
         this.messageList = res.data.message;
         this.getFriendList(this.selectFri.account);
         this.scrollToBottom();
@@ -1461,6 +1459,7 @@ export default {
     getUserInfo() {
       let url = this.store.state.requestUrl + "/user/info?token=" + this.token;
       axios.post(url).then((res) => {
+        // console.log(res.data);
         if (res.data.user) {
           this.user = res.data.user;
         } else {
@@ -1629,7 +1628,7 @@ export default {
               .then(() => {
                 axios({
                   method: "POST",
-                  url: "http://127.0.0.1:80/message/sendImg",
+                  url: this.store.state.requestUrl + "/message/sendImg",
                   params: [res, this.token, this.selectFri.account],
                   headers: {
                     "Content-Type": "application/x-www-form-urlencoded",
@@ -1823,7 +1822,7 @@ export default {
 
 .aside-user-desc {
   height: 80px;
-  width: 70%;
+  width: 65%;
 
   position: absolute;
   top: 50%;

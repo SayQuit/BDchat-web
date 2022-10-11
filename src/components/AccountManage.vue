@@ -2,16 +2,10 @@
   <div>
     <div class="bgr">
       <div class="log">
-        <el-button
-          type="primary"
-          class="login"
-          @click="goPage('LoginPage')"
+        <el-button type="primary" class="login" @click="goPage('LoginPage')"
           >登录</el-button
         >
-        <el-button
-          type="success"
-          class="login"
-          @click="goPage('RegisterPage')"
+        <el-button type="success" class="login" @click="goPage('RegisterPage')"
           >注册</el-button
         >
         <el-button
@@ -85,16 +79,19 @@ export default {
       if (localStorage.getItem("bd_chat_token"))
         TokenList = JSON.parse(localStorage.getItem("bd_chat_token"));
       for (let i = 0; i < TokenList.length; i++) {
-        let isNeedContinue=0;
-        for(let j=0;j<this.store.state.user.length;j++){
-          if(this.store.state.user[j].token==TokenList[i]){
-            isNeedContinue=1;
+        let isNeedContinue = 0;
+        for (let j = 0; j < this.store.state.user.length; j++) {
+          if (this.store.state.user[j].token == TokenList[i]) {
+            isNeedContinue = 1;
             break;
           }
         }
-        if(isNeedContinue)continue;
+        if (isNeedContinue) continue;
 
-        let url = "http://127.0.0.1/user/tokenLogin?token=" + TokenList[i];
+        let url =
+          this.store.state.requestUrl +
+          "/user/tokenLogin?token=" +
+          TokenList[i];
         axios.post(url).then((data) => {
           var dt = data.data;
           if (dt.message == "success") {
@@ -106,15 +103,11 @@ export default {
             };
             this.store.commit("handlePushUser", u);
             this.user = this.store.state.user;
-          }
-          else if(dt.message=='overdue'){
-            TokenList.splice(i,1)
-            localStorage.setItem('bd_chat_token',JSON.stringify(TokenList));
+          } else if (dt.message == "overdue") {
+            TokenList.splice(i, 1);
+            localStorage.setItem("bd_chat_token", JSON.stringify(TokenList));
           }
         });
-
-
-
       }
     },
   },
@@ -190,7 +183,7 @@ export default {
   height: 100px;
 
   margin: 0 auto;
-  margin-top: 20px;
+  margin-top: 36px;
 }
 .avatar img {
   width: 100%;

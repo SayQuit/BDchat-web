@@ -18,15 +18,9 @@
         </div>
 
         <div class="operation">
-          <el-button type="primary" @click="handleLogin()"
-            >登录</el-button
-          >
-          <el-button type="warning" @click="handleClear()"
-            >清空</el-button
-          >
-          <el-button type="danger" @click="goBack()"
-            >返回</el-button
-          >
+          <el-button type="primary" @click="handleLogin()">登录</el-button>
+          <el-button type="warning" @click="handleClear()">清空</el-button>
+          <el-button type="danger" @click="goBack()">返回</el-button>
         </div>
       </div>
     </div>
@@ -96,7 +90,8 @@ export default {
         }
       }
       let url =
-        "http://127.0.0.1/user/login?account=" +
+        this.store.state.requestUrl +
+        "/user/login?account=" +
         this.account +
         "&psw=" +
         this.psw;
@@ -115,13 +110,12 @@ export default {
             type: "success",
             message: "登录成功",
           });
-          let TokenList=[]
-          if(localStorage.getItem('bd_chat_token'))TokenList=JSON.parse(localStorage.getItem('bd_chat_token'))
-          TokenList.push(dt.token)
-          localStorage.setItem('bd_chat_token',JSON.stringify(TokenList));
-          this.$router.push({name:'UserPage', params:{token:dt.token}})
-
-
+          let TokenList = [];
+          if (localStorage.getItem("bd_chat_token"))
+            TokenList = JSON.parse(localStorage.getItem("bd_chat_token"));
+          TokenList.push(dt.token);
+          localStorage.setItem("bd_chat_token", JSON.stringify(TokenList));
+          this.$router.push({ name: "UserPage", params: { token: dt.token } });
         } else {
           this.$message({
             type: "error",

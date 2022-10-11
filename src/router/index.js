@@ -8,6 +8,7 @@ const routes = [
     {
         path: "/",
         redirect: "/AccountManage",
+        
       },
     
     {

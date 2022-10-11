@@ -11,7 +11,7 @@
         <div class="info">
           <div class="info-name">
             <div class="info-name-title">昵称</div>
-            <input type="text" v-model="name" ref="name"/>
+            <input type="text" v-model="name" ref="name" />
           </div>
           <div class="info-psw">
             <div class="info-psw-title">密码</div>
@@ -22,15 +22,9 @@
             <input type="password" v-model="makesurePsw" />
           </div>
           <div class="operation">
-            <el-button type="success" @click="handleRegister()"
-              >注册</el-button
-            >
-            <el-button type="warning" @click="handleClear()"
-              >清空</el-button
-            >
-            <el-button type="danger" @click="goBack()"
-              >返回</el-button
-            >
+            <el-button type="success" @click="handleRegister()">注册</el-button>
+            <el-button type="warning" @click="handleClear()">清空</el-button>
+            <el-button type="danger" @click="goBack()">返回</el-button>
           </div>
         </div>
       </div>
@@ -69,6 +63,7 @@
 <script>
 import { useRouter } from "vue-router";
 import axios from "axios";
+import { useStore } from "vuex";
 export default {
   setup() {
     const router = useRouter();
@@ -83,19 +78,18 @@ export default {
       makesurePsw: "",
       account: "",
     };
-  },mounted() {
-      this.$refs.name.focus()
-    },
+  },
+  mounted() {
+    this.$refs.name.focus();
+    this.store = useStore();
+  },
   methods: {
-    handleFont(){
+    handleFont() {
       let url =
-        "http://127.0.0.1/user/newfont?account=" +
-        this.account;
-      axios.post(url).then(() => {
-        
-      });
+        this.store.state.requestUrl + "/user/newfont?account=" + this.account;
+      axios.post(url).then(() => {});
     },
-    
+
     goPage(pageName) {
       this.router.push({ name: pageName });
     },
@@ -128,23 +122,26 @@ export default {
         });
         return;
       }
-      var reg =
-      /^(?!([a-zA-Z]+|\d+)$)[a-zA-Z\d]{8,16}$/;
-      if(!reg.test(this.psw)){
+      var reg = /^(?!([a-zA-Z]+|\d+)$)[a-zA-Z\d]{8,16}$/;
+      if (!reg.test(this.psw)) {
         this.$message({
           type: "error",
-          message: "密码不符合要求,密码长度应为8到16位包含字母与数字,不能包含特殊字符",
+          message:
+            "密码不符合要求,密码长度应为8到16位包含字母与数字,不能包含特殊字符",
         });
         return;
       }
       let url =
-        "http://127.0.0.1/user/register?name=" + this.name + "&psw=" + this.psw;
+        this.store.state.requestUrl +
+        "/user/register?name=" +
+        this.name +
+        "&psw=" +
+        this.psw;
       axios.post(url).then((data) => {
-        
         if (data.data.account) {
           var dt = data.data;
           this.account = dt.account;
-          this.handleFont()
+          this.handleFont();
           this.$message({
             type: "success",
             message: "注册成功",
@@ -158,12 +155,9 @@ export default {
       });
     },
 
-
-
-
     handleClear() {
       (this.name = ""), (this.psw = ""), (this.makesurePsw = "");
-      this.$refs.name.focus()
+      this.$refs.name.focus();
     },
   },
 };
