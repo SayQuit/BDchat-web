@@ -1405,11 +1405,12 @@ export default {
       axios.get(url).then((res) => {
         if(res.data.state=='success'){
           this.messageList = res.data.message;
-        this.getFriendList(this.selectFri.account);
-        if(Scroll)this.scrollToBottom();
+          this.getFriendList(this.selectFri.account);
+          if(Scroll)this.scrollToBottom();
         }
         else{
           this.selectFri=''
+          this.closeIsOpen=false
         }
       });
     },
@@ -1551,6 +1552,7 @@ export default {
           axios.post(url).then((res) => {
             if (res.data.state == "success") {
               this.getApply();
+              this.ApplyIsOpen=false
             } else {
               this.$message({
                 type: "error",
