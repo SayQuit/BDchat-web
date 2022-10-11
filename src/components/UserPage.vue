@@ -692,6 +692,16 @@ export default {
       return this.selectFriFont;
     },
   },
+  watch:{
+    searchWord:{
+      handler(){
+        
+        if(this.searchWord==''){
+          this.handleSearch()
+        }
+      }
+    }
+  },
   beforeCreate() {},
   created() {
     this.isIn = true;
@@ -726,8 +736,22 @@ export default {
       this.messageTimer=setInterval(() => {
       setTimeout(() => {
         this.getApply()
-        this.getFriendList(this.selectFri.account)
-        // 
+        if(this.tempFriendList.length==this.friendList.length)
+        {
+          for(let i=0;i<this.tempFriendList.length;i++){
+            if(this.tempFriendList[i].account!=this.friendList[i].account){
+              break;
+            }
+            if(i==this.tempFriendList.length-1)
+            
+            {
+              this.getFriendList(this.selectFri.account)
+            }
+          }
+        }
+        
+
+        
         if(this.selectFri!=''){
           if(this.lastLen!=this.messageList.length&&this.messageList[this.messageList.length-1].isMe!=1){
             this.getMessage(true)
@@ -1190,6 +1214,7 @@ export default {
           this.tempFriendList.push(this.friendList[i]);
         }
       }
+      this.selectFri=''
     },
     handleChangeSignature() {
       // const h = _this.$createElement;
@@ -1456,6 +1481,7 @@ export default {
             message: "发送成功",
           });
           this.send = "";
+          this.emojiIsOpen=false
           this.getMessage(true);
           this.UpdateClose();
         } else {
