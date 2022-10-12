@@ -74,6 +74,11 @@ export default {
     handleClickAccount(token) {
       this.$router.push({ name: "UserPage", params: { token: token } });
     },
+
+
+    // 初始化主页登录用户，通过localStorage存储token向后端发出请求，
+    //后端判断token是否过期，若没过期则自动登录，过期则localStorage删除该token
+
     initUser() {
       let TokenList = [];
       if (localStorage.getItem("bd_chat_token"))
@@ -104,6 +109,10 @@ export default {
             this.store.commit("handlePushUser", u);
             this.user = this.store.state.user;
           } else if (dt.message == "overdue") {
+            TokenList.splice(i, 1);
+            localStorage.setItem("bd_chat_token", JSON.stringify(TokenList));
+          }
+          else{
             TokenList.splice(i, 1);
             localStorage.setItem("bd_chat_token", JSON.stringify(TokenList));
           }

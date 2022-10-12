@@ -84,20 +84,28 @@ export default {
     this.store = useStore();
   },
   methods: {
-    handleFont() {
-      let url =
-        this.store.state.requestUrl + "/user/newfont?account=" + this.account;
-      axios.post(url).then(() => {});
-    },
-
+    
     goPage(pageName) {
       this.router.push({ name: pageName });
     },
     goBack() {
       this.$router.back();
     },
+
+
+    // 注册后要在后端向数据库增加一个font行，作为原始字体
+    handleFont() {
+      let url =
+        this.store.state.requestUrl + "/user/newfont?account=" + this.account;
+      axios.post(url).then(() => {});
+    },
+
+
+
+    // 注册请求
     handleRegister() {
       if (!this.name) {
+        // 条件判断
         this.$message({
           type: "error",
           message: "昵称不能为空",
@@ -131,6 +139,8 @@ export default {
         });
         return;
       }
+
+      // 请求后端
       let url =
         this.store.state.requestUrl +
         "/user/register?name=" +
@@ -155,6 +165,7 @@ export default {
       });
     },
 
+    // 清除输入
     handleClear() {
       (this.name = ""), (this.psw = ""), (this.makesurePsw = "");
       this.$refs.name.focus();

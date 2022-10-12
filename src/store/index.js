@@ -3,6 +3,8 @@ import { createStore } from 'vuex'
 export default createStore({
   state: {
     requestUrl: 'http://127.0.0.1:80',
+
+    // 存储用户信息
     user: [],
     emojiList:
     [
@@ -106,7 +108,6 @@ export default createStore({
     ],
     fontStyle:[
       {name:'普通',style:'normal'},
-      // {name:'italic',style:'italic'},
       {name:'倾斜',style:'oblique'},
     ],
     textDecoration:[
@@ -114,11 +115,6 @@ export default createStore({
       {name:'上划线',style:'overline'},   
       {name:'穿行线',style:'line-through'},
       {name:'下划线',style:'underline'},
-      // {name:'虚线',style:'dashed'},
-      // {name:'点虚线',style:'dotted'},
-      // {name:'双实线',style:'double'},
-      // {name:'实线',style:'solid'},
-      // {name:'波浪线',style:'wavy'},
 
     ],
     fontWeight:[
@@ -172,6 +168,8 @@ export default createStore({
     handlePushUser(state, TheUser) {
       state.user.push(TheUser);
     },
+
+    // 改名更新
     changeName(state,u){
       for(let i=0;i<state.user.length;i++){
         if(state.user[i].token==u.token){
@@ -179,6 +177,8 @@ export default createStore({
         }
       }
     },
+
+    // 改头像更新
     changeAvatar(state,u){
       for(let i=0;i<state.user.length;i++){
         if(state.user[i].token==u.token){
@@ -186,9 +186,9 @@ export default createStore({
         }
       }
     },
-    logout(state,token){
-      
 
+    // 退出账号，删除localStorage的对应token和用户信息
+    logout(state,token){
       for(let i=0;i<state.user.length;i++){
         if(token==state.user[i].token){
           state.user.splice(i,1)

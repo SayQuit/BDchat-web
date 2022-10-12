@@ -568,6 +568,11 @@
               >
               <el-button
                 class="FontSetup-select-no"
+                @click="handleSendDefaultFont()"
+                >恢复默认</el-button
+              >
+              <el-button
+                class="FontSetup-select-no"
                 @click="handleCancelFontSetup()"
                 >取消</el-button
               >
@@ -618,34 +623,34 @@ export default {
   data() {
     return {
       store: "",
-      mood: [],
-      token: "",
-      friendList: [],
-      tempFriendList: [],
+
+      // 用户信息
       user: {
         name: "",
         avatar: "",
         moodindex: 8,
       },
+      token: "",
+
+      // 选中的friend
+      selectFri: "",
+
       txtcolor: "#000000",
       send: "",
-      selectFri: "",
-      messageList: [],
-      emojiList: [],
-      applyList: [],
+
+      // 后端请求的一些数据，例如消息数组、好友列表数组、亲密度排行数组，字体对象
+      friendList: [],
+      tempFriendList: [],
       closeRankList: [],
-      applyLength: 0,
-      searchWord: "",
-
-      emojiIsOpen: false,
-      avatarFileIsOpen: false,
-      ApplyIsOpen: false,
-      emotionIsOpen: false,
-      fontIsOpen: false,
-      moodIsOpen: false,
-      wordCloudIsOpen: false,
-      closeIsOpen: false,
-
+      messageList: [],
+      tempFont: {
+        fontSize: 16,
+        fontWeight: 400,
+        textDecoration: "none",
+        color: "#000000",
+        fontStyle: "normal",
+        fontFamily: 0,
+      },
       emotionList: [],
       userFont: {
         fontSize: "16px",
@@ -663,14 +668,11 @@ export default {
         fontStyle: "normal",
         fontFamily: "'Segoe UI', Tahoma, Geneva, Verdana, sans-serif",
       },
-      tempFont: {
-        fontSize: 16,
-        fontWeight: 400,
-        textDecoration: "none",
-        color: "#000000",
-        fontStyle: "normal",
-        fontFamily: 0,
-      },
+
+      // 从store获取的数据
+      emojiList: [],
+      applyList: [],
+      mood: [],
       style: [],
       decoration: [],
       family: [],
@@ -678,10 +680,22 @@ export default {
       moodIndex: 8,
       word: [],
 
-      isIn: true,
+      // 控制控件显示的bool数据
+      emojiIsOpen: false,
+      avatarFileIsOpen: false,
+      ApplyIsOpen: false,
+      emotionIsOpen: false,
+      fontIsOpen: false,
+      moodIsOpen: false,
+      wordCloudIsOpen: false,
+      closeIsOpen: false,
 
-      lastLen:0,
-      messageTimer:''
+      // 其他
+      isIn: true,
+      lastLen: 0,
+      messageTimer: "",
+      applyLength: 0,
+      searchWord: "",
     };
   },
   computed: {
@@ -692,17 +706,15 @@ export default {
       return this.selectFriFont;
     },
   },
-  watch:{
-    searchWord:{
-      handler(){
-        
-        if(this.searchWord==''){
-          this.handleSearch()
+  watch: {
+    searchWord: {
+      handler() {
+        if (this.searchWord == "") {
+          this.handleSearch();
         }
-      }
-    }
+      },
+    },
   },
-  beforeCreate() {},
   created() {
     this.isIn = true;
     this.store = useStore();
@@ -733,55 +745,52 @@ export default {
       this.getEmotion();
       this.getFont();
 
-      this.messageTimer=setInterval(() => {
-      setTimeout(() => {
-        this.getApply()
-        if(this.tempFriendList.length==this.friendList.length)
-        {
-          for(let i=0;i<this.tempFriendList.length;i++){
-            if(this.tempFriendList[i].account!=this.friendList[i].account){
-              break;
+      // 隔一段时间(这里设置为1800毫秒)发送请求
+      this.messageTimer = setInterval(() => {
+        setTimeout(() => {
+          this.getApply();
+          if (this.tempFriendList.length == this.friendList.length) {
+            for (let i = 0; i < this.tempFriendList.length; i++) {
+              if (
+                this.tempFriendList[i].account != this.friendList[i].account
+              ) {
+                break;
+              }
+              if (i == this.tempFriendList.length - 1) {
+                this.getFriendList(this.selectFri.account);
+              }
             }
-            if(i==this.tempFriendList.length-1)
-            
-            {
-              this.getFriendList(this.selectFri.account)
+          }
+
+          if (this.selectFri != "") {
+            if (
+              this.lastLen != this.messageList.length &&
+              this.messageList[this.messageList.length - 1].isMe != 1
+            ) {
+              this.getMessage(true);
+            } else {
+              this.getMessage(false);
             }
+            this.lastLen = this.messageList.length;
+            this.getSelectFriFont();
+            this.handleReadMessage(this.selectFri.account);
           }
-        }
-        
-
-        
-        if(this.selectFri!=''){
-          if(this.lastLen!=this.messageList.length&&this.messageList[this.messageList.length-1].isMe!=1){
-            this.getMessage(true)
-          }
-          else{
-            this.getMessage(false)
-          }
-          // console.log(this.lastLen,this.messageList.length);
-          this.lastLen=this.messageList.length
-
-          // this.getMessage(true)
-          this.getSelectFriFont()
-          this.handleReadMessage(this.selectFri.account)
-        }
-      }, 0);
-    }, 1800);
-
-      
-
-    } else {
+        }, 0);
+      }, 1800);
+    } 
+    // 没有token则返回AccountManage
+    else {
       this.router.push("AccountManage");
     }
   },
   beforeUnmount() {
-    window.clearInterval(this.messageTimer)
+    window.clearInterval(this.messageTimer);
   },
   methods: {
     goPage(pageName) {
       this.router.push({ name: pageName });
     },
+    // 改变选中的好友
     handleChangeSelectFri(item) {
       this.selectFri = item;
       this.wordCloudIsOpen = false;
@@ -789,8 +798,33 @@ export default {
       this.getMessage(true);
       this.getSelectFriFont();
       this.searchWord = "";
-      
+    },    
+    goBack() {
+      this.$router.back();
     },
+    // 退出登录
+    handleLogout() {
+      this.$confirm("是否退出当前账号?", "提示", {
+        confirmButtonText: "确定",
+        cancelButtonText: "取消",
+        type: "warning",
+      })
+        .then(() => {
+          this.store.commit("logout", this.token);
+          this.goPage("AccountManage");
+          this.$message({
+            type: "success",
+            message: "退出成功!",
+          });
+        })
+        .catch(() => {
+          this.$message({
+            type: "info",
+            message: "已取消",
+          });
+        });
+    },
+    // 显示控件函数
     hideAllIsOpen() {
       this.emojiIsOpen = false;
       this.avatarFileIsOpen = false;
@@ -825,6 +859,222 @@ export default {
       if (!this.emotionIsOpen) this.hideAllIsOpen();
       this.emotionIsOpen = !this.emotionIsOpen;
     },
+    handleClickFont() {
+      if (!this.fontIsOpen) this.hideAllIsOpen();
+      this.fontIsOpen = !this.fontIsOpen;
+    },
+    handleClickMood() {
+      if (!this.moodIsOpen) this.hideAllIsOpen();
+      this.moodIsOpen = !this.moodIsOpen;
+    },
+    handleClickApply() {
+      if (!this.ApplyIsOpen) this.hideAllIsOpen();
+      this.ApplyIsOpen = !this.ApplyIsOpen;
+    },
+    handleChangeAvatar() {
+      if (!this.avatarFileIsOpen) this.hideAllIsOpen();
+      this.avatarFileIsOpen = !this.avatarFileIsOpen;
+    },    
+    // 获取用户信息
+    getUserInfo() {
+      let url = this.store.state.requestUrl + "/user/info?token=" + this.token;
+      axios.post(url).then((res) => {
+        if (res.data.user) {
+          this.user = res.data.user;
+        } else {
+          this.$message({
+            type: "error",
+            message: res.data.message,
+          });
+        }
+      });
+    },    
+    // 检索好友
+    handleSearch() {
+      if (this.searchWord == "") {
+        this.tempFriendList = [];
+        for (let i = 0; i < this.friendList.length; i++) {
+          this.tempFriendList.push(this.friendList[i]);
+        }
+        return;
+      }
+      this.tempFriendList = [];
+      for (let i = 0; i < this.friendList.length; i++) {
+        if (
+          this.friendList[i].name.search(this.searchWord) != -1 ||
+          this.friendList[i].account.search(this.searchWord) != -1
+        ) {
+          this.tempFriendList.push(this.friendList[i]);
+        }
+      }
+      this.selectFri = "";
+    },
+    // 获取好友信息
+    getFriendList(acc) {
+      let url =
+        this.store.state.requestUrl + "/user/friend?token=" + this.token;
+      axios.get(url).then((res) => {
+        this.friendList = res.data.friendList;
+        this.tempFriendList = [];
+        for (let i = 0; i < this.friendList.length; i++) {
+          this.tempFriendList.push(this.friendList[i]);
+          if (this.tempFriendList[i].account == acc) {
+            this.selectFri = this.tempFriendList[i];
+          }
+        }
+      });
+    },
+    // 屏蔽好友
+    handleIgnoreFri() {
+      this.$confirm("屏蔽该好友?", "提示", {
+        confirmButtonText: "确定",
+        cancelButtonText: "取消",
+        type: "warning",
+      })
+        .then(() => {
+          let url =
+            this.store.state.requestUrl +
+            "/user/ignore?token=" +
+            this.token +
+            "&hisaccount=" +
+            this.selectFri.account +
+            "&ignore=" +
+            1;
+          axios.post(url).then((res) => {
+            if (res.data.state == "success") {
+              this.$message({
+                type: "success",
+                message: "屏蔽成功",
+              });
+              this.getFriendList();
+              this.selectFri = "";
+            } else {
+              this.$message({
+                type: "error",
+                message: "屏蔽失败",
+              });
+            }
+          });
+        })
+        .catch(() => {
+          this.$message({
+            type: "info",
+            message: "已取消屏蔽",
+          });
+        });
+    },
+    // 取消屏蔽
+    handleCancelIgnoreFri() {
+      this.$confirm("取消屏蔽该好友?", "提示", {
+        confirmButtonText: "确定",
+        cancelButtonText: "取消",
+        type: "warning",
+      })
+        .then(() => {
+          let url =
+            this.store.state.requestUrl +
+            "/user/ignore?token=" +
+            this.token +
+            "&hisaccount=" +
+            this.selectFri.account +
+            "&ignore=" +
+            0;
+          axios.post(url).then((res) => {
+            if (res.data.state == "success") {
+              this.$message({
+                type: "success",
+                message: "取消屏蔽成功",
+              });
+              this.getFriendList();
+              this.selectFri = "";
+            } else {
+              this.$message({
+                type: "error",
+                message: "取消屏蔽失败",
+              });
+            }
+          });
+        })
+        .catch(() => {
+          this.$message({
+            type: "info",
+            message: "已取消",
+          });
+        });
+    },
+    // 获取消息
+    getMessage(Scroll) {
+      let url =
+        this.store.state.requestUrl +
+        "/message/get?token=" +
+        this.token +
+        "&hisaccount=" +
+        this.selectFri.account;
+      axios.get(url).then((res) => {
+        if (res.data.state == "success") {
+          this.messageList = res.data.message;
+          this.getFriendList(this.selectFri.account);
+          if (Scroll) this.scrollToBottom();
+        } else {
+          this.selectFri = "";
+          this.closeIsOpen = false;
+        }
+      });
+    },
+    // 读消息
+    handleReadMessage(acc) {
+      let url =
+        this.store.state.requestUrl +
+        "/message/read?token=" +
+        this.token +
+        "&hisaccount=" +
+        this.selectFri.account;
+      axios.post(url).then(() => {
+        this.getFriendList(acc);
+      });
+    },
+    // 发送消息
+    handleSendMessage() {
+      const msg = this.send;
+      if (msg.trim() == "") {
+        this.send = "";
+        return;
+      }
+      if (this.selectFri == "") {
+        this.$message({
+          type: "error",
+          message: "发送失败",
+        });
+        return;
+      }
+      let url =
+        this.store.state.requestUrl +
+        "/message/send?token=" +
+        this.token +
+        "&hisaccount=" +
+        this.selectFri.account +
+        "&message=" +
+        msg;
+      axios.post(url).then((res) => {
+        if (res.data.state == "success") {
+          this.$message({
+            type: "success",
+            message: "发送成功",
+          });
+          this.send = "";
+          this.emojiIsOpen = false;
+          this.getMessage(true);
+          this.UpdateClose();
+        } else {
+          this.$message({
+            type: "error",
+            message: "发送失败",
+          });
+        }
+      });
+    },
+    // 表情包
+    // 添加表情包
     handleAddEmotion(e) {
       let file = e.target.files[0];
       if (window.FileReader) {
@@ -885,14 +1135,143 @@ export default {
         };
       }
     },
-    handleClickFont() {
-      if (!this.fontIsOpen) this.hideAllIsOpen();
-      this.fontIsOpen = !this.fontIsOpen;
+    // 获取已有的表情包
+    getEmotion() {
+      let url =
+        this.store.state.requestUrl + "/user/emotionGet?token=" + this.token;
+      axios.get(url).then((res) => {
+        if (res.data.state == "success") {
+          this.emotionList = res.data.emotionList;
+        } else {
+          this.$message({
+            type: "error",
+            message: "获取表情包失败",
+          });
+        }
+      });
     },
-    handleClickMood() {
-      if (!this.moodIsOpen) this.hideAllIsOpen();
-      this.moodIsOpen = !this.moodIsOpen;
+    // 发送表情包
+    handleSendEmotionMessage(id) {
+      let url =
+        this.store.state.requestUrl +
+        "/user/emotionSendMessage?token=" +
+        this.token +
+        "&hisaccount=" +
+        this.selectFri.account +
+        "&id=" +
+        id;
+      axios.post(url).then((res) => {
+        if (res.data.state == "success") {
+          this.$message({
+            type: "success",
+            message: "发送成功",
+          });
+          this.send = "";
+          this.getMessage(true);
+          this.UpdateClose();
+          this.emotionIsOpen = false;
+        } else {
+          this.$message({
+            type: "error",
+            message: "发送失败",
+          });
+        }
+      });
     },
+    // 发送图片
+    sendBase64(e) {
+      let file = e.target.files[0];
+      if (window.FileReader) {
+        let reader = new FileReader();
+        reader.readAsDataURL(file);
+        reader.onload = (e) => {
+          let base64String = e.target.result;
+          let base64Img = this.compressImg(base64String, 100, 0.7);
+          base64Img.then((res) => {
+            if (res.length > 12000) {
+              this.$message({
+                type: "error",
+                message: "发送失败,图片过大",
+              });
+              return;
+            }
+
+            this.$confirm("是否发送图片?", "提示", {
+              confirmButtonText: "确定",
+              cancelButtonText: "取消",
+              type: "warning",
+            })
+              .then(() => {
+                axios({
+                  method: "POST",
+                  url: this.store.state.requestUrl + "/message/sendImg",
+                  params: [res, this.token, this.selectFri.account],
+                  headers: {
+                    "Content-Type": "application/x-www-form-urlencoded",
+                  },
+                }).then((res) => {
+                  this.$refs.sendimg.value = "";
+                  if (res.data.state == "success") {
+                    this.$message({
+                      type: "success",
+                      message: "发送成功",
+                    });
+                    this.getMessage(true);
+
+                    this.UpdateClose();
+                  } else {
+                    this.$message({
+                      type: "error",
+                      message: "发送失败",
+                    });
+                  }
+                });
+              })
+              .catch(() => {
+                this.$refs.sendimg.value = "";
+                this.$message({
+                  type: "info",
+                  message: "已取消",
+                });
+              });
+          });
+        };
+      }
+    },
+    compressImg(base64String, w, quality) {
+      var getMimeType = function (urlData) {
+        var arr = urlData.split(",");
+        var mime = arr[0].match(/:(.*?);/)[1];
+        return mime;
+      };
+      var newImage = new Image();
+      var imgWidth, imgHeight;
+      var promise = new Promise((resolve) => (newImage.onload = resolve));
+      newImage.src = base64String;
+      return promise.then(() => {
+        imgWidth = newImage.width;
+        imgHeight = newImage.height;
+        var canvas = document.createElement("canvas");
+        var ctx = canvas.getContext("2d");
+        if (Math.max(imgWidth, imgHeight) > w) {
+          if (imgWidth > imgHeight) {
+            canvas.width = w;
+            canvas.height = (w * imgHeight) / imgWidth;
+          } else {
+            canvas.height = w;
+            canvas.width = (w * imgWidth) / imgHeight;
+          }
+        } else {
+          canvas.width = imgWidth;
+          canvas.height = imgHeight;
+        }
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        ctx.drawImage(newImage, 0, 0, canvas.width, canvas.height);
+        var base64 = canvas.toDataURL(getMimeType(base64String), quality);
+        return base64;
+      });
+    },
+    // 改变心情
     handleSendMoodIndex(index) {
       let url =
         this.store.state.requestUrl +
@@ -910,10 +1289,8 @@ export default {
         }
       });
     },
-    handleClickApply() {
-      if (!this.ApplyIsOpen) this.hideAllIsOpen();
-      this.ApplyIsOpen = !this.ApplyIsOpen;
-    },
+    // 改变字体
+    // 取消设置后一些操作
     handleCancelFontSetup() {
       this.tempFont = JSON.parse(JSON.stringify(this.userFont));
       this.tempFont.fontSize = this.userFont.fontSize;
@@ -970,7 +1347,8 @@ export default {
           });
         }
       });
-    },
+    },   
+    // 获取以前设置的字体 
     getTempFont() {
       this.tempFont = JSON.parse(JSON.stringify(this.userFont));
       this.tempFont.fontSize = parseInt(this.tempFont.fontSize);
@@ -981,41 +1359,6 @@ export default {
           break;
         }
       }
-    },
-    getSelectFriFont() {
-      let url =
-        this.store.state.requestUrl +
-        "/user/friFont?account=" +
-        this.selectFri.account;
-      axios.get(url).then((res) => {
-        if (res.data.state == "success") {
-          this.selectFriFont = res.data.font;
-          this.selectFriFont.fontFamily =
-            this.store.state.fontFamily[res.data.font.fontFamily];
-          this.selectFriFont.fontSize = this.selectFriFont.fontSize + "px";
-        }
-      });
-    },
-    handleLogout() {
-      this.$confirm("是否退出当前账号?", "提示", {
-        confirmButtonText: "确定",
-        cancelButtonText: "取消",
-        type: "warning",
-      })
-        .then(() => {
-          this.store.commit("logout", this.token);
-          this.goPage("AccountManage");
-          this.$message({
-            type: "success",
-            message: "退出成功!",
-          });
-        })
-        .catch(() => {
-          this.$message({
-            type: "info",
-            message: "已取消",
-          });
-        });
     },
     getFont() {
       let url = this.store.state.requestUrl + "/user/font?token=" + this.token;
@@ -1030,6 +1373,220 @@ export default {
         }
       });
     },
+    // 获取好友的字体
+    getSelectFriFont() {
+      let url =
+        this.store.state.requestUrl +
+        "/user/friFont?account=" +
+        this.selectFri.account;
+      axios.get(url).then((res) => {
+        if (res.data.state == "success") {
+          this.selectFriFont = res.data.font;
+          this.selectFriFont.fontFamily =
+            this.store.state.fontFamily[res.data.font.fontFamily];
+          this.selectFriFont.fontSize = this.selectFriFont.fontSize + "px";
+        }
+      });
+    },
+    // 改成默认字体
+    handleSendDefaultFont() {
+      let f = {
+        fontSize: 16,
+        fontWeight: "400",
+        textDecoration: "none",
+        color: "%23000000",
+        fontStyle: "normal",
+        fontFamily: 0,
+      };
+      let url =
+        this.store.state.requestUrl +
+        "/user/font?token=" +
+        this.token +
+        "&fontSize=" +
+        f.fontSize +
+        "&fontWeight=" +
+        f.fontWeight +
+        "&fontFamily=" +
+        f.fontFamily +
+        "&fontStyle=" +
+        f.fontStyle +
+        "&color=" +
+        f.color +
+        "&textDecoration=" +
+        f.textDecoration;
+      axios.post(url).then((res) => {
+        if (res.data.state == "success") {
+          this.getFont();
+          this.$message({
+            type: "success",
+            message: "修改成功",
+          });
+          if (this.fontIsOpen) this.fontIsOpen = !this.fontIsOpen;
+        } else {
+          this.$message({
+            type: "error",
+            message: "修改失败",
+          });
+        }
+      });
+    },
+    // 添加朋友
+    handleAddFriend() {
+      this.$prompt("请输入对方账号", "提示", {
+        confirmButtonText: "确定",
+        cancelButtonText: "取消",
+        inputErrorMessage: "账号格式不正确",
+      })
+        .then(({ value }) => {
+          for (let i = 0; i < this.friendList.length; i++) {
+            if (this.friendList[i].account == value) {
+              this.$message({
+                type: "error",
+                message: "对方已经是您的好友",
+              });
+              return;
+            }
+          }
+
+          const url =
+            this.store.state.requestUrl +
+            "/apply/send?token=" +
+            this.token +
+            "&hisaccount=" +
+            value;
+          axios.post(url).then((res) => {
+            if (res.data.state == "success") {
+              this.$message({
+                type: "success",
+                message: "对方账号是:" + value + " 发送成功",
+              });
+              this.getFriendList();
+              this.getApply();
+            } else {
+              this.$message({
+                type: "error",
+                message: res.data.message,
+              });
+            }
+          });
+        })
+        .catch(() => {
+          this.$message({
+            type: "info",
+            message: "取消输入",
+          });
+        });
+    },  
+    //删除好友 
+    handleDeleteFri() {
+      this.$confirm("删除该好友?", "提示", {
+        confirmButtonText: "确定",
+        cancelButtonText: "取消",
+        type: "warning",
+      })
+        .then(() => {
+          let url =
+            this.store.state.requestUrl +
+            "/user/delete?token=" +
+            this.token +
+            "&hisaccount=" +
+            this.selectFri.account;
+          axios.post(url).then((res) => {
+            if (res.data.state == "success") {
+              this.$message({
+                type: "success",
+                message: "删除成功",
+              });
+              this.getFriendList();
+              this.selectFri = "";
+            } else {
+              this.$message({
+                type: "error",
+                message: "删除失败",
+              });
+            }
+          });
+        })
+        .catch(() => {
+          this.$message({
+            type: "info",
+            message: "已取消删除",
+          });
+        });
+    },    
+    // 获取好友申请
+    getApply() {
+      let url = this.store.state.requestUrl + "/apply/get?token=" + this.token;
+      axios.get(url).then((res) => {
+        this.applyList = res.data.applyList;
+        this.applyLength = 0;
+        this.applyList.forEach((element) => {
+          if (element.isSuccess == 0) {
+            this.applyLength++;
+          }
+        });
+      });
+    },
+    // 接受或者拒绝好友的请求
+    handleSendAllowOrRejectApply(allow, item) {
+      for (let i = 0; i < this.friendList.length; i++) {
+        if (
+          this.friendList[i].account == item.sendID ||
+          this.friendList[i].account == item.getID
+        ) {
+          this.$message({
+            type: "error",
+            message: "对方已经是您的好友",
+          });
+
+          const url =
+            this.store.state.requestUrl +
+            "/apply/hasBeFriend?id=" +
+            item.id +
+            "&allow=" +
+            1;
+          axios.post(url).then((res) => {
+            if (res.data.state == "success") {
+              this.getApply();
+              this.ApplyIsOpen = false;
+            } else {
+              this.$message({
+                type: "error",
+                message: res.data.message,
+              });
+            }
+          });
+
+          return;
+        }
+      }
+
+      const url =
+        this.store.state.requestUrl +
+        "/apply/allow?id=" +
+        item.id +
+        "&allow=" +
+        allow +
+        "&token=" +
+        this.token +
+        "&account2=" +
+        item.sendID;
+      axios.post(url).then((res) => {
+        if (res.data.state == "success") {
+          this.getFriendList();
+          this.getApply();
+        } else {
+          this.$message({
+            type: "error",
+            message: res.data.message,
+          });
+        }
+      });
+    },
+    
+    
+
+    // 获取词云
     handleChangeWordCloud() {
       if (!this.selectFri) {
         this.$message({
@@ -1061,14 +1618,8 @@ export default {
         this.wordCloudIsOpen = !this.wordCloudIsOpen;
       }
     },
-    handleChangeAvatar() {
-      if (!this.avatarFileIsOpen) this.hideAllIsOpen();
-      this.avatarFileIsOpen = !this.avatarFileIsOpen;
-    },
-    handleAddEmoji(emoji) {
-      this.send += emoji;
-      this.$refs.txtarea.focus();
-    },
+
+    // 换头像
     handleAvatarSuccess(e) {
       let file = e.target.files[0];
       if (window.FileReader) {
@@ -1138,17 +1689,12 @@ export default {
         };
       }
     },
-    handleReadMessage(acc) {
-      let url =
-        this.store.state.requestUrl +
-        "/message/read?token=" +
-        this.token +
-        "&hisaccount=" +
-        this.selectFri.account;
-      axios.post(url).then(() => {
-        this.getFriendList(acc);
-      });
+    // 发送表情
+    handleAddEmoji(emoji) {
+      this.send += emoji;
+      this.$refs.txtarea.focus();
     },
+    // 改名字
     handleChangeName() {
       this.$prompt("请输入新昵称", "提示", {
         confirmButtonText: "确定",
@@ -1196,26 +1742,8 @@ export default {
             message: "取消输入",
           });
         });
-    },
-    handleSearch() {
-      if (this.searchWord == "") {
-        this.tempFriendList = [];
-        for (let i = 0; i < this.friendList.length; i++) {
-          this.tempFriendList.push(this.friendList[i]);
-        }
-        return;
-      }
-      this.tempFriendList = [];
-      for (let i = 0; i < this.friendList.length; i++) {
-        if (
-          this.friendList[i].name.search(this.searchWord) != -1 ||
-          this.friendList[i].account.search(this.searchWord) != -1
-        ) {
-          this.tempFriendList.push(this.friendList[i]);
-        }
-      }
-      this.selectFri=''
-    },
+    },    
+    // 修改签名
     handleChangeSignature() {
       // const h = _this.$createElement;
       this.$alert(
@@ -1256,246 +1784,10 @@ export default {
         });
       });
     },
-    handleDeleteFri() {
-      this.$confirm("删除该好友?", "提示", {
-        confirmButtonText: "确定",
-        cancelButtonText: "取消",
-        type: "warning",
-      })
-        .then(() => {
-          let url =
-            this.store.state.requestUrl +
-            "/user/delete?token=" +
-            this.token +
-            "&hisaccount=" +
-            this.selectFri.account;
-          axios.post(url).then((res) => {
-            if (res.data.state == "success") {
-              this.$message({
-                type: "success",
-                message: "删除成功",
-              });
-              this.getFriendList();
-              this.selectFri = "";
-            } else {
-              this.$message({
-                type: "error",
-                message: "删除失败",
-              });
-            }
-          });
-        })
-        .catch(() => {
-          this.$message({
-            type: "info",
-            message: "已取消删除",
-          });
-        });
-    },
-    handleIgnoreFri() {
-      this.$confirm("屏蔽该好友?", "提示", {
-        confirmButtonText: "确定",
-        cancelButtonText: "取消",
-        type: "warning",
-      })
-        .then(() => {
-          let url =
-            this.store.state.requestUrl +
-            "/user/ignore?token=" +
-            this.token +
-            "&hisaccount=" +
-            this.selectFri.account +
-            "&ignore=" +
-            1;
-          axios.post(url).then((res) => {
-            if (res.data.state == "success") {
-              this.$message({
-                type: "success",
-                message: "屏蔽成功",
-              });
-              this.getFriendList();
-              this.selectFri = "";
-            } else {
-              this.$message({
-                type: "error",
-                message: "屏蔽失败",
-              });
-            }
-          });
-        })
-        .catch(() => {
-          this.$message({
-            type: "info",
-            message: "已取消屏蔽",
-          });
-        });
-    },
-    handleCancelIgnoreFri() {
-      this.$confirm("取消屏蔽该好友?", "提示", {
-        confirmButtonText: "确定",
-        cancelButtonText: "取消",
-        type: "warning",
-      })
-        .then(() => {
-          let url =
-            this.store.state.requestUrl +
-            "/user/ignore?token=" +
-            this.token +
-            "&hisaccount=" +
-            this.selectFri.account +
-            "&ignore=" +
-            0;
-          axios.post(url).then((res) => {
-            if (res.data.state == "success") {
-              this.$message({
-                type: "success",
-                message: "取消屏蔽成功",
-              });
-              this.getFriendList();
-              this.selectFri = "";
-            } else {
-              this.$message({
-                type: "error",
-                message: "取消屏蔽失败",
-              });
-            }
-          });
-        })
-        .catch(() => {
-          this.$message({
-            type: "info",
-            message: "已取消",
-          });
-        });
-    },
-    handleSendEmotionMessage(id) {
-      let url =
-        this.store.state.requestUrl +
-        "/user/emotionSendMessage?token=" +
-        this.token +
-        "&hisaccount=" +
-        this.selectFri.account +
-        "&id=" +
-        id;
-      axios.post(url).then((res) => {
-        if (res.data.state == "success") {
-          this.$message({
-            type: "success",
-            message: "发送成功",
-          });
-          this.send = "";
-          this.getMessage(true);
-          this.UpdateClose();
-          this.emotionIsOpen = false;
-        } else {
-          this.$message({
-            type: "error",
-            message: "发送失败",
-          });
-        }
-      });
-    },
-    getMessage(Scroll) {
-      let url =
-        this.store.state.requestUrl +
-        "/message/get?token=" +
-        this.token +
-        "&hisaccount=" +
-        this.selectFri.account;
-      axios.get(url).then((res) => {
-        if(res.data.state=='success'){
-          this.messageList = res.data.message;
-          this.getFriendList(this.selectFri.account);
-          if(Scroll)this.scrollToBottom();
-        }
-        else{
-          this.selectFri=''
-          this.closeIsOpen=false
-        }
-      });
-    },
-    getApply() {
-      let url = this.store.state.requestUrl + "/apply/get?token=" + this.token;
-      axios.get(url).then((res) => {
-        this.applyList = res.data.applyList;
-        this.applyLength = 0;
-        this.applyList.forEach((element) => {
-          if (element.isSuccess == 0) {
-            this.applyLength++;
-          }
-        });
-      });
-    },
-    getFriendList(acc) {
-      let url =
-        this.store.state.requestUrl + "/user/friend?token=" + this.token;
-      axios.get(url).then((res) => {
-        this.friendList = res.data.friendList;
-        this.tempFriendList = [];
-        for (let i = 0; i < this.friendList.length; i++) {
-          this.tempFriendList.push(this.friendList[i]);
-          if (this.tempFriendList[i].account == acc) {
-            this.selectFri = this.tempFriendList[i];
-          }
-        }
-      });
-    },
-    getEmotion() {
-      let url =
-        this.store.state.requestUrl + "/user/emotionGet?token=" + this.token;
-      axios.get(url).then((res) => {
-        if (res.data.state == "success") {
-          this.emotionList = res.data.emotionList;
-        } else {
-          this.$message({
-            type: "error",
-            message: "获取表情包失败",
-          });
-        }
-      });
-    },
-    handleSendMessage() {
-      const msg = this.send;
-      if (msg.trim() == "") {
-        this.send = "";
-        return;
-      }
-      if (this.selectFri == "") {
-        this.$message({
-          type: "error",
-          message: "发送失败",
-        });
-        return;
-      }
-      let url =
-        this.store.state.requestUrl +
-        "/message/send?token=" +
-        this.token +
-        "&hisaccount=" +
-        this.selectFri.account +
-        "&message=" +
-        msg;
-      axios.post(url).then((res) => {
-        if (res.data.state == "success") {
-          this.$message({
-            type: "success",
-            message: "发送成功",
-          });
-          this.send = "";
-          this.emojiIsOpen=false
-          this.getMessage(true);
-          this.UpdateClose();
-        } else {
-          this.$message({
-            type: "error",
-            message: "发送失败",
-          });
-        }
-      });
-    },
-    goBack() {
-      this.$router.back();
-    },
+
+
+
+    // 更新亲密度
     UpdateClose() {
       let rand = Math.random() * 10 + 1;
       let num = Number(this.selectFri.close) + Number(rand);
@@ -1514,217 +1806,16 @@ export default {
         }
       });
     },
+    // 滑动最底端
     scrollToBottom: function () {
       this.$nextTick(() => {
         this.$refs.scrollWin.scrollTop = this.$refs.scrollWin.scrollHeight;
       });
     },
-    getUserInfo() {
-      let url = this.store.state.requestUrl + "/user/info?token=" + this.token;
-      axios.post(url).then((res) => {
-        if (res.data.user) {
-          this.user = res.data.user;
-        } else {
-          this.$message({
-            type: "error",
-            message: res.data.message,
-          });
-        }
-      });
-    },
-    handleSendAllowOrRejectApply(allow, item) {
-      for (let i = 0; i < this.friendList.length; i++) {
-        if (
-          this.friendList[i].account == item.sendID ||
-          this.friendList[i].account == item.getID
-        ) {
-          this.$message({
-            type: "error",
-            message: "对方已经是您的好友",
-          });
 
-          const url =
-            this.store.state.requestUrl +
-            "/apply/hasBeFriend?id=" +
-            item.id +
-            "&allow=" +
-            1;
-          axios.post(url).then((res) => {
-            if (res.data.state == "success") {
-              this.getApply();
-              this.ApplyIsOpen=false
-            } else {
-              this.$message({
-                type: "error",
-                message: res.data.message,
-              });
-            }
-          });
 
-          return;
-        }
-      }
 
-      const url =
-        this.store.state.requestUrl +
-        "/apply/allow?id=" +
-        item.id +
-        "&allow=" +
-        allow +
-        "&token=" +
-        this.token +
-        "&account2=" +
-        item.sendID;
-      axios.post(url).then((res) => {
-        if (res.data.state == "success") {
-          this.getFriendList();
-          this.getApply();
-        } else {
-          this.$message({
-            type: "error",
-            message: res.data.message,
-          });
-        }
-      });
-    },
-    handleAddFriend() {
-      this.$prompt("请输入对方账号", "提示", {
-        confirmButtonText: "确定",
-        cancelButtonText: "取消",
-        inputErrorMessage: "账号格式不正确",
-      })
-        .then(({ value }) => {
-          for (let i = 0; i < this.friendList.length; i++) {
-            if (this.friendList[i].account == value) {
-              this.$message({
-                type: "error",
-                message: "对方已经是您的好友",
-              });
-              return;
-            }
-          }
 
-          const url =
-            this.store.state.requestUrl +
-            "/apply/send?token=" +
-            this.token +
-            "&hisaccount=" +
-            value;
-          axios.post(url).then((res) => {
-            if (res.data.state == "success") {
-              this.$message({
-                type: "success",
-                message: "对方账号是:" + value + " 发送成功",
-              });
-              this.getFriendList();
-              this.getApply();
-            } else {
-              this.$message({
-                type: "error",
-                message: res.data.message,
-              });
-            }
-          });
-        })
-        .catch(() => {
-          this.$message({
-            type: "info",
-            message: "取消输入",
-          });
-        });
-    },
-    compressImg(base64String, w, quality) {
-      var getMimeType = function (urlData) {
-        var arr = urlData.split(",");
-        var mime = arr[0].match(/:(.*?);/)[1];
-        return mime;
-      };
-      var newImage = new Image();
-      var imgWidth, imgHeight;
-      var promise = new Promise((resolve) => (newImage.onload = resolve));
-      newImage.src = base64String;
-      return promise.then(() => {
-        imgWidth = newImage.width;
-        imgHeight = newImage.height;
-        var canvas = document.createElement("canvas");
-        var ctx = canvas.getContext("2d");
-        if (Math.max(imgWidth, imgHeight) > w) {
-          if (imgWidth > imgHeight) {
-            canvas.width = w;
-            canvas.height = (w * imgHeight) / imgWidth;
-          } else {
-            canvas.height = w;
-            canvas.width = (w * imgWidth) / imgHeight;
-          }
-        } else {
-          canvas.width = imgWidth;
-          canvas.height = imgHeight;
-        }
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-        ctx.drawImage(newImage, 0, 0, canvas.width, canvas.height);
-        var base64 = canvas.toDataURL(getMimeType(base64String), quality);
-        return base64;
-      });
-    },
-    sendBase64(e) {
-      let file = e.target.files[0];
-      if (window.FileReader) {
-        let reader = new FileReader();
-        reader.readAsDataURL(file);
-        reader.onload = (e) => {
-          let base64String = e.target.result;
-          let base64Img = this.compressImg(base64String, 100, 0.7);
-          base64Img.then((res) => {
-            if (res.length > 12000) {
-              this.$message({
-                type: "error",
-                message: "发送失败,图片过大",
-              });
-              return;
-            }
-
-            this.$confirm("是否发送图片?", "提示", {
-              confirmButtonText: "确定",
-              cancelButtonText: "取消",
-              type: "warning",
-            })
-              .then(() => {
-                axios({
-                  method: "POST",
-                  url: this.store.state.requestUrl + "/message/sendImg",
-                  params: [res, this.token, this.selectFri.account],
-                  headers: {
-                    "Content-Type": "application/x-www-form-urlencoded",
-                  },
-                }).then((res) => {
-                  this.$refs.sendimg.value = "";
-                  if (res.data.state == "success") {
-                    this.$message({
-                      type: "success",
-                      message: "发送成功",
-                    });
-                    this.getMessage(true);
-
-                    this.UpdateClose();
-                  } else {
-                    this.$message({
-                      type: "error",
-                      message: "发送失败",
-                    });
-                  }
-                });
-              })
-              .catch(() => {
-                this.$refs.sendimg.value = "";
-                this.$message({
-                  type: "info",
-                  message: "已取消",
-                });
-              });
-          });
-        };
-      }
-    },
   },
 };
 </script>
@@ -1818,7 +1909,7 @@ export default {
 }
 .mood div {
   height: 30px;
-  width: 30px;
+  width: 40px;
   display: inline-block;
   vertical-align: middle;
   line-height: 30px;
@@ -1958,6 +2049,7 @@ export default {
 
   text-decoration: none;
   border-width: 1px;
+  border: none;
 }
 .aside-search-button {
   width: 35%;
@@ -1970,6 +2062,8 @@ export default {
   border-left: none;
   box-sizing: border-box;
   cursor: pointer;
+
+  border-left: 1px solid #999;
 }
 
 .aside-talkblock {
@@ -2502,11 +2596,9 @@ body {
   margin-right: 20px;
 }
 .FontSetup-select-yes {
-  margin-right: 40px;
   margin-top: 15px;
 }
 .FontSetup-select-no {
-  margin-left: 40px;
   margin-top: 15px;
   color: black;
 }

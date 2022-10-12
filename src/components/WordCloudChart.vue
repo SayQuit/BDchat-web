@@ -33,9 +33,7 @@ export default {
         title: {
           text: "聊天词云",
           x: "center",
-          // y:'0px'
         },
-        // backgroundColor: "#fff",
         series: [
           {
             type: "wordCloud",
@@ -78,9 +76,6 @@ export default {
         ],
       };
       echartsWordcloud.setOption(option);
-      // echartsWordcloud.on("click",function(e){
-      //   alert(e)
-      // })
     },
   },
 };

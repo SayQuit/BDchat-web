@@ -90,6 +90,8 @@ export default {
     goBack() {
       this.$router.back();
     },
+
+    // 清除输入数据
     handleClear() {
       (this.account = ""),
         (this.oldpsw = ""),
@@ -98,7 +100,9 @@ export default {
         this.$refs.account.focus();
     },
 
+    // 向后端发出修改密码请求
     handleChange() {
+      // 一些条件判断
       if (this.account === "") {
         this.$message({
           type: "error",
@@ -129,7 +133,8 @@ export default {
         });
         return;
       }
-      // 做一些不能同时登录两个的判断
+
+      // 发出请求
       let url =
         this.store.state.requestUrl +
         "/user/changePsw?account=" +

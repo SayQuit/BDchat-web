@@ -59,12 +59,16 @@ export default {
       this.$router.back();
     },
 
+    // 清除输入数据
     handleClear() {
       this.account = "";
       this.psw = "";
       this.$refs.account.focus();
     },
+
+    // 登录请求函数
     handleLogin() {
+      // 条件判断
       if (this.account === "") {
         this.$message({
           type: "error",
@@ -79,6 +83,8 @@ export default {
         });
         return;
       }
+
+      // 排除已登录再次登录的情况
       this.account = this.account.trim();
       for (let i = 0; i < this.store.state.user.length; i++) {
         if (this.store.state.user[i].account == this.account) {
@@ -89,6 +95,8 @@ export default {
           return;
         }
       }
+
+      // 发出请求
       let url =
         this.store.state.requestUrl +
         "/user/login?account=" +
