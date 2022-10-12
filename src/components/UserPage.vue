@@ -861,7 +861,7 @@ export default {
     },
     handleClickFont() {
       if (!this.fontIsOpen) this.hideAllIsOpen();
-      this.fontIsOpen = !this.fontIsOpen;
+      this.handleCancelFontSetup()
     },
     handleClickMood() {
       if (!this.moodIsOpen) this.hideAllIsOpen();
