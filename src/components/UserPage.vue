@@ -462,7 +462,8 @@
           <textarea
             class="maintalk-footer-input"
             v-model="send"
-            @keyup.enter="handleSendMessage()"
+            @keydown.enter="handleSendMessage()"
+            @keyup.enter="clearSend()"
             ref="txtarea"
           ></textarea>
 
@@ -768,17 +769,6 @@ export default {
           }
 
           if (this.selectFri != "") {
-            // if (
-            //   this.lastLen != this.messageList.length &&
-            //   this.messageList[this.messageList.length - 1].isMe != 1
-            // ) {
-            //   this.getMessage(true);
-            // } else {
-            //   this.getMessage(false);
-            // }
-            // if(this.lastLen!=this.messageList.length){
-              
-            // }
             
             this.getMessage(false);
 
@@ -1051,6 +1041,7 @@ export default {
     // 发送消息
     handleSendMessage() {
       const msg = this.send;
+      this.send = "";
       if (msg.trim() == "") {
         this.send = "";
         return;
@@ -1076,7 +1067,7 @@ export default {
             type: "success",
             message: "发送成功",
           });
-          this.send = "";
+          // this.send = "";
           this.emojiIsOpen = false;
           this.getMessage(true);
           this.UpdateClose();
@@ -1087,6 +1078,9 @@ export default {
           });
         }
       });
+    },
+    clearSend(){
+      this.send=""
     },
     // 表情包
     // 添加表情包
