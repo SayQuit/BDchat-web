@@ -69,7 +69,7 @@ export default {
             right: null,
             bottom: null,
             width: "90%",
-            height: "90%",
+            height: "80%",
             //数据
             data: data,
           },

@@ -212,7 +212,7 @@
               ></el-avatar>
               <div
                 class="aside-user-desc"
-                style="margin-left: 50px; width: 350px"
+                style="margin-left: 50px; width: 30%"
               >
                 <div class="aside-user-desc-name">
                   {{ item.name }}({{ item.account }})
@@ -584,12 +584,17 @@
               <div class="item">
                 <div class="rank">{{ index + 1 }}</div>
                 <div class="avatar">
-                  <img v-if="item.avatar" :src="item.avatar" class="mid" />
-                  <img
+                  <el-avatar
+                    v-if="item.avatar"
+                    :src="item.avatar"
+                    class="mid"
+                  ></el-avatar>
+
+                  <el-avatar
                     v-else
                     src="https://cube.elemecdn.com/0/88/03b0d39583f48206768a7534e55bcpng.png"
                     class="mid"
-                  />
+                  ></el-avatar>
                 </div>
                 <div class="name">{{ item.name }}</div>
                 <div class="close">
@@ -1862,6 +1867,7 @@ export default {
   height: 100%;
   border-radius: 50%;
   border: 1px solid #ddd;
+  width:75%;
 }
 .closeRank .item .close {
   height: 100%;
@@ -2018,7 +2024,7 @@ export default {
 .aside-user-desc-signature {
   height: 40px;
   line-height: 40px;
-  font-size: 15px;
+  /* font-size: 15px; */
 
   overflow: hidden;
   white-space: nowrap;
@@ -2097,7 +2103,7 @@ export default {
   top: 37%;
   width: 20px;
   height: 20px;
-  left: -20%;
+  left: 0%;
 }
 .aside-talkblock-talkitem-right-isread img {
   width: 100%;
@@ -2106,7 +2112,7 @@ export default {
 .aside-talkblock-talkitem-right-time {
   position: absolute;
   top: 56%;
-  left: -50%;
+  left: -30%;
 }
 .aside-talkblockbottom {
   height: 40px;
@@ -2611,7 +2617,7 @@ body {
 
   position: absolute;
   top: -100%;
-  left: 30%;
+  left: 45%;
 }
 .moodBlock div {
   width: 50px;
@@ -2641,6 +2647,7 @@ body {
   left: 85%;
   z-index: 1000;
 }
+
 </style>
 
 <style>
