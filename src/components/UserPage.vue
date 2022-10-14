@@ -768,15 +768,20 @@ export default {
           }
 
           if (this.selectFri != "") {
-            if (
-              this.lastLen != this.messageList.length &&
-              this.messageList[this.messageList.length - 1].isMe != 1
-            ) {
-              this.getMessage(true);
-            } else {
-              this.getMessage(false);
-            }
-            this.lastLen = this.messageList.length;
+            // if (
+            //   this.lastLen != this.messageList.length &&
+            //   this.messageList[this.messageList.length - 1].isMe != 1
+            // ) {
+            //   this.getMessage(true);
+            // } else {
+            //   this.getMessage(false);
+            // }
+            // if(this.lastLen!=this.messageList.length){
+              
+            // }
+            
+            this.getMessage(false);
+
             this.getSelectFriFont();
             this.handleReadMessage(this.selectFri.account);
           }
@@ -1020,6 +1025,11 @@ export default {
           this.messageList = res.data.message;
           this.getFriendList(this.selectFri.account);
           if (Scroll) this.scrollToBottom();
+          if(this.lastLen!=this.messageList.length){
+              this.scrollToBottom();
+              this.lastLen = this.messageList.length;
+            }
+            
         } else {
           this.selectFri = "";
           this.closeIsOpen = false;
