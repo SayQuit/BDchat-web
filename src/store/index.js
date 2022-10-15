@@ -4,6 +4,7 @@ export default createStore({
   state: {
     requestUrl: 'http://127.0.0.1:80',
 
+
     // 存储用户信息
     user: [],
     emojiList:

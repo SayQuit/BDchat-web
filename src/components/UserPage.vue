@@ -1840,7 +1840,7 @@ export default {
   overflow-y: scroll;
   position: absolute;
   top: -230%;
-  left: 25%;
+  left: 30%;
 }
 .closeRank div {
   width: 100%;
@@ -1908,7 +1908,7 @@ export default {
   height: 30px;
   display: inline-block;
   vertical-align: middle;
-  margin-left: 20px;
+  margin-left: 10%;
   cursor: pointer;
   line-height: 28px;
 }
@@ -1969,7 +1969,8 @@ export default {
 .aside-user {
   height: 100px;
   position: relative;
-  padding-left: 40px;
+  padding-left: 2%;
+  
   background-color: white;
   border-radius: 10px;
 }
@@ -1983,6 +1984,8 @@ export default {
   position: absolute;
   top: 50%;
   transform: translateY(-50%);
+
+  margin-right: 2%;
 }
 
 .aside-user-desc {
@@ -1992,7 +1995,7 @@ export default {
   position: absolute;
   top: 50%;
   transform: translateY(-50%);
-  left: 140px;
+  left: 20%;
 }
 .closeimg {
   display: inline-block;
@@ -2097,7 +2100,7 @@ export default {
 }
 
 .aside-talkblock-talkitem-right {
-  width: 150px;
+  width: 17.5%;
   height: 100%;
   position: relative;
   float: right;
@@ -2108,7 +2111,7 @@ export default {
   top: 37%;
   width: 20px;
   height: 20px;
-  left: 0%;
+  left: 10%;
 }
 .aside-talkblock-talkitem-right-isread img {
   width: 100%;
@@ -2264,7 +2267,7 @@ export default {
 }
 .maintalk-footer-header-expression {
   height: 100%;
-  width: 5%;
+  width: 6%;
   box-sizing: border-box;
   border-right: 1px solid #999;
   cursor: pointer;
@@ -2280,7 +2283,7 @@ export default {
 .maintalk-footer-header-outer {
   /* opacity: 0; */
   height: 100%;
-  width: 5%;
+  width: 6%;
   box-sizing: border-box;
   border-right: 1px solid #999;
   cursor: pointer;
