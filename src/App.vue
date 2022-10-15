@@ -21,9 +21,9 @@ export default {
 #app {
   width: 100%;
   height: 100%;
-  min-width: 1600px;
+  min-width: 1200px;
   min-height: 900px;
-  max-width: 2560px; 
+  max-width: 2800px; 
   margin: 0 auto;
 }
 html{

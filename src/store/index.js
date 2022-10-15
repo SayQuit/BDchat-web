@@ -2,7 +2,7 @@ import { createStore } from 'vuex'
 
 export default createStore({
   state: {
-    requestUrl: 'http://39.108.224.155',
+    requestUrl: 'http://127.0.0.1:80',
 
     // 存储用户信息
     user: [],

@@ -314,7 +314,7 @@
               </div>
             </template>
 
-            <div class="closeimg mid" style="left: 90%">
+            <div class="closeimg mid" style="left: 95%">
               <img src="../assets/close.png" />
               <div>{{ selectFri.close }}</div>
             </div>
@@ -1079,6 +1079,7 @@ export default {
         }
       });
     },
+    // 清除send
     clearSend(){
       this.send=""
     },
@@ -1937,7 +1938,7 @@ export default {
 .header-operation {
   height: 100%;
   float: right;
-  margin-right: 30px;
+  margin-right: 55px;
 }
 .header-operation > div {
   height: 100%;
@@ -1959,7 +1960,7 @@ export default {
 
 .aside {
   display: inline-block;
-  width: 40%;
+  width: 37.5%;
   height: 970px;
   margin-left: 40px;
 
@@ -2180,7 +2181,7 @@ export default {
 .maintalk-header-operation .el-button {
   display: block;
   margin-top: 40px;
-  margin-left: 150px;
+  margin-left: 100px;
 }
 .maintalk-main {
   height: 60%;
