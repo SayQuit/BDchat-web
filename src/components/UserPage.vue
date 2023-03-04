@@ -2,47 +2,18 @@
   <div>
     <div class="bgr">
       <div class="log">
-        <el-button type="primary" class="login" @click="goPage('LoginPage')"
-          >登录</el-button
-        >
-        <el-button type="success" class="login" @click="goPage('RegisterPage')"
-          >注册</el-button
-        >
-        <el-button
-          type="warning"
-          class="login"
-          @click="goPage('ChangePassword')"
-          >修改密码</el-button
-        >
+        <el-button type="primary" class="login" @click="goPage('LoginPage')">登录</el-button>
+        <el-button type="success" class="login" @click="goPage('RegisterPage')">注册</el-button>
+        <el-button type="warning" class="login" @click="goPage('ChangePassword')">修改密码</el-button>
       </div>
       <div class="header">
         <div class="header-operation">
-          <el-button
-            class="header-operation-min"
-            type="primary"
-            @click="goPage('AccountManage')"
-            >最小化</el-button
-          >
-          <el-button
-            class="header-operation-close"
-            type="warning"
-            @click="handleClickApply()"
-            v-if="applyLength == 0"
-            >好友申请</el-button
-          >
-          <el-button
-            class="header-operation-close"
-            type="warning"
-            @click="handleClickApply()"
-            v-else
-            >好友申请({{ applyLength }})</el-button
-          >
-          <el-button
-            class="header-operation-close"
-            type="danger"
-            @click="handleLogout()"
-            >退出</el-button
-          >
+          <el-button class="header-operation-min" type="primary" @click="goPage('AccountManage')">最小化</el-button>
+          <el-button class="header-operation-close" type="warning" @click="handleClickApply()"
+            v-if="applyLength == 0">好友申请</el-button>
+          <el-button class="header-operation-close" type="warning" @click="handleClickApply()" v-else>好友申请({{ applyLength
+          }})</el-button>
+          <el-button class="header-operation-close" type="danger" @click="handleLogout()">退出</el-button>
           <div class="friendApply" v-show="ApplyIsOpen">
             <template v-for="(item, index) in applyList" :key="index">
               <div class="apply-item">
@@ -54,18 +25,10 @@
                   <template v-if="item.isSuccess == 0">
                     <div class="apply-item-opration">
                       <div class="apply-item-operation-success">
-                        <el-button
-                          type="success"
-                          @click="handleSendAllowOrRejectApply(1, item)"
-                          >同意</el-button
-                        >
+                        <el-button type="success" @click="handleSendAllowOrRejectApply(1, item)">同意</el-button>
                       </div>
                       <div class="apply-item-operation-reject">
-                        <el-button
-                          type="danger"
-                          @click="handleSendAllowOrRejectApply(-1, item)"
-                          >拒绝</el-button
-                        >
+                        <el-button type="danger" @click="handleSendAllowOrRejectApply(-1, item)">拒绝</el-button>
                       </div>
                     </div>
                   </template>
@@ -113,16 +76,9 @@
 
       <div class="aside">
         <div class="aside-user">
-          <el-avatar
-            v-if="user.avatar"
-            :src="user.avatar"
-            class="aside-user-profilepicture"
-          ></el-avatar>
-          <el-avatar
-            v-else
-            src="https://cube.elemecdn.com/0/88/03b0d39583f48206768a7534e55bcpng.png"
-            class="aside-user-profilepicture"
-          ></el-avatar>
+          <el-avatar v-if="user.avatar" :src="user.avatar" class="aside-user-profilepicture"></el-avatar>
+          <el-avatar v-else src="https://cube.elemecdn.com/0/88/03b0d39583f48206768a7534e55bcpng.png"
+            class="aside-user-profilepicture"></el-avatar>
           <div class="aside-user-desc">
             <div class="aside-user-desc-name">
               {{ user.name }}({{ user.account }})
@@ -142,28 +98,13 @@
             </template>
 
             <div class="aside-user-desc-edit">
-              <el-button type="primary" @click="handleChangeName()"
-                >更换昵称</el-button
-              >
-              <el-button type="success" @click="handleChangeSignature()"
-                >更换签名</el-button
-              >
-              <el-button type="warning" @click="handleChangeAvatar()"
-                >更换头像</el-button
-              >
-              <div
-                class="avatar-uploader"
-                :show-file-list="false"
-                v-show="avatarFileIsOpen"
-              >
+              <el-button type="primary" @click="handleChangeName()">更换昵称</el-button>
+              <el-button type="success" @click="handleChangeSignature()">更换签名</el-button>
+              <el-button type="warning" @click="handleChangeAvatar()">更换头像</el-button>
+              <div class="avatar-uploader" :show-file-list="false" v-show="avatarFileIsOpen">
                 <div class="el-icon-plus avatar-uploader-icon">+</div>
-                <input
-                  type="file"
-                  class="maintalk-footer-header-sendImg"
-                  style="top: 0"
-                  @change="handleAvatarSuccess"
-                  ref="avatar"
-                />
+                <input type="file" class="maintalk-footer-header-sendImg" style="top: 0" @change="handleAvatarSuccess"
+                  ref="avatar" />
               </div>
 
               <div class="moodBlock" v-show="moodIsOpen">
@@ -182,38 +123,19 @@
         </div>
 
         <div class="aside-search">
-          <input
-            type="text"
-            class="aside-search-input"
-            v-model="searchWord"
-            @keyup.enter="handleSearch"
-          />
+          <input type="text" class="aside-search-input" v-model="searchWord" @keyup.enter="handleSearch" />
           <div class="aside-search-button" @click="handleSearch">搜索</div>
         </div>
 
         <div class="aside-talkblock">
           <template v-for="(item, index) in tempFriendList" :key="index">
-            <div
-              class="aside-talkblock-talkitem"
-              :class="{ currentSelect: selectFri == item }"
-              @click="handleChangeSelectFri(item)"
-            >
-              <el-avatar
-                v-if="item.avatar"
-                :src="item.avatar"
-                class="aside-user-profilepicture"
-                style="left: 40px"
-              ></el-avatar>
-              <el-avatar
-                v-else
-                src="https://cube.elemecdn.com/0/88/03b0d39583f48206768a7534e55bcpng.png"
-                class="aside-user-profilepicture"
-                style="left: 40px"
-              ></el-avatar>
-              <div
-                class="aside-user-desc"
-                style="margin-left: 50px; width: 30%"
-              >
+            <div class="aside-talkblock-talkitem" :class="{ currentSelect: selectFri == item }"
+              @click="handleChangeSelectFri(item)">
+              <el-avatar v-if="item.avatar" :src="item.avatar" class="aside-user-profilepicture"
+                style="left: 40px"></el-avatar>
+              <el-avatar v-else src="https://cube.elemecdn.com/0/88/03b0d39583f48206768a7534e55bcpng.png"
+                class="aside-user-profilepicture" style="left: 40px"></el-avatar>
+              <div class="aside-user-desc" style="margin-left: 50px; width: 30%">
                 <div class="aside-user-desc-name">
                   {{ item.name }}({{ item.account }})
                 </div>
@@ -228,11 +150,11 @@
               </div>
               <div class="aside-talkblock-talkitem-right">
                 <div class="aside-talkblock-talkitem-right-isread">
-                  <template v-if="item.ign == 1"
-                    ><div style="width: 50px; text-align: left">
+                  <template v-if="item.ign == 1">
+                    <div style="width: 50px; text-align: left">
                       已屏蔽
-                    </div></template
-                  >
+                    </div>
+                  </template>
                   <template v-else>
                     <template v-if="item.isRead == 1">
                       <img src="../assets/isRead.png" />
@@ -252,55 +174,31 @@
 
         <div class="aside-talkblockbottom">
           <div class="aside-talkblockbottom-operation">
-            <div
-              class="aside-talkblockbottom-operation-cloud"
-              @click="handleChangeWordCloud()"
-              :style="[wordCloudIsOpen ? 'background-color:#EEE;' : '']"
-            >
+            <div class="aside-talkblockbottom-operation-cloud" @click="handleChangeWordCloud()"
+              :style="[wordCloudIsOpen ? 'background-color:#EEE;' : '']">
               词云
             </div>
-            <div
-              class="aside-talkblockbottom-operation-add"
-              @click="handleAddFriend"
-            >
+            <div class="aside-talkblockbottom-operation-add" @click="handleAddFriend">
               +
             </div>
             <!-- <el-button type="text" @click="open">点击打开 Message Box</el-button> -->
           </div>
-          <WordCloudChart
-            class="wordCloud"
-            :word="word"
-            v-if="wordCloudIsOpen"
-          ></WordCloudChart>
+          <WordCloudChart class="wordCloud" :word="word" v-if="wordCloudIsOpen"></WordCloudChart>
         </div>
       </div>
 
       <div class="maintalk" v-if="selectFri">
         <div class="maintalk-header">
           <div class="maintalk-header-desc">
-            <el-avatar
-              v-if="selectFri.avatar"
-              :src="selectFri.avatar"
-              class="aside-user-profilepicture"
-              style="left: 40px"
-            ></el-avatar>
-            <el-avatar
-              v-else
-              src="https://cube.elemecdn.com/0/88/03b0d39583f48206768a7534e55bcpng.png"
-              class="aside-user-profilepicture"
-              style="left: 40px"
-            ></el-avatar>
-            <div
-              class="aside-user-desc"
-              style="left: 180px; width: 50%; display: inline-block"
-            >
+            <el-avatar v-if="selectFri.avatar" :src="selectFri.avatar" class="aside-user-profilepicture"
+              style="left: 40px"></el-avatar>
+            <el-avatar v-else src="https://cube.elemecdn.com/0/88/03b0d39583f48206768a7534e55bcpng.png"
+              class="aside-user-profilepicture" style="left: 40px"></el-avatar>
+            <div class="aside-user-desc" style="left: 180px; width: 50%; display: inline-block">
               <div class="aside-user-desc-name">
                 {{ selectFri.name }}({{ selectFri.account }})
               </div>
-              <div
-                class="aside-user-desc-signature"
-                :title="selectFri.signature"
-              >
+              <div class="aside-user-desc-signature" :title="selectFri.signature">
                 {{ selectFri.signature }}
               </div>
             </div>
@@ -321,21 +219,9 @@
           </div>
 
           <div class="maintalk-header-operation">
-            <el-button
-              type="warning"
-              @click="handleIgnoreFri()"
-              v-if="selectFri.ign == 0"
-              >屏蔽此人</el-button
-            >
-            <el-button
-              type="warning"
-              @click="handleCancelIgnoreFri()"
-              v-if="selectFri.ign == 1"
-              >取消屏蔽</el-button
-            >
-            <el-button type="danger" @click="handleDeleteFri()"
-              >删除好友</el-button
-            >
+            <el-button type="warning" @click="handleIgnoreFri()" v-if="selectFri.ign == 0">屏蔽此人</el-button>
+            <el-button type="warning" @click="handleCancelIgnoreFri()" v-if="selectFri.ign == 1">取消屏蔽</el-button>
+            <el-button type="danger" @click="handleDeleteFri()">删除好友</el-button>
           </div>
         </div>
 
@@ -345,32 +231,16 @@
               <div class="maintalk-main-talkitem">
                 <div class="maintalk-main-talkitem-user">
                   <template v-if="item.isMe">
-                    <el-avatar
-                      v-if="user.avatar"
-                      :src="user.avatar"
-                      class="maintalk-main-talkitem-user-profilepicture"
-                      style="left: 40px"
-                    ></el-avatar>
-                    <el-avatar
-                      v-else
-                      src="https://cube.elemecdn.com/0/88/03b0d39583f48206768a7534e55bcpng.png"
-                      class="maintalk-main-talkitem-user-profilepicture"
-                      style="left: 40px"
-                    ></el-avatar>
+                    <el-avatar v-if="user.avatar" :src="user.avatar" class="maintalk-main-talkitem-user-profilepicture"
+                      style="left: 40px"></el-avatar>
+                    <el-avatar v-else src="https://cube.elemecdn.com/0/88/03b0d39583f48206768a7534e55bcpng.png"
+                      class="maintalk-main-talkitem-user-profilepicture" style="left: 40px"></el-avatar>
                   </template>
                   <template v-else>
-                    <el-avatar
-                      v-if="selectFri.avatar"
-                      :src="selectFri.avatar"
-                      class="maintalk-main-talkitem-user-profilepicture"
-                      style="left: 40px"
-                    ></el-avatar>
-                    <el-avatar
-                      v-else
-                      src="https://cube.elemecdn.com/0/88/03b0d39583f48206768a7534e55bcpng.png"
-                      class="maintalk-main-talkitem-user-profilepicture"
-                      style="left: 40px"
-                    ></el-avatar>
+                    <el-avatar v-if="selectFri.avatar" :src="selectFri.avatar"
+                      class="maintalk-main-talkitem-user-profilepicture" style="left: 40px"></el-avatar>
+                    <el-avatar v-else src="https://cube.elemecdn.com/0/88/03b0d39583f48206768a7534e55bcpng.png"
+                      class="maintalk-main-talkitem-user-profilepicture" style="left: 40px"></el-avatar>
                   </template>
 
                   <div class="maintalk-main-talkitem-user-name">
@@ -387,12 +257,9 @@
                   <div v-else class="notread">未读</div>
                 </template>
 
-                <div
-                  class="maintalk-main-talkitem-content"
-                  :class="[
-                    item.isMe ? 'floatR greenMessage' : 'floatL blueMessage',
-                  ]"
-                >
+                <div class="maintalk-main-talkitem-content" :class="[
+                  item.isMe ? 'floatR greenMessage' : 'floatL blueMessage',
+                ]">
                   <template v-if="item.isImg == 0">
                     <template v-if="item.isMe">
                       <div :style="myStyle">{{ item.message }}</div>
@@ -412,60 +279,36 @@
 
         <div class="maintalk-footer">
           <div class="maintalk-footer-header">
-            <div
-              class="maintalk-footer-header-expression"
-              @click="handleClickEmoji()"
-              :style="[emojiIsOpen ? 'background-color:#EEE;' : '']"
-            >
+            <div class="maintalk-footer-header-expression" @click="handleClickEmoji()"
+              :style="[emojiIsOpen ? 'background-color:#EEE;' : '']">
               <img src="../assets/expression.png" />
             </div>
             <div class="maintalk-footer-header-outer">
-              <img src="../assets/img.png" /><input
-                type="file"
-                @change="sendBase64"
-                class="maintalk-footer-header-sendImg"
-                ref="sendimg"
-              />
+              <img src="../assets/img.png" /><input type="file" @change="sendBase64"
+                class="maintalk-footer-header-sendImg" ref="sendimg" />
             </div>
 
-            <div
-              class="maintalk-footer-header-expression"
-              @click="handleClickEmotion()"
-              :style="[emotionIsOpen ? 'background-color:#EEE;' : '']"
-            >
+            <div class="maintalk-footer-header-expression" @click="handleClickEmotion()"
+              :style="[emotionIsOpen ? 'background-color:#EEE;' : '']">
               <img src="../assets/emoticon.png" />
             </div>
 
-            <div
-              class="maintalk-footer-header-expression"
-              @click="handleClickFont()"
-              :style="[fontIsOpen ? 'background-color:#EEE;' : '']"
-            >
+            <div class="maintalk-footer-header-expression" @click="handleClickFont()"
+              :style="[fontIsOpen ? 'background-color:#EEE;' : '']">
               <img src="../assets/font.png" />
             </div>
 
-            <div
-              class="maintalk-footer-header-expression"
-              @click="handleCloseRank()"
-              :style="[closeIsOpen ? 'background-color:#EEE;' : '']"
-            >
+            <div class="maintalk-footer-header-expression" @click="handleCloseRank()"
+              :style="[closeIsOpen ? 'background-color:#EEE;' : '']">
               <img src="../assets/close.png" />
             </div>
 
-            <div
-              class="maintalk-footer-header-send"
-              @click="handleSendMessage()"
-            >
+            <div class="maintalk-footer-header-send" @click="handleSendMessage()">
               发 送
             </div>
           </div>
-          <textarea
-            class="maintalk-footer-input"
-            v-model="send"
-            @keydown.enter="handleSendMessage()"
-            @keyup.enter="clearSend()"
-            ref="txtarea"
-          ></textarea>
+          <textarea class="maintalk-footer-input" v-model="send" @keydown.enter="handleSendMessage()"
+            @keyup.enter="clearSend()" ref="txtarea"></textarea>
 
           <div class="emojiBlock" v-show="emojiIsOpen">
             <template v-for="(item, index) in emojiList" :key="index">
@@ -475,12 +318,7 @@
 
           <div class="emotionBlock" v-show="emotionIsOpen">
             <div>+</div>
-            <input
-              type="file"
-              @change="handleAddEmotion"
-              class="addEmotion"
-              ref="emotion"
-            />
+            <input type="file" @change="handleAddEmotion" class="addEmotion" ref="emotion" />
             <template v-for="(item, index) in emotionList" :key="index">
               <div @click="handleSendEmotionMessage(item.id)">
                 <img :src="item.emotionBase64" class="mid" />
@@ -493,25 +331,14 @@
 
             <div class="FontSetup-select">
               <span>字体:</span>
-              <el-input
-                v-model="tempFont.fontSize"
-                placeholder="请输入"
-                type="number"
-                style="width: 50%"
-                max="40"
-                min="12"
-              ></el-input>
+              <el-input v-model="tempFont.fontSize" placeholder="请输入" type="number" style="width: 50%" max="40"
+                min="12"></el-input>
             </div>
 
             <div class="FontSetup-select">
               <span>字号:</span>
               <el-select v-model="tempFont.fontFamily" placeholder="请选择">
-                <el-option
-                  v-for="(item, index) in family"
-                  :key="item"
-                  :label="item"
-                  :value="index"
-                >
+                <el-option v-for="(item, index) in family" :key="item" :label="item" :value="index">
                 </el-option>
               </el-select>
             </div>
@@ -519,12 +346,7 @@
             <div class="FontSetup-select">
               <span>粗细:</span>
               <el-select v-model="tempFont.fontWeight" placeholder="请选择">
-                <el-option
-                  v-for="item in weight"
-                  :key="item"
-                  :label="item"
-                  :value="item"
-                >
+                <el-option v-for="item in weight" :key="item" :label="item" :value="item">
                 </el-option>
               </el-select>
             </div>
@@ -532,12 +354,7 @@
             <div class="FontSetup-select">
               <span>装饰:</span>
               <el-select v-model="tempFont.textDecoration" placeholder="请选择">
-                <el-option
-                  v-for="item in decoration"
-                  :key="item.style"
-                  :label="item.name"
-                  :value="item.style"
-                >
+                <el-option v-for="item in decoration" :key="item.style" :label="item.name" :value="item.style">
                 </el-option>
               </el-select>
             </div>
@@ -545,12 +362,7 @@
             <div class="FontSetup-select">
               <span>风格:</span>
               <el-select v-model="tempFont.fontStyle" placeholder="请选择">
-                <el-option
-                  v-for="item in style"
-                  :key="item.style"
-                  :label="item.name"
-                  :value="item.style"
-                >
+                <el-option v-for="item in style" :key="item.style" :label="item.name" :value="item.style">
                 </el-option>
               </el-select>
             </div>
@@ -561,22 +373,9 @@
             </div>
 
             <div class="FontSetup-select">
-              <el-button
-                type="primary"
-                class="FontSetup-select-yes"
-                @click="handleSendFont()"
-                >确定</el-button
-              >
-              <el-button
-                class="FontSetup-select-no"
-                @click="handleSendDefaultFont()"
-                >恢复默认</el-button
-              >
-              <el-button
-                class="FontSetup-select-no"
-                @click="handleCancelFontSetup()"
-                >取消</el-button
-              >
+              <el-button type="primary" class="FontSetup-select-yes" @click="handleSendFont()">确定</el-button>
+              <el-button class="FontSetup-select-no" @click="handleSendDefaultFont()">恢复默认</el-button>
+              <el-button class="FontSetup-select-no" @click="handleCancelFontSetup()">取消</el-button>
             </div>
           </div>
           <div class="closeRank" v-show="closeIsOpen">
@@ -585,17 +384,10 @@
               <div class="item">
                 <div class="rank">{{ index + 1 }}</div>
                 <div class="avatar">
-                  <el-avatar
-                    v-if="item.avatar"
-                    :src="item.avatar"
-                    class="mid"
-                  ></el-avatar>
+                  <el-avatar v-if="item.avatar" :src="item.avatar" class="mid"></el-avatar>
 
-                  <el-avatar
-                    v-else
-                    src="https://cube.elemecdn.com/0/88/03b0d39583f48206768a7534e55bcpng.png"
-                    class="mid"
-                  ></el-avatar>
+                  <el-avatar v-else src="https://cube.elemecdn.com/0/88/03b0d39583f48206768a7534e55bcpng.png"
+                    class="mid"></el-avatar>
                 </div>
                 <div class="name">{{ item.name }}</div>
                 <div class="close">
@@ -616,6 +408,7 @@ import { useRouter } from "vue-router";
 import axios from "axios";
 import { useStore } from "vuex";
 import WordCloudChart from "./WordCloudChart.vue";
+import socket from '../plugin/socket'
 export default {
   setup() {
     const router = useRouter();
@@ -629,6 +422,7 @@ export default {
   data() {
     return {
       store: "",
+
 
       // 用户信息
       user: {
@@ -737,7 +531,11 @@ export default {
       }
     }
 
+
     if (this.isIn) {
+
+      this.handleInitSocket()
+
       this.emojiList = this.store.state.emojiList;
       this.style = this.store.state.fontStyle;
       this.decoration = this.store.state.textDecoration;
@@ -751,44 +549,80 @@ export default {
       this.getEmotion();
       this.getFont();
 
-      // 隔一段时间(这里设置为1800毫秒)发送请求
+      
+
+      // 消息、好友申请、字体颜色、好友列表信息
       this.messageTimer = setInterval(() => {
         setTimeout(() => {
           this.getApply();
-          if (this.tempFriendList.length == this.friendList.length) {
-            for (let i = 0; i < this.tempFriendList.length; i++) {
-              if (
-                this.tempFriendList[i].account != this.friendList[i].account
-              ) {
-                break;
-              }
-              if (i == this.tempFriendList.length - 1) {
-                this.getFriendList(this.selectFri.account);
-              }
-            }
-          }
+
+          // this.getFriendList(this.selectFri.account);
+
+          // if (this.tempFriendList.length == this.friendList.length) {
+          //   for (let i = 0; i < this.tempFriendList.length; i++) {
+          //     if (
+          //       this.tempFriendList[i].account != this.friendList[i].account
+          //     ) {
+          //       break;
+          //     }
+          //     if (i == this.tempFriendList.length - 1) {
+          //       this.getFriendList(this.selectFri.account);
+          //     }
+          //   }
+          // }
 
           if (this.selectFri != "") {
-            
-            this.getMessage(false);
-
+            // this.getMessage(false);
             this.getSelectFriFont();
             this.handleReadMessage(this.selectFri.account);
           }
+
         }, 0);
       }, 1800);
-    } 
+
+
+
+    }
     // 没有token则返回AccountManage
     else {
       this.router.push("AccountManage");
     }
+
+
+
+
   },
+  mounted() {
+    this.handleBindSocket()
+  },
+
   beforeUnmount() {
-    window.clearInterval(this.messageTimer);
+    this.handleLeave()
   },
+
+
+
   methods: {
     goPage(pageName) {
       this.router.push({ name: pageName });
+    },
+    handleLeave() {
+      window.clearInterval(this.messageTimer);
+      socket.emit("leave", this.token);
+      socket.close();
+
+    },
+    handleInitSocket() {
+      socket.open()
+      socket.emit('join', this.token);
+    },
+    handleBindSocket() {
+      socket.on('message', () => {
+        this.getFriendList(this.selectFri.account);
+        if (this.selectFri != "") {
+          this.getMessage(false);
+        }
+      });
     },
     // 改变选中的好友
     handleChangeSelectFri(item) {
@@ -798,7 +632,7 @@ export default {
       this.getMessage(true);
       this.getSelectFriFont();
       this.searchWord = "";
-    },    
+    },
     goBack() {
       this.$router.back();
     },
@@ -810,12 +644,28 @@ export default {
         type: "warning",
       })
         .then(() => {
-          this.store.commit("logout", this.token);
-          this.goPage("AccountManage");
-          this.$message({
-            type: "success",
-            message: "退出成功!",
+          let url = `${this.store.state.requestUrl}/user/logout?token=${this.token}`
+          axios.post(url).then((data) => {
+            var dt = data.data;
+            if (dt.data == 200) {
+
+              this.store.commit("logout", this.token);
+
+              this.goPage("AccountManage");
+              this.$message({
+                type: "success",
+                message: "退出成功!",
+              });
+            } else {
+              this.$message({
+                type: "error",
+                message: dt.message,
+              });
+            }
           });
+
+
+
         })
         .catch(() => {
           this.$message({
@@ -874,7 +724,7 @@ export default {
     handleChangeAvatar() {
       if (!this.avatarFileIsOpen) this.hideAllIsOpen();
       this.avatarFileIsOpen = !this.avatarFileIsOpen;
-    },    
+    },
     // 获取用户信息
     getUserInfo() {
       let url = this.store.state.requestUrl + "/user/info?token=" + this.token;
@@ -888,7 +738,7 @@ export default {
           });
         }
       });
-    },    
+    },
     // 检索好友
     handleSearch() {
       if (this.searchWord == "") {
@@ -1015,11 +865,11 @@ export default {
           this.messageList = res.data.message;
           this.getFriendList(this.selectFri.account);
           if (Scroll) this.scrollToBottom();
-          if(this.lastLen!=this.messageList.length){
-              this.scrollToBottom();
-              this.lastLen = this.messageList.length;
-            }
-            
+          if (this.lastLen != this.messageList.length) {
+            this.scrollToBottom();
+            this.lastLen = this.messageList.length;
+          }
+
         } else {
           this.selectFri = "";
           this.closeIsOpen = false;
@@ -1080,8 +930,8 @@ export default {
       });
     },
     // 清除send
-    clearSend(){
-      this.send=""
+    clearSend() {
+      this.send = ""
     },
     // 表情包
     // 添加表情包
@@ -1357,7 +1207,7 @@ export default {
           });
         }
       });
-    },   
+    },
     // 获取以前设置的字体 
     getTempFont() {
       this.tempFont = JSON.parse(JSON.stringify(this.userFont));
@@ -1486,7 +1336,7 @@ export default {
             message: "取消输入",
           });
         });
-    },  
+    },
     //删除好友 
     handleDeleteFri() {
       this.$confirm("删除该好友?", "提示", {
@@ -1523,7 +1373,7 @@ export default {
             message: "已取消删除",
           });
         });
-    },    
+    },
     // 获取好友申请
     getApply() {
       let url = this.store.state.requestUrl + "/apply/get?token=" + this.token;
@@ -1593,8 +1443,8 @@ export default {
         }
       });
     },
-    
-    
+
+
 
     // 获取词云
     handleChangeWordCloud() {
@@ -1752,7 +1602,7 @@ export default {
             message: "取消输入",
           });
         });
-    },    
+    },
     // 修改签名
     handleChangeSignature() {
       // const h = _this.$createElement;
@@ -1842,9 +1692,11 @@ export default {
   top: -230%;
   left: 30%;
 }
+
 .closeRank div {
   width: 100%;
 }
+
 .closeRank .title {
   font-weight: 500;
   font-size: 26px;
@@ -1852,6 +1704,7 @@ export default {
   border-bottom: 1px solid #ddd;
   padding: 10px 0;
 }
+
 .closeRank .item {
   height: 90px;
   width: 100%;
@@ -1861,37 +1714,45 @@ export default {
   justify-items: center;
   justify-content: center;
 }
-.closeRank .item > div {
+
+.closeRank .item>div {
   flex: 2;
 }
+
 .closeRank .item .avatar {
   height: 80%;
   position: relative;
 }
+
 .closeRank .item .avatar img {
   height: 100%;
   border-radius: 50%;
   border: 1px solid #ddd;
-  width:75%;
+  width: 75%;
 }
+
 .closeRank .item .close {
   height: 100%;
 }
-.closeRank .item > .rank {
+
+.closeRank .item>.rank {
   flex: 1;
   font-size: 16px;
   text-align: center;
 }
+
 .closeRank .item .name {
   font-size: 14px;
   text-align: center;
 }
+
 .closeRank .item .close img {
   height: 70%;
   display: inline-block;
   vertical-align: middle;
   margin-top: 15%;
 }
+
 .closeRank .item .close div {
   display: inline-block;
   width: auto;
@@ -1900,6 +1761,7 @@ export default {
   color: #ffb6c1;
   margin-left: 5px;
 }
+
 /* .closeRank .item:last-of-type{
   border-bottom: none;
 } */
@@ -1912,12 +1774,14 @@ export default {
   cursor: pointer;
   line-height: 28px;
 }
+
 .mood img {
   display: inline-block;
   width: 30px;
   height: 30px;
   vertical-align: middle;
 }
+
 .mood div {
   height: 30px;
   width: 40px;
@@ -1926,21 +1790,25 @@ export default {
   line-height: 30px;
   margin-left: 10%;
 }
+
 .el-button {
   color: white;
 }
+
 .header {
   width: 100%;
   height: 50px;
   margin-top: 10px;
   position: relative;
 }
+
 .header-operation {
   height: 100%;
   float: right;
   margin-right: 55px;
 }
-.header-operation > div {
+
+.header-operation>div {
   height: 100%;
   width: 33%;
   display: inline-block;
@@ -1948,12 +1816,15 @@ export default {
   text-align: center;
   cursor: pointer;
 }
+
 .header-operation-min {
   margin-left: 10px;
 }
+
 .header-operation-max {
   margin-left: 10px;
 }
+
 .header-operation-close {
   margin-left: 10px;
 }
@@ -1966,11 +1837,12 @@ export default {
 
   vertical-align: top;
 }
+
 .aside-user {
   height: 100px;
   position: relative;
   padding-left: 2%;
-  
+
   background-color: white;
   border-radius: 10px;
 }
@@ -1997,16 +1869,19 @@ export default {
   transform: translateY(-50%);
   left: 20%;
 }
+
 .closeimg {
   display: inline-block;
   width: 100px;
   height: 50px;
 }
+
 .closeimg img {
   height: 100%;
   display: inline-block;
   vertical-align: middle;
 }
+
 .closeimg div {
   display: inline-block;
   line-height: 50px;
@@ -2015,20 +1890,24 @@ export default {
   font-size: 18px;
   color: #ffb6c1;
 }
+
 .aside-user-desc-name {
   height: 40px;
   line-height: 40px;
 
   display: inline-block;
 }
+
 .aside-user-desc-edit {
   /* display: inline-block; */
   float: right;
   height: 40px;
 }
+
 .aside-user-desc-edit .el-button {
   margin-left: 8px;
 }
+
 .aside-user-desc-signature {
   height: 40px;
   line-height: 40px;
@@ -2047,6 +1926,7 @@ export default {
   background-color: white;
   border-radius: 10px;
 }
+
 .aside-search-input {
   outline: none;
   vertical-align: top;
@@ -2065,6 +1945,7 @@ export default {
   border-width: 1px;
   border: none;
 }
+
 .aside-search-button {
   width: 35%;
   height: 100%;
@@ -2106,6 +1987,7 @@ export default {
   float: right;
   margin-right: 30px;
 }
+
 .aside-talkblock-talkitem-right-isread {
   position: absolute;
   top: 37%;
@@ -2113,15 +1995,18 @@ export default {
   height: 20px;
   left: 10%;
 }
+
 .aside-talkblock-talkitem-right-isread img {
   width: 100%;
   height: 100%;
 }
+
 .aside-talkblock-talkitem-right-time {
   position: absolute;
   top: 56%;
   left: -30%;
 }
+
 .aside-talkblockbottom {
   height: 40px;
   border-top: 1px solid #999;
@@ -2131,9 +2016,11 @@ export default {
   border-bottom-right-radius: 10px;
   position: relative;
 }
+
 .aside-talkblockbottom-operation {
   float: right;
 }
+
 .aside-talkblockbottom-operation div {
   width: 100px;
   text-align: center;
@@ -2162,6 +2049,7 @@ export default {
   vertical-align: top;
   border-radius: 10px;
 }
+
 .maintalk-header {
   height: 20%;
   width: 100%;
@@ -2169,6 +2057,7 @@ export default {
   display: flex;
   box-sizing: border-box;
 }
+
 .maintalk-header-desc {
   height: 100%;
   flex: 7;
@@ -2177,15 +2066,18 @@ export default {
 
   position: relative;
 }
+
 .maintalk-header-operation {
   flex: 3;
   height: 100%;
 }
+
 .maintalk-header-operation .el-button {
   display: block;
   margin-top: 40px;
   margin-left: 100px;
 }
+
 .maintalk-main {
   height: 60%;
   width: 100%;
@@ -2197,15 +2089,18 @@ export default {
   overflow: auto;
   padding: 30px 0;
 }
+
 .maintalk-main-talkitem {
   width: 100%;
   box-sizing: border-box;
   padding: 30px 50px;
 }
+
 .maintalk-main-talkitem-user {
   display: block;
   width: auto;
 }
+
 .maintalk-main-talkitem-user-profilepicture {
   height: 50px;
   width: 50px;
@@ -2214,6 +2109,7 @@ export default {
   display: inline-block;
   vertical-align: middle;
 }
+
 .maintalk-main-talkitem-user-name {
   margin-left: 15px;
   display: inline-block;
@@ -2225,6 +2121,7 @@ export default {
   margin-top: 10px;
   color: #777;
 }
+
 .maintalk-main-talkitem-content {
   margin-top: 15px;
   width: auto;
@@ -2236,22 +2133,27 @@ export default {
   color: #111;
   flex: 1;
 }
+
 .floatR {
   text-align: left;
   float: right;
   margin-left: 200px;
 }
+
 .floatL {
   margin-right: 200px;
 }
+
 .isMe {
   text-align: right;
   display: flex;
 }
+
 .isFri {
   text-align: left;
   display: flex;
 }
+
 .maintalk-footer {
   height: 20%;
   width: 100%;
@@ -2259,12 +2161,14 @@ export default {
 
   position: relative;
 }
+
 .maintalk-footer-header {
   height: 30%;
   width: 100%;
   box-sizing: border-box;
   border-bottom: 1px solid #999;
 }
+
 .maintalk-footer-header-expression {
   height: 100%;
   width: 6%;
@@ -2274,12 +2178,14 @@ export default {
 
   display: inline-block;
 }
+
 .maintalk-footer-header-expression img {
   box-sizing: border-box;
   padding: 10%;
   width: 100%;
   height: 100%;
 }
+
 .maintalk-footer-header-outer {
   /* opacity: 0; */
   height: 100%;
@@ -2292,6 +2198,7 @@ export default {
   display: inline-block;
   position: relative;
 }
+
 .maintalk-footer-header-outer img {
   position: absolute;
   width: 80%;
@@ -2300,6 +2207,7 @@ export default {
   left: 50%;
   transform: translateY(-50%) translateX(-50%);
 }
+
 .maintalk-footer-header-sendImg {
   opacity: 0;
   vertical-align: top;
@@ -2308,6 +2216,7 @@ export default {
   cursor: pointer;
   position: absolute;
 }
+
 .maintalk-footer-header-send {
   background-color: #ccccff;
   text-align: center;
@@ -2320,6 +2229,7 @@ export default {
   float: right;
   line-height: 55px;
 }
+
 .maintalk-footer-input {
   width: 100%;
   height: 70%;
@@ -2352,6 +2262,7 @@ export default {
   border-radius: 0;
   background: rgba(0, 0, 0, 0.1);
 }
+
 body {
   overflow-x: hidden;
 }
@@ -2360,17 +2271,20 @@ body {
   width: 100vw;
   overflow-x: hidden;
 }
+
 .log {
   width: 100%;
   height: 50px;
   display: block;
   border-radius: 10px;
 }
-.log > .login {
+
+.log>.login {
   display: inline-block;
   margin-left: 10px;
   margin-top: 10px;
 }
+
 .bgr {
   background: url("../assets/2.png") no-repeat;
   background-size: cover;
@@ -2379,17 +2293,21 @@ body {
   height: 1400px;
   opacity: 1;
 }
+
 .currentSelect {
   background-color: #ddd;
 }
+
 .greenMessage {
   background-color: #95eb6c;
   color: #111;
 }
+
 .blueMessage {
   background-color: #1099fe;
   color: white;
 }
+
 .emojiBlock {
   width: 500px;
   background-color: white;
@@ -2401,6 +2319,7 @@ body {
   top: -244%;
   left: -30%;
 }
+
 .emojiBlock div {
   width: 50px;
   height: 50px;
@@ -2414,6 +2333,7 @@ body {
   line-height: 50px;
   cursor: pointer;
 }
+
 .emotionBlock {
   width: 500px;
   background-color: white;
@@ -2429,6 +2349,7 @@ body {
 .emojiBlock div:hover {
   background-color: #ddd;
 }
+
 .emotionBlock div {
   width: 125px;
   height: 125px;
@@ -2448,6 +2369,7 @@ body {
 .emotionBlock div:hover {
   background-color: #eee;
 }
+
 .addEmotion {
   position: absolute;
   width: 125px;
@@ -2458,6 +2380,7 @@ body {
   top: 0;
   cursor: pointer;
 }
+
 .avatar-uploader {
   width: 178px;
   display: inline-block;
@@ -2469,6 +2392,7 @@ body {
   left: 92.5%;
   z-index: 1000;
 }
+
 .avatar-uploader .el-upload {
   border: 1px dashed #d9d9d9;
   border-radius: 6px;
@@ -2476,9 +2400,11 @@ body {
   position: relative;
   overflow: hidden;
 }
+
 .avatar-uploader .el-upload:hover {
   border-color: #409eff;
 }
+
 .avatar-uploader .avatar-uploader-icon {
   font-size: 28px;
   color: #8c939d;
@@ -2487,11 +2413,13 @@ body {
   line-height: 178px;
   text-align: center;
 }
+
 .avatar {
   width: 178px;
   height: 178px;
   display: block;
 }
+
 .header .friendApply {
   /* display: block; */
   width: 350px;
@@ -2507,6 +2435,7 @@ body {
   z-index: 10;
   border: 1px solid #ddd;
 }
+
 .header .friendApply .apply-item {
   height: 125px;
   width: 100%;
@@ -2517,12 +2446,13 @@ body {
 
   /* display: block; */
 }
+
 .apply-item-desc {
   flex: 7;
   position: relative;
 }
 
-.apply-item-desc > div {
+.apply-item-desc>div {
   position: absolute;
   top: 50%;
   transform: translateY(-50%);
@@ -2530,53 +2460,64 @@ body {
   width: 100%;
   color: #444;
 }
+
 .apply-item-opration {
   flex: 3;
   display: flex;
   flex-direction: column;
   padding: 15px 0;
 }
+
 .apply-item-operation-success {
   flex: 1;
   position: relative;
 }
+
 .apply-item-operation-reject {
   flex: 1;
   position: relative;
 }
-.apply-item-operation-success > .el-button {
+
+.apply-item-operation-success>.el-button {
   position: absolute;
   top: 50%;
   transform: translateY(-50%) translateX(-50%);
   left: 50%;
 }
-.apply-item-operation-reject > .el-button {
+
+.apply-item-operation-reject>.el-button {
   position: absolute;
   top: 50%;
   transform: translateY(-50%) translateX(-50%);
   left: 50%;
 }
+
 .apply-item-operation-reject .header .friendApply .apply-item:last-of-type {
   border: none;
 }
+
 .apply-item-hasReject {
   position: relative;
   flex: 3;
 }
+
 .mid {
   position: absolute;
   top: 50%;
   left: 50%;
   transform: translateY(-50%) translateX(-50%);
 }
+
 .maintalk-main-talkitem .isread {
   color: #444;
   padding-top: 5px;
 }
+
 .maintalk-main-talkitem .notread {
   color: #777;
   padding-top: 5px;
 }
+
 .FontSetup {
   background-color: white;
   width: 400px;
@@ -2597,25 +2538,31 @@ body {
 
   box-sizing: border-box;
 }
+
 .FontSetup .FontSetup-title {
   font-size: 28px;
   text-align: center;
   flex: 1;
   margin: 20px 0;
 }
+
 .FontSetup .FontSetup-select {
   flex: 2;
 }
-.FontSetup .FontSetup-select > span {
+
+.FontSetup .FontSetup-select>span {
   margin-right: 20px;
 }
+
 .FontSetup-select-yes {
   margin-top: 15px;
 }
+
 .FontSetup-select-no {
   margin-top: 15px;
   color: black;
 }
+
 .moodBlock {
   width: 200px;
   background-color: white;
@@ -2627,6 +2574,7 @@ body {
   top: -100%;
   left: 45%;
 }
+
 .moodBlock div {
   width: 50px;
   height: 50px;
@@ -2637,16 +2585,20 @@ body {
   vertical-align: top;
   cursor: pointer;
 }
+
 .moodBlock div:hover {
   background-color: #ddd;
 }
+
 .moodBlock img:hover {
   background-color: #ddd;
 }
+
 .moodBlock img {
   width: 50px;
   height: 50px;
 }
+
 .wordCloud {
   background-color: white;
   border-radius: 10px;
@@ -2655,7 +2607,6 @@ body {
   left: 85%;
   z-index: 1000;
 }
-
 </style>
 
 <style>
@@ -2668,13 +2619,16 @@ body {
   padding: 10px;
   outline: none;
 }
+
 .el-avatar img {
   width: 100%;
   height: 100%;
 }
+
 .reject {
   color: #ff0000;
 }
+
 .allow {
   color: #00ff00;
 }

@@ -113,7 +113,10 @@ export default {
             account: dt.account,
           };
           this.store.commit("handlePushUser", u);
-          // var ac = this.account;
+          
+          // socket消息
+          
+
           this.$message({
             type: "success",
             message: "登录成功",
