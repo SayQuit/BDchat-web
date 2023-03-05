@@ -549,36 +549,19 @@ export default {
       this.getEmotion();
       this.getFont();
 
-      
 
-      // 消息、好友申请、字体颜色、好友列表信息
-      this.messageTimer = setInterval(() => {
-        setTimeout(() => {
-          this.getApply();
 
-          // this.getFriendList(this.selectFri.account);
+      // 已读问题、好友列表信息
+      // this.messageTimer = setInterval(() => {
+      //   setTimeout(() => {
+      //     if (this.selectFri != "") {
+      //       // this.getMessage(false);
+      //       // this.getSelectFriFont();
+      //       // this.handleReadMessage(this.selectFri.account);
+      //     }
 
-          // if (this.tempFriendList.length == this.friendList.length) {
-          //   for (let i = 0; i < this.tempFriendList.length; i++) {
-          //     if (
-          //       this.tempFriendList[i].account != this.friendList[i].account
-          //     ) {
-          //       break;
-          //     }
-          //     if (i == this.tempFriendList.length - 1) {
-          //       this.getFriendList(this.selectFri.account);
-          //     }
-          //   }
-          // }
-
-          if (this.selectFri != "") {
-            // this.getMessage(false);
-            this.getSelectFriFont();
-            this.handleReadMessage(this.selectFri.account);
-          }
-
-        }, 0);
-      }, 1800);
+      //   }, 0);
+      // }, 1800);
 
 
 
@@ -617,12 +600,51 @@ export default {
       socket.emit('join', this.token);
     },
     handleBindSocket() {
-      socket.on('message', () => {
-        this.getFriendList(this.selectFri.account);
-        if (this.selectFri != "") {
-          this.getMessage(false);
+
+      socket.on('message', (data) => {
+        // console.log('message:',this.selectFri.account,data);
+        if (this.selectFri.account == data) {
+          // console.log('message-1');
+          this.getMessage(false)
+          this.handleReadMessage(data)
+          this.getFriendList(this.selectFri.account)
+
+
+
+          // 然后发送一个emit，带上对方账号参数，对方得到消息后，就得知我们已经read，然后对方进行post请求
+          // socket.emit('read', this.this.selectFri.account);
+
+        }
+        else {
+
+          // console.log('message-2');
+          this.getFriendList(this.selectFri.account);
         }
       });
+
+
+      socket.on('readMessage', (data) => {
+        if (data == this.selectFri.account) {
+          this.getMessage(false)
+          this.getFriendList(this.selectFri.account)
+        }
+        else {
+          this.getFriendList(this.selectFri.account)
+        }
+      });
+
+      socket.on('apply', () => {
+        this.getApply()
+        this.getFriendList(this.selectFri.account)
+
+      });
+
+      socket.on('font', (data) => {
+        if (data == this.selectFri.account) this.getSelectFriFont()
+
+      });
+
+
     },
     // 改变选中的好友
     handleChangeSelectFri(item) {
@@ -761,18 +783,22 @@ export default {
     },
     // 获取好友信息
     getFriendList(acc) {
-      let url =
-        this.store.state.requestUrl + "/user/friend?token=" + this.token;
-      axios.get(url).then((res) => {
-        this.friendList = res.data.friendList;
-        this.tempFriendList = [];
-        for (let i = 0; i < this.friendList.length; i++) {
-          this.tempFriendList.push(this.friendList[i]);
-          if (this.tempFriendList[i].account == acc) {
-            this.selectFri = this.tempFriendList[i];
+      return new Promise(resolve => {
+        // console.log(acc);
+        let url =
+          this.store.state.requestUrl + "/user/friend?token=" + this.token;
+        axios.get(url).then((res) => {
+          this.friendList = res.data.friendList;
+          this.tempFriendList = [];
+          for (let i = 0; i < this.friendList.length; i++) {
+            this.tempFriendList.push(this.friendList[i]);
+            if (this.tempFriendList[i].account == acc) {
+              this.selectFri = this.tempFriendList[i];
+            }
           }
-        }
-      });
+          resolve()
+        });
+      })
     },
     // 屏蔽好友
     handleIgnoreFri() {
@@ -852,41 +878,59 @@ export default {
           });
         });
     },
+
     // 获取消息
     getMessage(Scroll) {
-      let url =
-        this.store.state.requestUrl +
-        "/message/get?token=" +
-        this.token +
-        "&hisaccount=" +
-        this.selectFri.account;
-      axios.get(url).then((res) => {
-        if (res.data.state == "success") {
-          this.messageList = res.data.message;
-          this.getFriendList(this.selectFri.account);
-          if (Scroll) this.scrollToBottom();
-          if (this.lastLen != this.messageList.length) {
-            this.scrollToBottom();
-            this.lastLen = this.messageList.length;
-          }
+      return new Promise((resolve, reject) => {
+        let url = `${this.store.state.requestUrl}/message/get?token=${this.token}&hisaccount=${this.selectFri.account}`
 
-        } else {
-          this.selectFri = "";
-          this.closeIsOpen = false;
-        }
-      });
+        axios.get(url).then((res) => {
+          if (res.data.state == "success") {
+            this.messageList = res.data.message;
+            if (Scroll) this.scrollToBottom();
+            if (this.lastLen != this.messageList.length) {
+              this.scrollToBottom();
+              this.lastLen = this.messageList.length;
+            }
+            this.getFriendList(this.selectFri.account);
+            resolve()
+
+          } else {
+            this.selectFri = "";
+            this.closeIsOpen = false;
+            reject()
+          }
+        });
+      })
     },
+
     // 读消息
     handleReadMessage(acc) {
-      let url =
-        this.store.state.requestUrl +
-        "/message/read?token=" +
-        this.token +
-        "&hisaccount=" +
-        this.selectFri.account;
-      axios.post(url).then(() => {
-        this.getFriendList(acc);
-      });
+
+      return new Promise(() => {
+        // for (let i = 0; i < this.friendList.length; i++) {
+        //   if (acc == this.friendList[i].account) {
+        //     if (this.friendList[i].isRead == 1) {
+        //       return
+        //     }
+        //   }
+        // }
+
+        let url =
+          this.store.state.requestUrl +
+          "/message/read?token=" +
+          this.token +
+          "&hisaccount=" +
+          this.selectFri.account;
+
+        axios.post(url).then(() => {
+
+          return this.getFriendList(acc);
+
+        });
+      })
+
+
     },
     // 发送消息
     handleSendMessage() {
@@ -1669,7 +1713,7 @@ export default {
     // 滑动最底端
     scrollToBottom: function () {
       this.$nextTick(() => {
-        this.$refs.scrollWin.scrollTop = this.$refs.scrollWin.scrollHeight;
+        if(this.$refs.scrollWin.scrollHeight)this.$refs.scrollWin.scrollTop = this.$refs.scrollWin.scrollHeight;
       });
     },
 
