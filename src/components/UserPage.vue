@@ -602,26 +602,16 @@ export default {
     handleBindSocket() {
 
       socket.on('message', (data) => {
-        // console.log('message:',this.selectFri.account,data);
         if (this.selectFri.account == data) {
-          // console.log('message-1');
           this.getMessage(false)
           this.handleReadMessage(data)
           this.getFriendList(this.selectFri.account)
-
-
-
-          // 然后发送一个emit，带上对方账号参数，对方得到消息后，就得知我们已经read，然后对方进行post请求
-          // socket.emit('read', this.this.selectFri.account);
-
+          console.log(data);
         }
         else {
-
-          // console.log('message-2');
           this.getFriendList(this.selectFri.account);
         }
       });
-
 
       socket.on('readMessage', (data) => {
         if (data == this.selectFri.account) {
@@ -643,6 +633,11 @@ export default {
         if (data == this.selectFri.account) this.getSelectFriFont()
 
       });
+
+      socket.on('friend',()=>{
+        console.log(this.selectFri.account);
+        this.getFriendList(this.selectFri.account)
+      })
 
 
     },
