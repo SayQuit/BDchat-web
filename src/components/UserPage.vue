@@ -269,7 +269,7 @@
                     </template>
                   </template>
                   <template v-else>
-                    <div><img :src="item.base64" /></div>
+                    <div><img :src="item.base64" class="maintalk-main-talkitem-image" /></div>
                   </template>
                 </div>
               </div>
@@ -634,7 +634,7 @@ export default {
 
       });
 
-      socket.on('friend',()=>{
+      socket.on('friend', () => {
         console.log(this.selectFri.account);
         this.getFriendList(this.selectFri.account)
       })
@@ -1085,55 +1085,45 @@ export default {
         reader.readAsDataURL(file);
         reader.onload = (e) => {
           let base64String = e.target.result;
-          let base64Img = this.compressImg(base64String, 100, 0.7);
-          base64Img.then((res) => {
-            if (res.length > 12000) {
-              this.$message({
-                type: "error",
-                message: "发送失败,图片过大",
-              });
-              return;
-            }
 
-            this.$confirm("是否发送图片?", "提示", {
-              confirmButtonText: "确定",
-              cancelButtonText: "取消",
-              type: "warning",
-            })
-              .then(() => {
-                axios({
-                  method: "POST",
-                  url: this.store.state.requestUrl + "/message/sendImg",
-                  params: [res, this.token, this.selectFri.account],
-                  headers: {
-                    "Content-Type": "application/x-www-form-urlencoded",
-                  },
-                }).then((res) => {
-                  this.$refs.sendimg.value = "";
-                  if (res.data.state == "success") {
-                    this.$message({
-                      type: "success",
-                      message: "发送成功",
-                    });
-                    this.getMessage(true);
+          const params = {
+            img: base64String,
+            token: this.token,
+            hisaccount: this.selectFri.account
+          }
+          const url = this.store.state.requestUrl + "/message/sendImg"
 
-                    this.UpdateClose();
-                  } else {
-                    this.$message({
-                      type: "error",
-                      message: "发送失败",
-                    });
-                  }
-                });
-              })
-              .catch(() => {
+          this.$confirm("是否发送图片?", "提示", {
+            confirmButtonText: "确定",
+            cancelButtonText: "取消",
+            type: "warning",
+          })
+            .then(() => {
+              axios.post(url, params).then((res) => {
                 this.$refs.sendimg.value = "";
-                this.$message({
-                  type: "info",
-                  message: "已取消",
-                });
+                if (res.data.state == "success") {
+                  this.$message({
+                    type: "success",
+                    message: "发送成功",
+                  });
+                  this.getMessage(true);
+
+                  this.UpdateClose();
+                } else {
+                  this.$message({
+                    type: "error",
+                    message: "发送失败",
+                  });
+                }
               });
-          });
+            })
+            .catch(() => {
+              this.$refs.sendimg.value = "";
+              this.$message({
+                type: "info",
+                message: "已取消",
+              });
+            });
         };
       }
     },
@@ -1526,65 +1516,48 @@ export default {
         reader.readAsDataURL(file);
         reader.onload = (e) => {
           let base64String = e.target.result;
-          let base64Img = this.compressImg(base64String, 100, 0.3);
-          base64Img.then((res) => {
-            if (res.length > 12000) {
-              this.$refs.avatar.value = "";
-              this.$message({
-                type: "error",
-                message: "发送失败,图片过大",
-              });
-              return;
-            }
-            base64Img.then((res) => {
-              let b = res;
+          const params = {
+            avatar: base64String,
+            token: this.token,
+          }
+          const url = this.store.state.requestUrl +'/user/avatar'
 
-              this.$confirm("是否修改头像?", "提示", {
-                confirmButtonText: "确定",
-                cancelButtonText: "取消",
-                type: "warning",
-              })
-                .then(() => {
-                  axios({
-                    method: "POST",
-                    url: this.store.state.requestUrl + "/user/avatar",
-                    params: [res, this.token],
-                    headers: {
-                      "Content-Type": "application/x-www-form-urlencoded",
-                    },
-                  }).then((res) => {
-                    if (res.data.state == "success") {
-                      this.$refs.avatar.value = "";
-                      this.$message({
-                        type: "success",
-                        message: "发送成功",
-                      });
-                      const u = {
-                        token: this.token,
-                        base64: b,
-                      };
-
-                      this.store.commit("changeAvatar", u);
-                      this.avatarFileIsOpen = false;
-                      this.getUserInfo();
-                    } else {
-                      this.$refs.avatar.value = "";
-                      this.$message({
-                        type: "error",
-                        message: "发送失败",
-                      });
-                    }
-                  });
-                })
-                .catch(() => {
-                  this.$refs.avatar.value = "";
-                  this.$message({
-                    type: "info",
-                    message: "已取消",
-                  });
+            this.$confirm("是否修改头像?", "提示", {
+              confirmButtonText: "确定",
+              cancelButtonText: "取消",
+              type: "warning",
+            })
+              .then(() => {
+                axios.post(url, params).then((res) => {
+                  if (res.data.state == "success") {
+                    this.$refs.avatar.value = "";
+                    this.$message({
+                      type: "success",
+                      message: "发送成功",
+                    });
+                    const u = {
+                      token: this.token,
+                      base64: base64String,
+                    };
+                    this.store.commit("changeAvatar", u);
+                    this.avatarFileIsOpen = false;
+                    this.getUserInfo();
+                  } else {
+                    this.$refs.avatar.value = "";
+                    this.$message({
+                      type: "error",
+                      message: "发送失败",
+                    });
+                  }
                 });
-            });
-          });
+              })
+              .catch(() => {
+                this.$refs.avatar.value = "";
+                this.$message({
+                  type: "info",
+                  message: "已取消",
+                });
+              });
         };
       }
     },
@@ -1708,7 +1681,7 @@ export default {
     // 滑动最底端
     scrollToBottom: function () {
       this.$nextTick(() => {
-        if(this.$refs.scrollWin.scrollHeight)this.$refs.scrollWin.scrollTop = this.$refs.scrollWin.scrollHeight;
+        if (this.$refs.scrollWin.scrollHeight) this.$refs.scrollWin.scrollTop = this.$refs.scrollWin.scrollHeight;
       });
     },
 
@@ -2645,6 +2618,10 @@ body {
   top: -650%;
   left: 85%;
   z-index: 1000;
+}
+
+.maintalk-main-talkitem-image {
+  max-width: 400px;
 }
 </style>
 
